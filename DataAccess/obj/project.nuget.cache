@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "dgSpecHash": "DX5ACNEs364=",
+  "success": true,
+  "projectFilePath": "/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/DataAccess.csproj",
+  "expectedPackageFiles": [
+    "/Users/macbook/.nuget/packages/bcrypt.net-next/4.0.3/bcrypt.net-next.4.0.3.nupkg.sha512",
+    "/Users/macbook/.nuget/packages/microsoft.data.sqlite/8.0.14/microsoft.data.sqlite.8.0.14.nupkg.sha512",
+    "/Users/macbook/.nuget/packages/microsoft.data.sqlite.core/8.0.14/microsoft.data.sqlite.core.8.0.14.nupkg.sha512",
+    "/Users/macbook/.nuget/packages/sqlitepclraw.bundle_e_sqlite3/2.1.6/sqlitepclraw.bundle_e_sqlite3.2.1.6.nupkg.sha512",
+    "/Users/macbook/.nuget/packages/sqlitepclraw.core/2.1.6/sqlitepclraw.core.2.1.6.nupkg.sha512",
+    "/Users/macbook/.nuget/packages/sqlitepclraw.lib.e_sqlite3/2.1.6/sqlitepclraw.lib.e_sqlite3.2.1.6.nupkg.sha512",
+    "/Users/macbook/.nuget/packages/sqlitepclraw.provider.e_sqlite3/2.1.6/sqlitepclraw.provider.e_sqlite3.2.1.6.nupkg.sha512",
+    "/Users/macbook/.nuget/packages/system.memory/4.5.3/system.memory.4.5.3.nupkg.sha512"
+  ],
+  "logs": []
+}

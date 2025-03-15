@@ -1,0 +1,12 @@
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Domain/bin/Debug/net8.0/Domain.deps.json
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Domain/bin/Debug/net8.0/Domain.dll
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Domain/bin/Debug/net8.0/Domain.pdb
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Domain/obj/Debug/net8.0/Domain.csproj.AssemblyReference.cache
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Domain/obj/Debug/net8.0/Domain.GeneratedMSBuildEditorConfig.editorconfig
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Domain/obj/Debug/net8.0/Domain.AssemblyInfoInputs.cache
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Domain/obj/Debug/net8.0/Domain.AssemblyInfo.cs
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Domain/obj/Debug/net8.0/Domain.csproj.CoreCompileInputs.cache
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Domain/obj/Debug/net8.0/Domain.dll
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Domain/obj/Debug/net8.0/refint/Domain.dll
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Domain/obj/Debug/net8.0/Domain.pdb
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Domain/obj/Debug/net8.0/ref/Domain.dll

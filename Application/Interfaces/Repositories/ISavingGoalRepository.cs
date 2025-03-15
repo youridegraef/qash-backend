@@ -1,0 +1,16 @@
+using Application.Domain;
+
+namespace Application.Interfaces;
+
+public interface ISavingGoalRepository
+{
+    public List<SavingGoal> FindAll();
+
+    public SavingGoal? FindById(int id);
+
+    public bool Add(SavingGoal savingGoal);
+
+    public bool Edit(SavingGoal savingGoal);
+
+    public bool Delete(SavingGoal savingGoal);
+}

@@ -1,0 +1,12 @@
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Application/obj/Debug/net8.0/Application.csproj.AssemblyReference.cache
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Application/obj/Debug/net8.0/Application.GeneratedMSBuildEditorConfig.editorconfig
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Application/obj/Debug/net8.0/Application.AssemblyInfoInputs.cache
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Application/obj/Debug/net8.0/Application.AssemblyInfo.cs
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Application/obj/Debug/net8.0/Application.csproj.CoreCompileInputs.cache
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Application/bin/Debug/net8.0/Application.deps.json
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Application/bin/Debug/net8.0/Application.dll
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Application/bin/Debug/net8.0/Application.pdb
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Application/obj/Debug/net8.0/Application.dll
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Application/obj/Debug/net8.0/refint/Application.dll
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Application/obj/Debug/net8.0/Application.pdb
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Application/obj/Debug/net8.0/ref/Application.dll

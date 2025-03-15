@@ -1,0 +1,15 @@
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/bin/Debug/net8.0/DataAccess.deps.json
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/bin/Debug/net8.0/DataAccess.dll
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/bin/Debug/net8.0/DataAccess.pdb
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/bin/Debug/net8.0/Application.dll
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/bin/Debug/net8.0/Application.pdb
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/obj/Debug/net8.0/DataAccess.csproj.AssemblyReference.cache
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/obj/Debug/net8.0/DataAccess.GeneratedMSBuildEditorConfig.editorconfig
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/obj/Debug/net8.0/DataAccess.AssemblyInfoInputs.cache
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/obj/Debug/net8.0/DataAccess.AssemblyInfo.cs
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/obj/Debug/net8.0/DataAccess.csproj.CoreCompileInputs.cache
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/obj/Debug/net8.0/DataAccess.csproj.Up2Date
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/obj/Debug/net8.0/DataAccess.dll
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/obj/Debug/net8.0/refint/DataAccess.dll
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/obj/Debug/net8.0/DataAccess.pdb
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/obj/Debug/net8.0/ref/DataAccess.dll

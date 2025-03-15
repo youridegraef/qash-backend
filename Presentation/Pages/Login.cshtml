@@ -1,0 +1,25 @@
+@page
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model Presentation.Pages.Login
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <p class="text-danger">@Model.ErrorMessage</p>
+}
+
+@if (Model.LoggedInUser != null)
+{
+    <p>Ingelogd als: @Model.LoggedInUser.Name (ID: @Model.LoggedInUser.Id)</p>
+}
+
+<form method="post">
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="text" id="email" name="email" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="password">Wachtwoord:</label>
+        <input type="password" id="password" name="password" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Login</button>
+</form>
