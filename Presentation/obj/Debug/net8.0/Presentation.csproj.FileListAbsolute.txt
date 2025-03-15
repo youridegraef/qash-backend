@@ -59,3 +59,4 @@
 /Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Presentation/obj/Debug/net8.0/Presentation.pdb
 /Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Presentation/obj/Debug/net8.0/Presentation.genruntimeconfig.cache
 /Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Presentation/obj/Debug/net8.0/ref/Presentation.dll
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Presentation/obj/Debug/net8.0/Presentation.sourcelink.json

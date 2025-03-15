@@ -13,3 +13,4 @@
 /Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/obj/Debug/net8.0/refint/DataAccess.dll
 /Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/obj/Debug/net8.0/DataAccess.pdb
 /Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/obj/Debug/net8.0/ref/DataAccess.dll
+/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/obj/Debug/net8.0/DataAccess.sourcelink.json

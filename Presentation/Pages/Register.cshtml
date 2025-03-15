@@ -1,0 +1,39 @@
+@page
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model Presentation.Pages.Register
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <p class="text-danger">@Model.ErrorMessage</p>
+}
+
+@if (Model.CreatedUser != null)
+{
+    <p>Gebruiker aangemaakt:@Model.CreatedUser.Name (Email: @Model.CreatedUser.Email)</p>
+
+}
+
+<form method="post">
+    <div class="form-group">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" class="form-control" />
+    </div> 
+    
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" class="form-control" />
+    </div>
+    
+    <div class="form-group">
+        <label for="password">Wachtwoord:</label>
+        <input type="password" id="password" name="password" class="form-control" />
+    </div>
+    
+    <div class="form-group">
+        <label for="dateOfBirth">Wachtwoord:</label>
+        <input type="date" id="dateOfBirth" name="dateOfBirth" class="form-control" />
+    </div>
+    
+    
+    <button type="submit" class="btn btn-primary">Register</button>
+</form>
