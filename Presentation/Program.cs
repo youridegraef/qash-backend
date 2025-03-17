@@ -1,11 +1,12 @@
 using Application.Interfaces;
 using Application.Services;
+using Application.Services;
 using DataAccess;
 using DataAccess.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddScoped<DatabaseConnection>(provider => new DatabaseConnection("Data Source=database.db"));
+builder.Services.AddScoped<DatabaseConnection>(provider => new DatabaseConnection());
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 

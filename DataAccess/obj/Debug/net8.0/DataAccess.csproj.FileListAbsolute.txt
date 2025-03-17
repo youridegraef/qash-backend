@@ -14,3 +14,19 @@
 /Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/obj/Debug/net8.0/DataAccess.pdb
 /Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/obj/Debug/net8.0/ref/DataAccess.dll
 /Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/obj/Debug/net8.0/DataAccess.sourcelink.json
+/Volumes/PortableSSD/ExpenseTracker/DataAccess/bin/Debug/net8.0/DataAccess.deps.json
+/Volumes/PortableSSD/ExpenseTracker/DataAccess/bin/Debug/net8.0/DataAccess.dll
+/Volumes/PortableSSD/ExpenseTracker/DataAccess/bin/Debug/net8.0/DataAccess.pdb
+/Volumes/PortableSSD/ExpenseTracker/DataAccess/bin/Debug/net8.0/Application.dll
+/Volumes/PortableSSD/ExpenseTracker/DataAccess/bin/Debug/net8.0/Application.pdb
+/Volumes/PortableSSD/ExpenseTracker/DataAccess/obj/Debug/net8.0/DataAccess.csproj.AssemblyReference.cache
+/Volumes/PortableSSD/ExpenseTracker/DataAccess/obj/Debug/net8.0/DataAccess.GeneratedMSBuildEditorConfig.editorconfig
+/Volumes/PortableSSD/ExpenseTracker/DataAccess/obj/Debug/net8.0/DataAccess.AssemblyInfoInputs.cache
+/Volumes/PortableSSD/ExpenseTracker/DataAccess/obj/Debug/net8.0/DataAccess.AssemblyInfo.cs
+/Volumes/PortableSSD/ExpenseTracker/DataAccess/obj/Debug/net8.0/DataAccess.csproj.CoreCompileInputs.cache
+/Volumes/PortableSSD/ExpenseTracker/DataAccess/obj/Debug/net8.0/DataAccess.sourcelink.json
+/Volumes/PortableSSD/ExpenseTracker/DataAccess/obj/Debug/net8.0/DataAccess.csproj.Up2Date
+/Volumes/PortableSSD/ExpenseTracker/DataAccess/obj/Debug/net8.0/DataAccess.dll
+/Volumes/PortableSSD/ExpenseTracker/DataAccess/obj/Debug/net8.0/refint/DataAccess.dll
+/Volumes/PortableSSD/ExpenseTracker/DataAccess/obj/Debug/net8.0/DataAccess.pdb
+/Volumes/PortableSSD/ExpenseTracker/DataAccess/obj/Debug/net8.0/ref/DataAccess.dll

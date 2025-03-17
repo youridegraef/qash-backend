@@ -1,5 +1,6 @@
 using Application.Domain;
 
+// ReSharper disable once CheckNamespace
 namespace Application.Interfaces;
 
 public interface ITransactionRepository
@@ -15,4 +16,6 @@ public interface ITransactionRepository
     public bool Delete(Transaction transaction);
 
     public List<Tag> FindTransactionTags(int id);
+    public List<Transaction> FindTransactionsByCategory(int id);
+    
 }

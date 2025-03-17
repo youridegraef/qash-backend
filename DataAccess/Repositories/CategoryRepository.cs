@@ -1,6 +1,6 @@
 using Application.Domain;
 using Application.Interfaces;
-using Microsoft.Data.Sqlite;
+using MySql.Data.MySqlClient;
 
 namespace DataAccess.Repositories;
 
@@ -9,21 +9,21 @@ public class CategoryRepository(DatabaseConnection _dbConnection) : ICategoryRep
     public List<Category> FindAll()
     {
         List<Category> allCategories = new List<Category>();
-        using SqliteConnection connection = _dbConnection.GetConnection();
+        using MySqlConnection connection = _dbConnection.GetMySqlConnection();
         connection.Open();
 
         string sql = "SELECT * FROM category";
 
-        using SqliteCommand command = new SqliteCommand(sql, connection);
-        using SqliteDataReader reader = command.ExecuteReader();
+        using MySqlCommand command = new MySqlCommand(sql, connection);
+        using MySqlDataReader reader = command.ExecuteReader();
 
         while (reader.Read())
         {
             allCategories.Add(
                 new Category(
-                    (int)reader["id"],
-                    (string)reader["name"],
-                    (int)reader["user_id"]
+                    Convert.ToInt32(reader["id"]),
+                    reader["name"].ToString(),
+                    Convert.ToInt32(reader["user_id"])
                 )
             );
         }
@@ -33,22 +33,22 @@ public class CategoryRepository(DatabaseConnection _dbConnection) : ICategoryRep
 
     public Category? FindById(int id)
     {
-        using SqliteConnection connection = _dbConnection.GetConnection();
+        using MySqlConnection connection = _dbConnection.GetMySqlConnection();
         connection.Open();
 
         string sql = "SELECT * FROM category WHERE id = @id";
 
-        using SqliteCommand command = new SqliteCommand(sql, connection);
+        using MySqlCommand command = new MySqlCommand(sql, connection);
         command.Parameters.AddWithValue("@id", id);
 
-        using SqliteDataReader reader = command.ExecuteReader();
+        using MySqlDataReader reader = command.ExecuteReader();
 
         if (reader.Read())
         {
             return new Category(
-                (int)reader["id"],
-                (string)reader["name"],
-                (int)reader["user_id"]
+                Convert.ToInt32(reader["id"]),
+                reader["name"].ToString(),
+                Convert.ToInt32(reader["user_id"])
             );
         }
 
@@ -57,12 +57,12 @@ public class CategoryRepository(DatabaseConnection _dbConnection) : ICategoryRep
 
     public bool Add(Category category)
     {
-        using SqliteConnection connection = _dbConnection.GetConnection();
+        using MySqlConnection connection = _dbConnection.GetMySqlConnection();
         connection.Open();
 
         string sql = "INSERT INTO category (name, user_id) VALUES (@name, @user_id)";
 
-        using SqliteCommand command = new SqliteCommand(sql, connection);
+        using MySqlCommand command = new MySqlCommand(sql, connection);
         command.Parameters.AddWithValue("@name", category.Name);
         command.Parameters.AddWithValue("@user_id", category.UserId);
 
@@ -73,16 +73,16 @@ public class CategoryRepository(DatabaseConnection _dbConnection) : ICategoryRep
 
     public bool Edit(Category category)
     {
-        using SqliteConnection connection = _dbConnection.GetConnection();
+        using MySqlConnection connection = _dbConnection.GetMySqlConnection();
         connection.Open();
 
         string sql = "UPDATE category SET name = @name, user_id = @user_id WHERE id = @id";
 
-        using SqliteCommand command = new SqliteCommand(sql, connection);
+        using MySqlCommand command = new MySqlCommand(sql, connection);
         command.Parameters.AddWithValue("@id", category.Id);
         command.Parameters.AddWithValue("@name", category.Name);
         command.Parameters.AddWithValue("@user_id", category.UserId);
-        
+
         int rowsAffected = command.ExecuteNonQuery();
 
         return rowsAffected > 0;
@@ -90,15 +90,15 @@ public class CategoryRepository(DatabaseConnection _dbConnection) : ICategoryRep
 
     public bool Delete(Category category)
     {
-        using SqliteConnection connection = _dbConnection.GetConnection();
+        using MySqlConnection connection = _dbConnection.GetMySqlConnection();
         connection.Open();
 
         string sql = "DELETE FROM category WHERE id = @id";
-        
-        using SqliteCommand command = new SqliteCommand(sql, connection);
-        
+
+        using MySqlCommand command = new MySqlCommand(sql, connection);
+
         command.Parameters.AddWithValue("@id", category.Id);
-        
+
         int rowsAffected = command.ExecuteNonQuery();
 
         return rowsAffected > 0;

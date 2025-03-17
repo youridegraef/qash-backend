@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Czu22XgqLCI=",
+  "dgSpecHash": "nBHX/rRSRX8=",
   "success": true,
-  "projectFilePath": "/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Application/Application.csproj",
+  "projectFilePath": "/Volumes/PortableSSD/ExpenseTracker/Application/Application.csproj",
   "expectedPackageFiles": [
     "/Users/macbook/.nuget/packages/bcrypt.net-next/4.0.3/bcrypt.net-next.4.0.3.nupkg.sha512",
     "/Users/macbook/.nuget/packages/microsoft.data.sqlite/8.0.14/microsoft.data.sqlite.8.0.14.nupkg.sha512",

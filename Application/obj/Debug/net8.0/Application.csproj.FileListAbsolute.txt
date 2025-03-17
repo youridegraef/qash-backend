@@ -11,3 +11,16 @@
 /Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Application/obj/Debug/net8.0/Application.pdb
 /Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Application/obj/Debug/net8.0/ref/Application.dll
 /Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Application/obj/Debug/net8.0/Application.sourcelink.json
+/Volumes/PortableSSD/ExpenseTracker/Application/bin/Debug/net8.0/Application.deps.json
+/Volumes/PortableSSD/ExpenseTracker/Application/bin/Debug/net8.0/Application.dll
+/Volumes/PortableSSD/ExpenseTracker/Application/bin/Debug/net8.0/Application.pdb
+/Volumes/PortableSSD/ExpenseTracker/Application/obj/Debug/net8.0/Application.csproj.AssemblyReference.cache
+/Volumes/PortableSSD/ExpenseTracker/Application/obj/Debug/net8.0/Application.GeneratedMSBuildEditorConfig.editorconfig
+/Volumes/PortableSSD/ExpenseTracker/Application/obj/Debug/net8.0/Application.AssemblyInfoInputs.cache
+/Volumes/PortableSSD/ExpenseTracker/Application/obj/Debug/net8.0/Application.AssemblyInfo.cs
+/Volumes/PortableSSD/ExpenseTracker/Application/obj/Debug/net8.0/Application.csproj.CoreCompileInputs.cache
+/Volumes/PortableSSD/ExpenseTracker/Application/obj/Debug/net8.0/Application.sourcelink.json
+/Volumes/PortableSSD/ExpenseTracker/Application/obj/Debug/net8.0/Application.dll
+/Volumes/PortableSSD/ExpenseTracker/Application/obj/Debug/net8.0/refint/Application.dll
+/Volumes/PortableSSD/ExpenseTracker/Application/obj/Debug/net8.0/Application.pdb
+/Volumes/PortableSSD/ExpenseTracker/Application/obj/Debug/net8.0/ref/Application.dll

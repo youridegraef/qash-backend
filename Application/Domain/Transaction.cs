@@ -6,15 +6,17 @@ public class Transaction
     public double Amount { get; set; }
     public DateOnly Date { get; set; }
     public int UserId { get; set; }
+    public int CategoryId { get; set; }
 
     public List<Tag> Tags { get; set; } = new List<Tag>();
 
-    public Transaction(int id, double amount, DateOnly date, int userId)
+    public Transaction(int id, double amount, DateOnly date, int userId, int categoryId)
     {
         Id = id;
         Amount = amount;
         Date = date;
         UserId = userId;
+        CategoryId = categoryId;
     }
 
     public Transaction(int id, double amount, DateOnly date, List<Tag> tags, int userId)

@@ -1,19 +1,13 @@
-using Microsoft.Data.Sqlite;
-using System.IO;
+using MySql.Data.MySqlClient;
 
 namespace DataAccess;
 
 public class DatabaseConnection
 {
-    private readonly string _connectionString;
+    private readonly string _connectionString = "Server=localhost;Database=expense_tracker;Uid=root;Pwd=Rafensoes2019!;";
 
-    public DatabaseConnection(string connectionString)
+    public MySqlConnection GetMySqlConnection()
     {
-        _connectionString = connectionString;
-    }
-
-    public SqliteConnection GetConnection()
-    {
-        return new SqliteConnection(_connectionString);
+        return new MySqlConnection(_connectionString);
     }
 }

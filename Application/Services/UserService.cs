@@ -1,21 +1,14 @@
 using System.Net.Mail;
 using System.Text.RegularExpressions;
 using System.Security.Authentication;
-using Application.Interfaces;
 using Application.Domain;
 using Application.Exceptions;
+using Application.Interfaces;
 
 namespace Application.Services;
 
-public class UserService : IUserService
+public class UserService(IUserRepository _userRepository) : IUserService
 {
-    private readonly IUserRepository _userRepository;
-
-    public UserService(IUserRepository userRepository)
-    {
-        _userRepository = userRepository;
-    }
-
     public User RegisterUser(string name, string email, string password, DateOnly dateOfBirth)
     {
         string hashedPassword = PasswordHasher.HashPassword(password);

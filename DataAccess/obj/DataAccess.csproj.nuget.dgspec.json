@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/DataAccess.csproj": {}
+    "/Volumes/PortableSSD/ExpenseTracker/DataAccess/DataAccess.csproj": {}
   },
   "projects": {
-    "/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Application/Application.csproj": {
+    "/Volumes/PortableSSD/ExpenseTracker/Application/Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Application/Application.csproj",
+        "projectUniqueName": "/Volumes/PortableSSD/ExpenseTracker/Application/Application.csproj",
         "projectName": "Application",
-        "projectPath": "/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Application/Application.csproj",
+        "projectPath": "/Volumes/PortableSSD/ExpenseTracker/Application/Application.csproj",
         "packagesPath": "/Users/macbook/.nuget/packages/",
-        "outputPath": "/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Application/obj/",
+        "outputPath": "/Volumes/PortableSSD/ExpenseTracker/Application/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/macbook/.nuget/NuGet/NuGet.Config"
@@ -20,6 +20,7 @@
           "net8.0"
         ],
         "sources": {
+          "/usr/local/share/dotnet/library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -76,14 +77,14 @@
         }
       }
     },
-    "/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/DataAccess.csproj": {
+    "/Volumes/PortableSSD/ExpenseTracker/DataAccess/DataAccess.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/DataAccess.csproj",
+        "projectUniqueName": "/Volumes/PortableSSD/ExpenseTracker/DataAccess/DataAccess.csproj",
         "projectName": "DataAccess",
-        "projectPath": "/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/DataAccess.csproj",
+        "projectPath": "/Volumes/PortableSSD/ExpenseTracker/DataAccess/DataAccess.csproj",
         "packagesPath": "/Users/macbook/.nuget/packages/",
-        "outputPath": "/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/DataAccess/obj/",
+        "outputPath": "/Volumes/PortableSSD/ExpenseTracker/DataAccess/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/macbook/.nuget/NuGet/NuGet.Config"
@@ -92,14 +93,15 @@
           "net8.0"
         ],
         "sources": {
+          "/usr/local/share/dotnet/library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Application/Application.csproj": {
-                "projectPath": "/Users/macbook/Desktop/S2 Code/Indiv Project/ExpenseTracker/Application/Application.csproj"
+              "/Volumes/PortableSSD/ExpenseTracker/Application/Application.csproj": {
+                "projectPath": "/Volumes/PortableSSD/ExpenseTracker/Application/Application.csproj"
               }
             }
           }
@@ -130,6 +132,10 @@
             "Microsoft.Data.Sqlite.Core": {
               "target": "Package",
               "version": "[8.0.14, )"
+            },
+            "MySql.Data": {
+              "target": "Package",
+              "version": "[9.2.0, )"
             }
           },
           "imports": [

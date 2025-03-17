@@ -1,6 +1,6 @@
 using Application.Domain;
 using Application.Interfaces;
-using Microsoft.Data.Sqlite;
+using MySql.Data.MySqlClient;
 
 namespace DataAccess.Repositories;
 
@@ -9,22 +9,22 @@ public class TagRepository(DatabaseConnection _dbConnection) : ITagRepository
     public List<Tag> FindAll()
     {
         List<Tag> allTags = new List<Tag>();
-        using SqliteConnection connection = _dbConnection.GetConnection();
+        using MySqlConnection connection = _dbConnection.GetMySqlConnection();
         connection.Open();
 
         string sql = "SELECT * FROM tag";
 
-        using SqliteCommand command = new SqliteCommand(sql, connection);
-        using SqliteDataReader reader = command.ExecuteReader();
+        using MySqlCommand command = new MySqlCommand(sql, connection);
+        using MySqlDataReader reader = command.ExecuteReader();
 
         while (reader.Read())
         {
             allTags.Add(
                 new Tag(
-                    (int)reader["id"],
-                    (string)reader["name"],
-                    (string)reader["color_hex_code"],
-                    (int)reader["user_id"]
+                    Convert.ToInt32(reader["id"]),
+                    reader["name"].ToString(),
+                    reader["color_hex_code"].ToString(),
+                    Convert.ToInt32(reader["user_id"])
                 )
             );
         }
@@ -34,23 +34,23 @@ public class TagRepository(DatabaseConnection _dbConnection) : ITagRepository
 
     public Tag? FindById(int id)
     {
-        using SqliteConnection connection = _dbConnection.GetConnection();
+        using MySqlConnection connection = _dbConnection.GetMySqlConnection();
         connection.Open();
 
         string sql = "SELECT * FROM tag WHERE id = @id";
 
-        using SqliteCommand command = new SqliteCommand(sql, connection);
+        using MySqlCommand command = new MySqlCommand(sql, connection);
         command.Parameters.AddWithValue("@id", id);
 
-        using SqliteDataReader reader = command.ExecuteReader();
+        using MySqlDataReader reader = command.ExecuteReader();
 
         if (reader.Read())
         {
             return new Tag(
-                (int)reader["id"],
-                (string)reader["name"],
-                (string)reader["color_hex_code"],
-                (int)reader["user_id"]
+                Convert.ToInt32(reader["id"]),
+                reader["name"].ToString(),
+                reader["color_hex_code"].ToString(),
+                Convert.ToInt32(reader["user_id"])
             );
         }
 
@@ -59,13 +59,13 @@ public class TagRepository(DatabaseConnection _dbConnection) : ITagRepository
 
     public bool Add(Tag tag)
     {
-        using SqliteConnection connection = _dbConnection.GetConnection();
+        using MySqlConnection connection = _dbConnection.GetMySqlConnection();
         connection.Open();
 
         string sql = "INSERT INTO tag (name, color_hex_code, user_id) VALUES (@name, @color_hex_code, @user_id)";
 
-        using SqliteCommand command = new SqliteCommand(sql, connection);
-        
+        using MySqlCommand command = new MySqlCommand(sql, connection);
+
         command.Parameters.AddWithValue("@name", tag.Name);
         command.Parameters.AddWithValue("@color_hex_code", tag.ColorHexCode);
         command.Parameters.AddWithValue("@user_id", tag.UserId);
@@ -77,12 +77,12 @@ public class TagRepository(DatabaseConnection _dbConnection) : ITagRepository
 
     public bool Edit(Tag tag)
     {
-        using SqliteConnection connection = _dbConnection.GetConnection();
+        using MySqlConnection connection = _dbConnection.GetMySqlConnection();
         connection.Open();
 
-        string sql = "UPDATE tag SET name = @name, color_hex_code = @color_hex_code, user_id = @user_id WHERE id= @id";
+        string sql = "UPDATE tag SET name = @name, color_hex_code = @color_hex_code, user_id = @user_id WHERE id = @id";
 
-        SqliteCommand command = new SqliteCommand(sql, connection);
+        using MySqlCommand command = new MySqlCommand(sql, connection);
 
         command.Parameters.AddWithValue("@id", tag.Id);
         command.Parameters.AddWithValue("@name", tag.Name);
@@ -96,12 +96,12 @@ public class TagRepository(DatabaseConnection _dbConnection) : ITagRepository
 
     public bool Delete(Tag tag)
     {
-        using SqliteConnection connection = _dbConnection.GetConnection();
+        using MySqlConnection connection = _dbConnection.GetMySqlConnection();
         connection.Open();
 
         string sql = "DELETE FROM tag WHERE id = @id";
 
-        SqliteCommand command = new SqliteCommand(sql, connection);
+        using MySqlCommand command = new MySqlCommand(sql, connection);
 
         command.Parameters.AddWithValue("@id", tag.Id);
 
@@ -109,6 +109,4 @@ public class TagRepository(DatabaseConnection _dbConnection) : ITagRepository
 
         return rowsAffected > 0;
     }
-    
-    //TODO: Add TagTransactions method
 }
