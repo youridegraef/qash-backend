@@ -5,12 +5,13 @@ namespace Application.Interfaces;
 
 public interface ITransactionService
 {
-    public Transaction AddTransaction(double amount, DateOnly date, int categoryId);
-    public Transaction GetTransactionById(int transactionId);
-    public List<Transaction> GetAllTransactions(int userId);
-    public List<Transaction> GetTransactionsByPeriod(DateOnly start, DateOnly end);
-    public List<Transaction> GetTransactionsByCategory(int categoryId);
-    public List<Transaction> GetTransactionsByTag(int tagId);
-    public void UpdateTransaction(Transaction transaction);
-    public void DeleteTransaction(Transaction transaction);
+    public Transaction GetById(int id);
+    public List<Transaction> GetAll();
+    public List<Transaction> GetAllByUserId(int userId);
+    public List<Transaction> GetByPeriod(DateOnly start, DateOnly end);
+    public List<Transaction> GetByCategory(int id);
+    public List<Transaction> GetByTag(int tagId);
+    public Transaction Add(double amount, DateOnly date, int categoryId);
+    public bool Edit(Transaction transaction);
+    public void Delete(int id);
 }

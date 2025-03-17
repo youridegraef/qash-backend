@@ -28,7 +28,7 @@ public class Login : PageModel
     {
         try
         {
-            LoggedInUser = _userService.AuthenticateUser(email, password);
+            LoggedInUser = _userService.Authenticate(email, password);
             if (LoggedInUser != null)
             {
                 return Page();

@@ -9,7 +9,7 @@ namespace Application.Services;
 
 public class UserService(IUserRepository _userRepository) : IUserService
 {
-    public User RegisterUser(string name, string email, string password, DateOnly dateOfBirth)
+    public User Register(string name, string email, string password, DateOnly dateOfBirth)
     {
         string hashedPassword = PasswordHasher.HashPassword(password);
 
@@ -27,9 +27,9 @@ public class UserService(IUserRepository _userRepository) : IUserService
         }
     }
 
-    public User AuthenticateUser(string email, string password)
+    public User Authenticate(string email, string password)
     {
-        User? user = GetUserByEmail(email);
+        User? user = GetByEmail(email);
 
         if (user == null)
         {
@@ -44,7 +44,7 @@ public class UserService(IUserRepository _userRepository) : IUserService
         throw new AuthenticationException("Invalid email or password");
     }
 
-    public User GetUserById(int userId)
+    public User GetById(int userId)
     {
         User? user = _userRepository.FindById(userId);
 
@@ -56,7 +56,7 @@ public class UserService(IUserRepository _userRepository) : IUserService
         throw new UserNotFoundException("User not found");
     }
 
-    public User GetUserByEmail(string email)
+    public User GetByEmail(string email)
     {
         User? user = _userRepository.FindByEmail(email);
 
@@ -68,13 +68,21 @@ public class UserService(IUserRepository _userRepository) : IUserService
         throw new UserNotFoundException("User not found");
     }
 
-    public void UpdateUser(User user)
+    public void Update(User user)
     {
         _userRepository.Edit(user);
     }
 
-    public void DeleteUser(User user)
+    public void Delete(int id)
     {
-        _userRepository.Delete(user);
+        try
+        {
+            User user = _userRepository.FindById(id);
+            _userRepository.Delete(user);
+        }
+        catch
+        {
+            throw new UserNotFoundException($"User with id: {id} not found.");
+        }
     }
 }

@@ -26,11 +26,7 @@ public class Register : PageModel
     {
         try
         {
-            CreatedUser = _userService.RegisterUser(name, email, password, dateOfBirth);
-            if (CreatedUser != null)
-            {
-                return Page();
-            }
+            CreatedUser = _userService.Register(name, email, password, dateOfBirth);
         }
         catch (InvalidDataException ex)
         {

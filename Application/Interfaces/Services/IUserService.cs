@@ -5,10 +5,10 @@ namespace Application.Interfaces;
 
 public interface IUserService
 {
-    User RegisterUser(string name, string email, string password, DateOnly dateOfBirth);
-    User AuthenticateUser(string email, string password);
-    User GetUserById(int userId);
-    User GetUserByEmail(string email);
-    void UpdateUser(User user);
-    void DeleteUser(User user);
+    User Register(string name, string email, string password, DateOnly dateOfBirth);
+    User Authenticate(string email, string password);
+    User GetById(int userId);
+    User GetByEmail(string email);
+    void Update(User user);
+    void Delete(int id);
 }

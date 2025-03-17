@@ -9,14 +9,14 @@ namespace ConsolePresentation;
 
 class Program
 {
-    private static readonly UserRepository userRepository = new UserRepository();
+    private static readonly IUserRepository userRepository = new UserRepository();
     private static readonly IUserService userService = new UserService(userRepository);
 
     static void Main(string[] args)
     {
         try
         {
-            User authenticatdeUser1 = userService.AuthenticateUser("youridegraef@icloud.com", "wachtwoord");
+            User authenticatdeUser1 = userService.Authenticate("youridegraef@icloud.com", "wachtwoord");
             Console.WriteLine(authenticatdeUser1.Name);
         }
         catch
@@ -26,7 +26,7 @@ class Program
         
         try
         {
-            User authenticatdeUser2 = userService.AuthenticateUser("youridegraef@icloud.com", "wachtwoord2");
+            User authenticatdeUser2 = userService.Authenticate("youridegraef@icloud.com", "wachtwoord2");
             Console.WriteLine(authenticatdeUser2.Name);
         }
         catch
