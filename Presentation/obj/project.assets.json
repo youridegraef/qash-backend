@@ -2014,11 +2014,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Volumes/PortableSSD/ExpenseTracker/Presentation/Presentation.csproj",
+      "projectUniqueName": "/Volumes/PortableSSD/SchoolProjects/ExpenseTracker/Presentation/Presentation.csproj",
       "projectName": "Presentation",
-      "projectPath": "/Volumes/PortableSSD/ExpenseTracker/Presentation/Presentation.csproj",
+      "projectPath": "/Volumes/PortableSSD/SchoolProjects/ExpenseTracker/Presentation/Presentation.csproj",
       "packagesPath": "/Users/macbook/.nuget/packages/",
-      "outputPath": "/Volumes/PortableSSD/ExpenseTracker/Presentation/obj/",
+      "outputPath": "/Volumes/PortableSSD/SchoolProjects/ExpenseTracker/Presentation/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/macbook/.nuget/NuGet/NuGet.Config"
@@ -2034,8 +2034,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "/Volumes/PortableSSD/ExpenseTracker/DataAccess/DataAccess.csproj": {
-              "projectPath": "/Volumes/PortableSSD/ExpenseTracker/DataAccess/DataAccess.csproj"
+            "/Volumes/PortableSSD/SchoolProjects/ExpenseTracker/DataAccess/DataAccess.csproj": {
+              "projectPath": "/Volumes/PortableSSD/SchoolProjects/ExpenseTracker/DataAccess/DataAccess.csproj"
             }
           }
         }

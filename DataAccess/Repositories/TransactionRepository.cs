@@ -4,8 +4,10 @@ using MySql.Data.MySqlClient;
 
 namespace DataAccess.Repositories;
 
-public class TransactionRepository(DatabaseConnection _dbConnection) : ITransactionRepository
+public class TransactionRepository : ITransactionRepository
 {
+    private readonly DatabaseConnection _dbConnection = new DatabaseConnection();
+
     public List<Transaction> FindAll()
     {
         List<Transaction> allTransactions = new List<Transaction>();
@@ -59,12 +61,13 @@ public class TransactionRepository(DatabaseConnection _dbConnection) : ITransact
         return null;
     }
 
-    public bool Add(Transaction transaction)
+    public int Add(Transaction transaction)
     {
         using MySqlConnection connection = _dbConnection.GetMySqlConnection();
         connection.Open();
 
-        string sql = "INSERT INTO transactions (amount, date, user_id, category_id) VALUES (@amount, @date, @user_id, @category_id)";
+        string sql =
+            "INSERT INTO transactions (amount, date, user_id, category_id) VALUES (@amount, @date, @user_id, @category_id)";
 
         using MySqlCommand command = new MySqlCommand(sql, connection);
 
@@ -75,7 +78,15 @@ public class TransactionRepository(DatabaseConnection _dbConnection) : ITransact
 
         int rowsAffected = command.ExecuteNonQuery();
 
-        return rowsAffected > 0;
+        if (rowsAffected > 0)
+        {
+            string selectIdSql = "SELECT LAST_INSERT_ID()";
+            using MySqlCommand selectIdCommand = new MySqlCommand(selectIdSql, connection);
+            int newId = Convert.ToInt32(selectIdCommand.ExecuteScalar());
+            return newId;
+        }
+
+        return 0; // Of gooi een exception, afhankelijk van je foutafhandeling.
     }
 
     public bool Edit(Transaction transaction)
@@ -141,33 +152,35 @@ public class TransactionRepository(DatabaseConnection _dbConnection) : ITransact
         return transactionTags;
     }
 
-    public List<Transaction> FindTransactionsByCategory(int id)
+    public bool AssignTagToTransaction(int transactionId, int tagId)
     {
-        List<Transaction> transactions = new List<Transaction>();
-
         using MySqlConnection connection = _dbConnection.GetMySqlConnection();
         connection.Open();
 
-        string sql = "SELECT * FROM transactions WHERE category_id = @id";
+        string sql = "INSERT INTO transaction_tag (transaction_id, tag_id) VALUES (@transactionId, @tagId)";
 
         using MySqlCommand command = new MySqlCommand(sql, connection);
-        command.Parameters.AddWithValue("@id", id);
+        command.Parameters.AddWithValue("@transactionId", transactionId);
+        command.Parameters.AddWithValue("@tagId", tagId);
 
-        using MySqlDataReader reader = command.ExecuteReader();
+        int rowsAffected = command.ExecuteNonQuery();
 
-        while (reader.Read())
-        {
-            transactions.Add(
-                new Transaction(
-                    Convert.ToInt32(reader["id"]),
-                    Convert.ToDouble(reader["amount"]),
-                    DateOnly.FromDateTime(Convert.ToDateTime(reader["date"])),
-                    Convert.ToInt32(reader["user_id"]),
-                    Convert.ToInt32(reader["category_id"])
-                )
-            );
-        }
+        return rowsAffected > 0;
+    }
 
-        return transactions;
+    public bool DeleteTagFromTransaction(int transactionId, int tagId)
+    {
+        using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+        connection.Open();
+
+        string sql = "DELETE FROM transaction_tag WHERE transaction_id = @transactionId AND tag_id = @tagId";
+
+        using MySqlCommand command = new MySqlCommand(sql, connection);
+        command.Parameters.AddWithValue("@transactionId", transactionId);
+        command.Parameters.AddWithValue("@tagId", tagId);
+
+        int rowsAffected = command.ExecuteNonQuery();
+
+        return rowsAffected > 0;
     }
 }

@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Presentation", "Presentatio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsolePresentation", "ConsolePresentation\ConsolePresentation.csproj", "{FA4C6ABD-1E16-4CB7-81C6-AD6EF234759D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PresentationAPI", "PresentationAPI\PresentationAPI.csproj", "{CD80D0F0-262D-47F7-BC2C-B2BDFADA9954}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{FA4C6ABD-1E16-4CB7-81C6-AD6EF234759D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA4C6ABD-1E16-4CB7-81C6-AD6EF234759D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA4C6ABD-1E16-4CB7-81C6-AD6EF234759D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD80D0F0-262D-47F7-BC2C-B2BDFADA9954}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD80D0F0-262D-47F7-BC2C-B2BDFADA9954}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD80D0F0-262D-47F7-BC2C-B2BDFADA9954}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD80D0F0-262D-47F7-BC2C-B2BDFADA9954}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

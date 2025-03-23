@@ -9,29 +9,16 @@ namespace ConsolePresentation;
 
 class Program
 {
-    private static readonly IUserRepository userRepository = new UserRepository();
-    private static readonly IUserService userService = new UserService(userRepository);
+    private static readonly IUserRepository _userRepository = new UserRepository();
+    private static readonly IUserService _userService = new UserService(_userRepository);
+
+    private static readonly ITransactionRepository _transactionRepository = new TransactionRepository();
+    private static readonly ITransactionService _transactionService = new TransactionService(_transactionRepository);
 
     static void Main(string[] args)
     {
-        try
-        {
-            User authenticatdeUser1 = userService.Authenticate("youridegraef@icloud.com", "wachtwoord");
-            Console.WriteLine(authenticatdeUser1.Name);
-        }
-        catch
-        {
-            throw new Exception("Invalid Credentials");
-        }
-        
-        try
-        {
-            User authenticatdeUser2 = userService.Authenticate("youridegraef@icloud.com", "wachtwoord2");
-            Console.WriteLine(authenticatdeUser2.Name);
-        }
-        catch
-        {
-            throw new Exception("Invalid Credentials");
-        }
+        Transaction transaction = _transactionService.Add(30.0, new DateOnly(2025, 3, 19), 1, 1);
+        Console.WriteLine(transaction.Amount.ToString());
+        Console.WriteLine(transaction.Date.ToString());
     }
 }

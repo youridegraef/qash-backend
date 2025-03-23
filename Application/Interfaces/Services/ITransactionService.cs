@@ -8,10 +8,9 @@ public interface ITransactionService
     public Transaction GetById(int id);
     public List<Transaction> GetAll();
     public List<Transaction> GetAllByUserId(int userId);
-    public List<Transaction> GetByPeriod(DateOnly start, DateOnly end);
-    public List<Transaction> GetByCategory(int id);
-    public List<Transaction> GetByTag(int tagId);
-    public Transaction Add(double amount, DateOnly date, int categoryId);
+    public Transaction Add(double amount, DateOnly date, int userId, int categoryId);
     public bool Edit(Transaction transaction);
-    public void Delete(int id);
+    public bool Delete(int id);
+    public bool AssignTag(int transactionId, int tagId);
+    public bool UnAssignTag(int transactionId, int tagId);
 }

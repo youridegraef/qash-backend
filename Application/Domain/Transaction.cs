@@ -2,7 +2,7 @@ namespace Application.Domain;
 
 public class Transaction
 {
-    public int Id { get; private set; }
+    public int Id { get; set; }
     public double Amount { get; set; }
     public DateOnly Date { get; set; }
     public int UserId { get; set; }
@@ -10,6 +10,24 @@ public class Transaction
 
     public List<Tag> Tags { get; set; } = new List<Tag>();
 
+    public Transaction(int id, double amount, DateOnly date, int userId, List<Tag> tags, int categoryId)
+    {
+        Id = id;
+        Amount = amount;
+        Date = date;
+        UserId = userId;
+        Tags = tags;
+        CategoryId = categoryId;
+    }
+
+    public Transaction(double amount, DateOnly date, int userId, int categoryId)
+    {
+        Amount = amount;
+        Date = date;
+        UserId = userId;
+        CategoryId = categoryId;
+    }    
+    
     public Transaction(int id, double amount, DateOnly date, int userId, int categoryId)
     {
         Id = id;

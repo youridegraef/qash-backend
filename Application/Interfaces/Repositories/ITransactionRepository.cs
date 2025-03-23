@@ -9,13 +9,12 @@ public interface ITransactionRepository
 
     public Transaction? FindById(int id);
 
-    public bool Add(Transaction transaction);
+    public int Add(Transaction transaction);
 
     public bool Edit(Transaction transaction);
 
     public bool Delete(Transaction transaction);
+    public bool AssignTagToTransaction(int transactionId, int tagId);
+    public bool DeleteTagFromTransaction(int transactionId, int tagId);
 
-    public List<Tag> FindTransactionTags(int id);
-    public List<Transaction> FindTransactionsByCategory(int id);
-    
 }

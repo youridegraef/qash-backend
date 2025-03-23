@@ -9,7 +9,7 @@ public interface ISavingGoalRepository
 
     public SavingGoal? FindById(int id);
 
-    public bool Add(SavingGoal savingGoal);
+    public int Add(SavingGoal savingGoal);
 
     public bool Edit(SavingGoal savingGoal);
 

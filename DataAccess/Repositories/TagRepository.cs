@@ -57,7 +57,7 @@ public class TagRepository(DatabaseConnection _dbConnection) : ITagRepository
         return null;
     }
 
-    public bool Add(Tag tag)
+    public int Add(Tag tag)
     {
         using MySqlConnection connection = _dbConnection.GetMySqlConnection();
         connection.Open();
@@ -72,7 +72,15 @@ public class TagRepository(DatabaseConnection _dbConnection) : ITagRepository
 
         int rowsAffected = command.ExecuteNonQuery();
 
-        return rowsAffected > 0;
+        if (rowsAffected > 0)
+        {
+            string selectIdSql = "SELECT LAST_INSERT_ID()";
+            using MySqlCommand selectIdCommand = new MySqlCommand(selectIdSql, connection);
+            int newId = Convert.ToInt32(selectIdCommand.ExecuteScalar());
+            return newId;
+        }
+
+        return 0;
     }
 
     public bool Edit(Tag tag)

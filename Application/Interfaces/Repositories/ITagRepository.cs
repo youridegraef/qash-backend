@@ -9,7 +9,7 @@ public interface ITagRepository
 
     public Tag? FindById(int id);
 
-    public bool Add(Tag tag);
+    public int Add(Tag tag);
 
     public bool Edit(Tag tag);
 

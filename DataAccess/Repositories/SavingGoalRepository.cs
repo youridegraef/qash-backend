@@ -58,7 +58,7 @@ public class SavingGoalRepository(DatabaseConnection _dbConnection) : ISavingGoa
         return null;
     }
 
-    public bool Add(SavingGoal savingGoal)
+    public int Add(SavingGoal savingGoal)
     {
         using MySqlConnection connection = _dbConnection.GetMySqlConnection();
         connection.Open();
@@ -74,7 +74,15 @@ public class SavingGoalRepository(DatabaseConnection _dbConnection) : ISavingGoa
 
         int rowsAffected = command.ExecuteNonQuery();
 
-        return rowsAffected > 0;
+        if (rowsAffected > 0)
+        {
+            string selectIdSql = "SELECT LAST_INSERT_ID()";
+            using MySqlCommand selectIdCommand = new MySqlCommand(selectIdSql, connection);
+            int newId = Convert.ToInt32(selectIdCommand.ExecuteScalar());
+            return newId;
+        }
+
+        return 0;
     }
 
     public bool Edit(SavingGoal savingGoal)

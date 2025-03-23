@@ -9,6 +9,6 @@ public interface IUserService
     User Authenticate(string email, string password);
     User GetById(int userId);
     User GetByEmail(string email);
-    void Update(User user);
-    void Delete(int id);
+    bool Update(User user);
+    bool Delete(int id);
 }
