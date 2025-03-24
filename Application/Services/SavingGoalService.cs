@@ -156,11 +156,26 @@ public class SavingGoalService : ISavingGoalService
 
     public bool Edit(SavingGoal savingGoal)
     {
-        throw new NotImplementedException();
+        try
+        {
+            return _savingGoalRepository.Edit(savingGoal);
+        }
+        catch
+        {
+            throw new Exception("Invalid saving goal");
+        }
     }
 
-    public void Delete(int id)
+    public bool Delete(int id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var savingGoal = _savingGoalRepository.FindById(id);
+            return _savingGoalRepository.Delete(savingGoal);
+        }
+        catch
+        {
+            throw new Exception("Saving goal not deleted.");
+        }
     }
 }

@@ -15,5 +15,5 @@ public interface ISavingGoalService
     public List<SavingGoal> GetByDeadlineRange(DateOnly startDate, DateOnly endDate);
     public SavingGoal Add(string name, double target, DateOnly deadline, int userId);
     public bool Edit(SavingGoal savingGoal);
-    public void Delete(int id);
+    public bool Delete(int id);
 }
