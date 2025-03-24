@@ -22,3 +22,9 @@ class Program
         Console.WriteLine(transaction.Date.ToString());
     }
 }
+
+//TODO: TEST USERSERVICE
+//TODO: TEST TRANSACTIONSERVICE
+//TODO: TEST TAGSERVICE
+//TODO: TEST SAVINGGOALSERVICE
+//TODO: TEST BUDGETSERVICE

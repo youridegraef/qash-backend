@@ -15,7 +15,7 @@ public class UserService : IUserService
         _userRepository = userRepository;
     }
 
-    //TODO: TEST ALL METHODS
+
     
     public User Register(string name, string email, string password, DateOnly dateOfBirth)
     {

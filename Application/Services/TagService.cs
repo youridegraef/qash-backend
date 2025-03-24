@@ -13,7 +13,6 @@ public class TagService : ITagService
         _tagRepository = tagRepository;
     }
 
-    //TODO: TEST ALL METHODS
 
     public List<Tag> GetAll()
     {

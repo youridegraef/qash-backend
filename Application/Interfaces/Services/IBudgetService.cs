@@ -7,10 +7,8 @@ public interface IBudgetService
 {
     public List<Budget> GetAll();
     public Budget GetById(int id);
-    public List<Budget> GetByUserId(int userId);
-    public List<Budget> GetByName(string name);
-    public List<Budget> GetBYNameAndUserId(int userId, string name);
+    public List<Budget> GetByCategoryId(int categoryId);
     public Budget Add(DateOnly startDate, DateOnly endDate, double target, int categoryId);
-    public Budget Edit(Budget budget);
-    public Budget Delete(int id);
+    public bool Edit(Budget budget);
+    public bool Delete(int id);
 }

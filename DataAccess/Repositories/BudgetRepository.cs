@@ -59,7 +59,7 @@ public class BudgetRepository(DatabaseConnection _dbConnection) : IBudgetReposit
         return null;
     }
 
-    public bool Add(Budget budget)
+    public int Add(Budget budget)
     {
         using MySqlConnection connection = _dbConnection.GetMySqlConnection();
         connection.Open();
@@ -69,12 +69,20 @@ public class BudgetRepository(DatabaseConnection _dbConnection) : IBudgetReposit
         using MySqlCommand command = new MySqlCommand(sql, connection);
         command.Parameters.AddWithValue("@start_date", budget.StartDate.ToDateTime(TimeOnly.MinValue));
         command.Parameters.AddWithValue("@end_date", budget.EndDate.ToDateTime(TimeOnly.MinValue));
-        command.Parameters.AddWithValue("@budget", budget.BudgetAmount);
+        command.Parameters.AddWithValue("@budget", budget.Target);
         command.Parameters.AddWithValue("@category_id", budget.CategoryId);
 
         int rowsAffected = command.ExecuteNonQuery();
 
-        return rowsAffected > 0;
+        if (rowsAffected > 0)
+        {
+            string selectIdSql = "SELECT LAST_INSERT_ID()";
+            using MySqlCommand selectIdCommand = new MySqlCommand(selectIdSql, connection);
+            int newId = Convert.ToInt32(selectIdCommand.ExecuteScalar());
+            return newId;
+        }
+
+        return 0;
     }
 
     public bool Edit(Budget budget)
@@ -89,7 +97,7 @@ public class BudgetRepository(DatabaseConnection _dbConnection) : IBudgetReposit
         command.Parameters.AddWithValue("@id", budget.Id);
         command.Parameters.AddWithValue("@start_date", budget.StartDate.ToDateTime(TimeOnly.MinValue));
         command.Parameters.AddWithValue("@end_date", budget.EndDate.ToDateTime(TimeOnly.MinValue));
-        command.Parameters.AddWithValue("@budget", budget.BudgetAmount);
+        command.Parameters.AddWithValue("@budget", budget.Target);
         command.Parameters.AddWithValue("@category_id", budget.CategoryId);
 
         int rowsAffected = command.ExecuteNonQuery();

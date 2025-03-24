@@ -13,7 +13,7 @@ public class TransactionService : ITransactionService
         _transactionRepository = transactionRepository;
     }
     
-    //TODO: TEST ALL METHODS
+
 
     public Transaction GetById(int id)
     {
@@ -89,7 +89,20 @@ public class TransactionService : ITransactionService
 
     public List<Transaction> GetByTag(int tagId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            List<Transaction> allTransactions = _transactionRepository.FindAll();
+
+            var filteredTransactions = allTransactions
+                .Where(t => t.Tags != null && t.Tags.Any(tag => tag.Id == tagId))
+                .ToList();
+
+            return filteredTransactions;
+        }
+        catch
+        {
+            throw new Exception($"No transactions under tag with id: {tagId} found.");
+        }
     }
 
     public Transaction Add(double amount, DateOnly date, int userId, int categoryId)

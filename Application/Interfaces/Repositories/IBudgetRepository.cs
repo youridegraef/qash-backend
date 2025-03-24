@@ -9,7 +9,7 @@ public interface IBudgetRepository
 
     public Budget? FindById(int id);
 
-    public bool Add(Budget budget);
+    public int Add(Budget budget);
 
     public bool Edit(Budget budget);
 
