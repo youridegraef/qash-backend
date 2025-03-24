@@ -7,7 +7,7 @@ public interface ITransactionService
 {
     public Transaction GetById(int id);
     public List<Transaction> GetAll();
-    public List<Transaction> GetAllByUserId(int userId);
+    public List<Transaction> GetByUserId(int userId);
     public Transaction Add(double amount, DateOnly date, int userId, int categoryId);
     public bool Edit(Transaction transaction);
     public bool Delete(int id);

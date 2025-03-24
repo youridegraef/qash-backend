@@ -39,7 +39,7 @@ public class TransactionService : ITransactionService
         }
     }
 
-    public List<Transaction> GetAllByUserId(int userId)
+    public List<Transaction> GetByUserId(int userId)
     {
         try
         {
