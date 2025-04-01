@@ -1,0 +1,49 @@
+@model Presentation.Models.RegisterModel;
+
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+
+<main class="flex flex-col h-screen w-full justify-center items-center">
+    <div class="bg-white p-8 rounded-xl shadow-md w-full max-w-sm">
+        <h2 class="text-2xl font-semibold mb-6 text-center text-blue-500">Register</h2>
+
+        <form asp-action="Register" asp-controller="Account" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="mb-4">
+                <label asp-for="email" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                <input asp-for="email"
+                       class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+                <span asp-validation-for="email" class="text-red-500 text-xs mt-1"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="name" class="block text-gray-700 text-sm font-bold mb-2">Name</label>
+                <input asp-for="name"
+                       class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+                <span asp-validation-for="name" class="text-red-500 text-xs mt-1"></span>
+            </div>
+
+            <div class="mb-6">
+                <label asp-for="password" class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                <input asp-for="password" type="password"
+                       class="appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"/>
+                <span asp-validation-for="password" class="text-red-500 text-xs mt-1"></span>
+            </div>
+            
+            <div class="mb-6">
+                <label asp-for="dateOfBirth" class="block text-gray-700 text-sm font-bold mb-2">Date Of Birth</label>
+                <input asp-for="dateOfBirth" type="date"
+                       class="appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"/>
+                <span asp-validation-for="dateOfBirth" class="text-red-500 text-xs mt-1"></span>
+            </div>
+
+            <button type="submit"
+                    class="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">
+                Register
+            </button>
+        </form>
+    </div>
+</main>

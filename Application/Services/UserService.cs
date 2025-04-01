@@ -27,12 +27,16 @@ public class UserService : IUserService
             _userRepository.Add(newUser);
             return newUser;
         }
-        catch (FormatException)
+        catch (FormatException ex)
         {
+            //log the error.
+            Console.WriteLine($"Invalid email format: {ex.Message}");
             throw new InvalidEmailFormatException("Invalid email format");
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            //log the error.
+            Console.WriteLine($"Error registering user: {ex.Message}, {ex.StackTrace}");
             throw new Exception("Error registering user");
         }
     }
