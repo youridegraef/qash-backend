@@ -12,7 +12,8 @@ public class TransactionsController : Controller
     private readonly ITransactionService _transactionService;
     private readonly ICategoryService _categoryService;
 
-    public TransactionsController(ILogger<HomeController> logger, ITransactionService transactionService, ICategoryService categoryService)
+    public TransactionsController(ILogger<HomeController> logger, ITransactionService transactionService,
+        ICategoryService categoryService)
     {
         _logger = logger;
         _transactionService = transactionService;
@@ -43,19 +44,32 @@ public class TransactionsController : Controller
 
     public IActionResult Edit()
     {
-        return View();
+        throw new NotImplementedException();
     }
-    
+
     public IActionResult Details()
     {
-        return View();
+        throw new NotImplementedException();
     }
-    
+
     public IActionResult Add()
     {
-        return View();
+        User? user = GetLoggedInUser();
+        ViewBag.User = user;
+
+        if (user != null)
+        {
+            return View();
+        }
+
+        return RedirectToAction("Login", "Account");
     }
-    
+
+    public IActionResult Remove()
+    {
+        throw new NotImplementedException();
+    }
+
     public User? GetLoggedInUser()
     {
         var userJson = HttpContext.Session.GetString("LoggedInUser");

@@ -85,6 +85,11 @@ public class AccountController : Controller
         return RedirectToAction("Login", "Account");
     }
 
+    public IActionResult EditProfile()
+    {
+        return View();
+    }
+
     public IActionResult Logout()
     {
         HttpContext.Session.Clear();
