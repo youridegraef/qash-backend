@@ -9,7 +9,7 @@ public interface ICategoryRepository
 
     public Category? FindById(int id);
 
-    public bool Add(Category category);
+    public int Add(Category category);
 
     public bool Edit(Category category);
 

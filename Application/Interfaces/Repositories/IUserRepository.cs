@@ -11,7 +11,7 @@ public interface IUserRepository
 
     public User? FindByEmail(string email);
 
-    public bool Add(User user);
+    public int Add(User user);
 
     public bool Edit(User user);
 

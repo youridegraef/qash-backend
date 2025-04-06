@@ -1,0 +1,43 @@
+@model Presentation.Models.TransactionsModel
+
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+
+<main>
+    <div class="flex flex-row justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold">Transactions</h1>
+        <button class="bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded-xl text-white">Add</button>
+    </div>
+
+    <table class="w-full text-left table-auto border-collapse rounded-lg overflow-hidden">
+        <thead>
+        <tr class="bg-gray-600 text-white">
+            <th class="py-3 px-4">Amount</th>
+            <th class="py-3 px-4">Date</th>
+            <th class="py-3 px-4">Category</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var transaction in Model.Transactions)
+        {
+            var cat = Model.Categories.FirstOrDefault(c => c.Id == transaction.CategoryId);
+            <a asp-action="Edit" asp-controller="Transactions">
+                <tr class="bg-white/10 hover:bg-gray-200 border-b border-gray-700">
+                    <td class="py-3 px-4">€@transaction.Amount</td>
+                    <td class="py-3 px-4">@transaction.Date</td>
+                    @if (cat != null)
+                    {
+                        <td class="py-3 px-4">@cat.Name</td>
+                    }
+                    else
+                    {
+                        <td class="py-3 px-4">No category</td>
+                    }
+                </tr>
+            </a>
+        }
+        </tbody>
+    </table>
+</main>

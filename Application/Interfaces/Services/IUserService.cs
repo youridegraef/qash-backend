@@ -11,4 +11,7 @@ public interface IUserService
     User GetByEmail(string email);
     bool Update(User user);
     bool Delete(int id);
+    public double CalculateBalance(int userId);
+    public double CalculateExpenses(int userId);
+    public double CalculateIncome(int userId);
 }

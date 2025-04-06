@@ -4,8 +4,10 @@ using MySql.Data.MySqlClient;
 
 namespace DataAccess.Repositories;
 
-public class BudgetRepository(DatabaseConnection _dbConnection) : IBudgetRepository
+public class BudgetRepository : IBudgetRepository
 {
+    private readonly DatabaseConnection _dbConnection = new DatabaseConnection();
+
     public List<Budget> FindAll()
     {
         List<Budget> allBudgets = new List<Budget>();
@@ -64,7 +66,8 @@ public class BudgetRepository(DatabaseConnection _dbConnection) : IBudgetReposit
         using MySqlConnection connection = _dbConnection.GetMySqlConnection();
         connection.Open();
 
-        string sql = "INSERT INTO budget (start_date, end_date, budget, category_id) VALUES (@start_date, @end_date, @budget, @category_id)";
+        string sql =
+            "INSERT INTO budget (start_date, end_date, budget, category_id) VALUES (@start_date, @end_date, @budget, @category_id)";
 
         using MySqlCommand command = new MySqlCommand(sql, connection);
         command.Parameters.AddWithValue("@start_date", budget.StartDate.ToDateTime(TimeOnly.MinValue));
@@ -90,7 +93,8 @@ public class BudgetRepository(DatabaseConnection _dbConnection) : IBudgetReposit
         using MySqlConnection connection = _dbConnection.GetMySqlConnection();
         connection.Open();
 
-        string sql = "UPDATE budget SET start_date = @start_date, end_date = @end_date, budget = @budget, category_id = @category_id WHERE id = @id";
+        string sql =
+            "UPDATE budget SET start_date = @start_date, end_date = @end_date, budget = @budget, category_id = @category_id WHERE id = @id";
 
         using MySqlCommand command = new MySqlCommand(sql, connection);
 

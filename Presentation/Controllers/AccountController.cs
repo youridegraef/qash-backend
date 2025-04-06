@@ -35,11 +35,9 @@ public class AccountController : Controller
 
             if (user != null)
             {
-                Console.WriteLine("Login succesful!");
-                
                 HttpContext.Session.SetString("LoggedInUser", JsonSerializer.Serialize(user));
 
-                return RedirectToPage("/Index");
+                return RedirectToAction("index", "Home");
             }
 
             ViewBag.ErrorMessage = "Login failed";
@@ -72,5 +70,45 @@ public class AccountController : Controller
         }
 
         return View(model);
+    }
+
+    public IActionResult Profile()
+    {
+        User? user = GetLoggedInUser();
+        ViewBag.User = user;
+        
+        if (user != null)
+        {
+            return View(user);
+        }
+
+        return RedirectToAction("Login", "Account");
+    }
+
+    public IActionResult Logout()
+    {
+        HttpContext.Session.Clear();
+
+        return RedirectToAction("Login", "Account");
+    }
+
+    public User? GetLoggedInUser()
+    {
+        var userJson = HttpContext.Session.GetString("LoggedInUser");
+
+        if (string.IsNullOrEmpty(userJson))
+        {
+            return null; // Gebruiker is niet ingelogd
+        }
+
+        try
+        {
+            var _user = JsonSerializer.Deserialize<User>(userJson);
+            return _user;
+        }
+        catch (JsonException)
+        {
+            return null; // Ongeldige JSON in de sessie
+        }
     }
 }

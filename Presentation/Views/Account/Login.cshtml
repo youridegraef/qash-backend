@@ -2,7 +2,7 @@
 
 @{
     ViewBag.Title = "title";
-    Layout = "_Layout";
+    Layout = "_Layout2";
     string ErrorMessage = ViewBag.ErrorMessage;
 }
 
@@ -36,6 +36,10 @@
                     class="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">
                 Login
             </button>
+
+            <div class="mt-4 w-full justify-center items-center">
+                <a asp-action="Register">Or create an account</a>
+            </div>
         </form>
     </div>
 </main>

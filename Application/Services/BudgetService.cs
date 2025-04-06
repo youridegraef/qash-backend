@@ -39,7 +39,6 @@ public class BudgetService : IBudgetService
 
     public List<Budget> GetByCategoryId(int categoryId)
     {
-
         try
         {
             List<Budget> allBudgets = _budgetRepository.FindAll();

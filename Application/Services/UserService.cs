@@ -9,14 +9,15 @@ namespace Application.Services;
 public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
+    private readonly ITransactionRepository _transactionRepository;
 
-    public UserService(IUserRepository userRepository)
+    public UserService(IUserRepository userRepository, ITransactionRepository transactionRepository)
     {
         _userRepository = userRepository;
+        _transactionRepository = transactionRepository;
     }
 
 
-    
     public User Register(string name, string email, string password, DateOnly dateOfBirth)
     {
         try
@@ -111,5 +112,56 @@ public class UserService : IUserService
         {
             return false;
         }
+    }
+
+    public double CalculateBalance(int userId)
+    {
+        double balance = 0;
+
+        List<Transaction> transactions = _transactionRepository.FindAll();
+        var filteredTransactions = transactions.Where(t => t.UserId == userId).ToList();
+
+        foreach (var transaction in filteredTransactions)
+        {
+            balance += transaction.Amount;
+        }
+
+        return balance;
+    }
+
+    public double CalculateIncome(int userId)
+    {
+        double income = 0;
+
+        List<Transaction> transactions = _transactionRepository.FindAll();
+        var filteredTransactions = transactions.Where(t => t.UserId == userId && t.Amount > 00.00).ToList();
+
+        foreach (var transaction in filteredTransactions)
+        {
+            income += transaction.Amount;
+        }
+
+        return income;
+    }
+
+    public double CalculateExpenses(int userId)
+    {
+        double expenses = 0;
+
+        List<Transaction> transactions = _transactionRepository.FindAll();
+        var filteredTransactions = transactions.Where(t => t.UserId == userId && t.Amount < 00.00).ToList();
+
+        foreach (var transaction in filteredTransactions)
+        {
+            expenses += transaction.Amount;
+        }
+
+
+        if (expenses == 0)
+        {
+            return expenses;
+        }
+
+        return expenses * -1;
     }
 }

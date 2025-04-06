@@ -87,7 +87,7 @@ public class UserRepository : IUserRepository
         return null;
     }
 
-    public bool Add(User user)
+    public int Add(User user)
     {
         using MySqlConnection connection = _dbConnection.GetMySqlConnection();
         connection.Open();
@@ -105,7 +105,15 @@ public class UserRepository : IUserRepository
 
         int rowsAffected = command.ExecuteNonQuery();
 
-        return rowsAffected > 0;
+        if (rowsAffected > 0)
+        {
+            string selectIdSql = "SELECT LAST_INSERT_ID()";
+            using MySqlCommand selectIdCommand = new MySqlCommand(selectIdSql, connection);
+            int newId = Convert.ToInt32(selectIdCommand.ExecuteScalar());
+            return newId;
+        }
+
+        return 0;
     }
 
     public bool Edit(User user)
