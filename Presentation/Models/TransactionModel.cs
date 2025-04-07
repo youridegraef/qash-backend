@@ -1,3 +1,5 @@
+using Application.Domain;
+
 namespace Presentation.Models;
 
 public class TransactionModel
@@ -7,4 +9,5 @@ public class TransactionModel
     public DateOnly Date { get; set; }
     public int UserId { get; set; }
     public int CategoryId { get; set; }
+    public List<Category> Categories { get; set; }
 }

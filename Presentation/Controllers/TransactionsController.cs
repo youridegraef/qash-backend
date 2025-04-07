@@ -23,7 +23,7 @@ public class TransactionsController : BaseController
     public IActionResult Index()
     {
         var transactions = _transactionService.GetAll();
-        var categories = _categoryService.GetByUserId((int)LoggedInUser.Id);
+        var categories = _categoryService.GetALl();
 
         var viewModel = new TransactionsModel
         {
@@ -37,13 +37,16 @@ public class TransactionsController : BaseController
     public IActionResult Edit(int id)
     {
         var transaction = _transactionService.GetById(id);
+        var categories = _categoryService.GetALl();
+        
         TransactionModel viewModel = new TransactionModel
         {
             Id = transaction.Id,
             Amount = transaction.Amount,
             Date = transaction.Date,
             UserId = transaction.UserId,
-            CategoryId = transaction.CategoryId
+            CategoryId = transaction.CategoryId,
+            Categories = categories
         };
 
         return View(viewModel);
@@ -91,6 +94,7 @@ public class TransactionsController : BaseController
     public IActionResult Details(int id)
     {
         var transaction = _transactionService.GetById(id);
+        var categories = _categoryService.GetALl();
 
         TransactionModel viewModel = new TransactionModel
         {
@@ -98,7 +102,8 @@ public class TransactionsController : BaseController
             Amount = transaction.Amount,
             Date = transaction.Date,
             UserId = transaction.UserId,
-            CategoryId = transaction.CategoryId
+            CategoryId = transaction.CategoryId,
+            Categories = categories
         };
 
         return View(viewModel);
@@ -106,7 +111,14 @@ public class TransactionsController : BaseController
 
     public IActionResult Add()
     {
-        return View();
+        var categories = _categoryService.GetALl();
+
+        TransactionModel viewModel = new TransactionModel
+        {
+            Categories = categories
+        };
+
+        return View(viewModel);
     }
 
     [HttpPost]

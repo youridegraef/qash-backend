@@ -37,8 +37,13 @@
 
             <div class="mb-6">
                 <label asp-for="CategoryId" class="block text-gray-700 text-sm font-bold mb-2">Category</label>
-                <input asp-for="CategoryId" type="number"
-                       class="appearance-none border rounded-xl w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"/>
+                <select asp-for="CategoryId" type="number"
+                        class="appearance-none border rounded-xl w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline">
+                    @foreach (var category in Model.Categories)
+                    {
+                        <option value="@category.Id">@category.Name</option>
+                    }
+                </select>
                 <span asp-validation-for="CategoryId" class="text-red-500 text-xs mt-1"></span>
             </div>
 

@@ -1,7 +1,7 @@
-@model Presentation.Models.TransactionsModel
+@model Presentation.Models.SavingGoalsModel
 
 @{
-    ViewBag.Title = "All Transactions";
+    ViewBag.Title = "All saving goals";
     Layout = "_Layout";
     string SuccesMessage = ViewBag.SuccesMessage;
     string ErrorMessage = ViewBag.ErrorMessage;
@@ -9,7 +9,7 @@
 
 <main class="overflow-visible">
     <div class="flex flex-row justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold">Transactions</h1>
+        <h1 class="text-3xl font-bold">Saving Goals</h1>
         <a asp-controller="Transactions" asp-action="Add"
            class="bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded-xl text-white inline-block">Add</a>
     </div>
@@ -23,33 +23,35 @@
         <span>@ErrorMessage</span>
     }
 
+    <div class="flex flex-row w-full gap-3 mb-8">
+        <div class="bg-[#F7F7F7] h-48 w-full rounded-xl px-3 py-3 flex flex-col justify-between shadow-md border-1">
+            <h2 class="text-2xl font-bold">Monthly saving goal:</h2>
+            <h3 class="text-5xl">€200</h3>
+            <span>To reach all of your goals.</span>
+        </div>
+        <div class="bg-[#F7F7F7] h-48 w-full rounded-xl px-3 py-3 flex flex-col justify-between shadow-md border-1">
+            <h2 class="text-2xl font-bold">Total money saved:</h2>
+            <h3 class="text-5xl">€1275</h3>
+            <span>You have saved for a total of 23 saving goals.</span>
+
+        </div>
+        <div class="bg-[#F7F7F7] h-48 w-full rounded-xl px-3 py-3 flex flex-col justify-between shadow-md border-1">
+            <h2 class="text-2xl font-bold">uhhh</h2>
+            <h3 class="text-5xl">€20</h3>
+            <span>Ik heb geen flauw idee wat hier moet komen te staan.</span>
+
+        </div>
+    </div>
+
     <table class="min-w-full leading-normal text-left table-auto border-collapse rounded-lg overflow-visible">
         <tbody>
-        @foreach (var transaction in Model.Transactions)
+        @foreach (var savingGoal in Model.SavingGoals)
         {
-            var category = Model.Categories.FirstOrDefault(c => c.Id == transaction.CategoryId);
             <a asp-action="Edit" asp-controller="Transactions">
                 <tr class="bg-white/10 hover:bg-gray-200 border-b border-t border-gray-500/25">
-                    <td class="py-3 px-4">€@transaction.Amount</td>
-                    <td class="py-3 px-4">@transaction.Date</td>
-                    @if (category != null)
-                    {
-                        <td class="py-3 px-4">@category.Name</td>
-                    }
-                    else
-                    {
-                        <td class="py-3 px-4">No category</td>
-                    }
-                    <td class="py-3 px-4 flex flex-row gap-2">
-                        @if (category != null)
-                        {
-                            <div
-                                class="flex flex-row justify-center items-center gap-2 bg-blue-500/15 w-fit px-2 rounded-full py-1/2">
-                                <div class="w-[8px] h-[8px] rounded-full bg-blue-500"></div>
-                                <span class="text-blue-500">Tag</span>
-                            </div>
-                        }
-                    </td>
+                    <td class="py-3 px-4">@savingGoal.Name</td>
+                    <td class="py-3 px-4">€@savingGoal.Target</td>
+                    <td class="py-3 px-4 flex flex-row gap-2">@savingGoal.Deadline</td>
                     <td>
                         <div class="relative inline-block text-left js-dropdown-container overflow-visible">
                             <button
@@ -67,13 +69,13 @@
                                 class="js-dropdown-menu z-40 absolute hidden mt-2 w-40 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
                                 role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
                                 <div class="py-1" role="none">
-                                    <a asp-action="Details" asp-controller="Transactions" asp-route-id="@transaction.Id"
+                                    <a asp-action="Details" asp-controller="SavingGoal" asp-route-id="@savingGoal.Id"
                                        role="menuitem" tabindex="-1"
                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Details</a>
-                                    <a asp-action="Edit" asp-controller="Transactions" asp-route-id="@transaction.Id"
+                                    <a asp-action="Edit" asp-controller="SavingGoal" asp-route-id="@savingGoal.Id"
                                        role="menuitem" tabindex="-1"
                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</a>
-                                    <a asp-action="Remove" asp-controller="Transactions" asp-route-id="@transaction.Id"
+                                    <a asp-action="Remove" asp-controller="SavingGoal" asp-route-id="@savingGoal.Id"
                                        role="menuitem" tabindex="-1"
                                        class="block px-4 py-2 text-sm text-red-500 hover:text-red-600 hover:bg-gray-100">Remove</a>
                                 </div>
@@ -86,115 +88,45 @@
         }
         </tbody>
     </table>
-
 </main>
 
+
+
 <script>
-
-    // Selecteer ALLE knoppen met de class 'js-dropdown-button'
-
     const dropdownButtons = document.querySelectorAll('.js-dropdown-button');
-
-
-
-    // Functie om alle openstaande dropdowns te sluiten
 
     function closeAllDropdowns(exceptButton = null) {
 
         document.querySelectorAll('.js-dropdown-menu').forEach(menu => {
 
-// Sluit het menu tenzij het hoort bij de knop die net geklikt is (optioneel)
-
-            const parentButton = menu.previousElementSibling; // Aanname: knop is directe voorganger
-
-// Alternatief: const parentContainer = menu.closest('.js-dropdown-container');
-
-// const parentButton = parentContainer?.querySelector('.js-dropdown-button');
-
-
+            const parentButton = menu.previousElementSibling;
 
             if (parentButton !== exceptButton) {
-
                 menu.classList.add('hidden');
-
             }
-
         });
-
     }
 
-
-
-    // Voeg een listener toe aan ELKE knop
-
     dropdownButtons.forEach(button => {
-
         button.addEventListener('click', (event) => {
-
-            event.stopPropagation(); // Voorkom dat de klik direct de document listener triggert
-
-
-
-// Zoek het menu dat bij DEZE knop hoort
-
-// Aanname: menu is het directe volgende element na de knop
+            event.stopPropagation();
 
             const menu = button.nextElementSibling;
 
-// Robuuster: const parent = button.closest('.js-dropdown-container'); const menu = parent.querySelector('.js-dropdown-menu');
-
-
-
             if (menu) {
-
                 const isHidden = menu.classList.contains('hidden');
-
-
-
-// Sluit eerst alle *andere* dropdowns
-
                 closeAllDropdowns(button);
-
-
-
-// Toggle dan de huidige dropdown
-
                 menu.classList.toggle('hidden', !isHidden);
-
             }
-
         });
-
     });
-
-
-
-    // Listener om te sluiten bij klikken buiten de dropdown
 
     document.addEventListener('click', (event) => {
-
-// Controleer of de klik buiten een actieve dropdown component viel
-
         const clickedInside = event.target.closest('.js-dropdown-container');
-
         if (!clickedInside) {
-
             closeAllDropdowns();
-
         }
-
-// Verbetering: Als op SVG geklikt wordt, behandel als klik op knop
-
         if (event.target.closest('svg') && event.target.closest('.js-dropdown-button')) {
-
-// De button listener handelt dit al af door event bubbling
-
-// Maar we moeten voorkomen dat de document listener direct sluit.
-
-// De stopPropagation in de button listener doet dit.
-
         }
-
     });
-
 </script>

@@ -4,8 +4,10 @@ using MySql.Data.MySqlClient;
 
 namespace DataAccess.Repositories;
 
-public class SavingGoalRepository(DatabaseConnection _dbConnection) : ISavingGoalRepository
+public class SavingGoalRepository : ISavingGoalRepository
 {
+    private readonly DatabaseConnection _dbConnection = new DatabaseConnection();
+
     public List<SavingGoal> FindAll()
     {
         List<SavingGoal> allSavingGoals = new List<SavingGoal>();
