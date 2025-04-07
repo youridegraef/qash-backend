@@ -7,7 +7,7 @@ using Presentation.Models;
 
 namespace Presentation.Controllers;
 
-public class AccountController : Controller
+public class AccountController : BaseController
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserService _userService;
@@ -74,20 +74,66 @@ public class AccountController : Controller
 
     public IActionResult Profile()
     {
-        User? user = GetLoggedInUser();
-        ViewBag.User = user;
-        
-        if (user != null)
-        {
-            return View(user);
-        }
-
-        return RedirectToAction("Login", "Account");
+        return View(LoggedInUser);
     }
 
     public IActionResult EditProfile()
     {
-        return View();
+        ProfileModel viewModel = new ProfileModel
+        {
+            email = LoggedInUser.Email,
+            name = LoggedInUser.Name,
+            dateOfBirth = LoggedInUser.DateOfBirth
+        };
+
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> EditProfile(ProfileModel model)
+    {
+        if (ModelState.IsValid)
+        {
+            if (LoggedInUser == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            LoggedInUser.Name = model.name;
+            LoggedInUser.Email = model.email;
+            LoggedInUser.DateOfBirth = model.dateOfBirth;
+
+            var isUserEdited = _userService.Update(LoggedInUser);
+
+            if (isUserEdited)
+            {
+                HttpContext.Session.SetString("LoggedInUser", JsonSerializer.Serialize(LoggedInUser));
+                return RedirectToAction("Profile");
+            }
+            else
+            {
+                ViewBag.ErrorMessage = "Editing profile failed";
+                return View(model);
+            }
+        }
+
+        if (!ModelState.IsValid)
+        {
+            foreach (var modelStateKey in ModelState.Keys)
+            {
+                var modelStateVal = ModelState[modelStateKey];
+                foreach (var error in modelStateVal.Errors)
+                {
+                    var errorMessage = error.ErrorMessage;
+                    // Of error.Exception, om de daadwerkelijke uitzondering te krijgen
+                    Console.WriteLine($"Key: {modelStateKey}, Error: {errorMessage}");
+                }
+            }
+
+            return View(model);
+        }
+
+        return View(model);
     }
 
     public IActionResult Logout()
@@ -95,25 +141,5 @@ public class AccountController : Controller
         HttpContext.Session.Clear();
 
         return RedirectToAction("Login", "Account");
-    }
-
-    public User? GetLoggedInUser()
-    {
-        var userJson = HttpContext.Session.GetString("LoggedInUser");
-
-        if (string.IsNullOrEmpty(userJson))
-        {
-            return null; // Gebruiker is niet ingelogd
-        }
-
-        try
-        {
-            var _user = JsonSerializer.Deserialize<User>(userJson);
-            return _user;
-        }
-        catch (JsonException)
-        {
-            return null; // Ongeldige JSON in de sessie
-        }
     }
 }

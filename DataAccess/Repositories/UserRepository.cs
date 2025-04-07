@@ -118,23 +118,37 @@ public class UserRepository : IUserRepository
 
     public bool Edit(User user)
     {
-        using MySqlConnection connection = _dbConnection.GetMySqlConnection();
-        connection.Open();
+        try
+        {
+            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            connection.Open();
 
-        string sql =
-            "UPDATE user SET name = @name, email = @email, password_hash = @password_hash, date_of_birth = @date_of_birth WHERE id = @id";
+            string sql =
+                "UPDATE user SET name = @name, email = @email, password_hash = @password_hash, date_of_birth = @date_of_birth WHERE id = @id";
 
-        using MySqlCommand command = new MySqlCommand(sql, connection);
+            using MySqlCommand command = new MySqlCommand(sql, connection);
 
-        command.Parameters.AddWithValue("@id", user.Id);
-        command.Parameters.AddWithValue("@name", user.Name);
-        command.Parameters.AddWithValue("@email", user.Email);
-        command.Parameters.AddWithValue("@password_hash", user.PasswordHash);
-        command.Parameters.AddWithValue("@date_of_birth", user.DateOfBirth.ToDateTime(TimeOnly.MinValue));
+            command.Parameters.AddWithValue("@id", user.Id);
+            command.Parameters.AddWithValue("@name", user.Name);
+            command.Parameters.AddWithValue("@email", user.Email);
+            command.Parameters.AddWithValue("@password_hash", user.PasswordHash);
+            command.Parameters.AddWithValue("@date_of_birth", user.DateOfBirth);
 
-        int rowsAffected = command.ExecuteNonQuery();
 
-        return rowsAffected > 0;
+            int rowsAffected = command.ExecuteNonQuery();
+
+            return rowsAffected > 0;
+        }
+        catch (MySqlException ex)
+        {
+            Console.WriteLine($"Error updating user: {ex.Message}");
+            return false;
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine($"General Error updating user: {ex.Message}");
+            return false;
+        }
     }
 
     public bool Delete(User user)

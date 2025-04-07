@@ -3,6 +3,8 @@
 @{
     ViewBag.Title = "All Transactions";
     Layout = "_Layout";
+    string SuccesMessage = ViewBag.SuccesMessage;
+    string ErrorMessage = ViewBag.ErrorMessage;
 }
 
 <main class="overflow-visible">
@@ -12,33 +14,22 @@
            class="bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded-xl text-white inline-block">Add</a>
     </div>
 
+    @if (SuccesMessage != null)
+    {
+        <span>@SuccesMessage</span>
+    }
+    @if (ErrorMessage != null)
+    {
+        <span>@ErrorMessage</span>
+    }
 
     <table class="min-w-full leading-normal text-left table-auto border-collapse rounded-lg overflow-visible">
-        <thead>
-        <tr>
-            <th
-                class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Amount
-            </th>
-            <th
-                class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Date
-            </th>
-            <th
-                class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Category
-            </th>
-            <th
-                class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-            </th>
-        </tr>
-        </thead>
         <tbody>
         @foreach (var transaction in Model.Transactions)
         {
             var cat = Model.Categories.FirstOrDefault(c => c.Id == transaction.CategoryId);
             <a asp-action="Edit" asp-controller="Transactions">
-                <tr class="bg-white/10 hover:bg-gray-200 border-b border-gray-500/25">
+                <tr class="bg-white/10 hover:bg-gray-200 border-b border-t border-gray-500/25">
                     <td class="py-3 px-4">€@transaction.Amount</td>
                     <td class="py-3 px-4">@transaction.Date</td>
                     @if (cat != null)
@@ -49,10 +40,22 @@
                     {
                         <td class="py-3 px-4">No category</td>
                     }
+                    <td class="py-3 px-4 flex flex-row gap-2">
+                        <div
+                            class="flex flex-row justify-center items-center gap-2 bg-blue-500/15 w-fit px-2 rounded-full py-1/2">
+                            <div class="w-[8px] h-[8px] rounded-full bg-blue-500"></div>
+                            <span class="text-blue-500">Groceries</span>
+                        </div>
+                        <div
+                            class="flex flex-row justify-center items-center gap-2 bg-red-500/15 w-fit px-2 rounded-full py-1/2">
+                            <div class="w-[8px] h-[8px] rounded-full bg-red-500"></div>
+                            <span class="text-red-500">Fun</span>
+                        </div>
+                    </td>
                     <td>
                         <div class="relative inline-block text-left js-dropdown-container overflow-visible">
                             <button
-                                class="js-dropdown-button bg-blue-600 hover:bg-blue-700 py-2 pl-3 pr-4 rounded-xl text-white font-semibold flex items-center">
+                                class="js-dropdown-button border-1 border-gray-500/25 py-2 pl-3 pr-4 rounded-xl text-gray-500 font-semibold flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 pointer-events-none"
                                      viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd"
@@ -63,14 +66,17 @@
                             </button>
 
                             <div
-                                class="js-dropdown-menu z-40 absolute hidden mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                class="js-dropdown-menu z-40 absolute hidden mt-2 w-40 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
                                 role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
                                 <div class="py-1" role="none">
-                                    <a asp-action="Details" asp-controller="Transactions" role="menuitem" tabindex="-1"
+                                    <a asp-action="Details" asp-controller="Transactions" asp-route-id="@transaction.Id"
+                                       role="menuitem" tabindex="-1"
                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Details</a>
-                                    <a asp-action="Edit" asp-controller="Transactions" role="menuitem" tabindex="-1"
+                                    <a asp-action="Edit" asp-controller="Transactions" asp-route-id="@transaction.Id"
+                                       role="menuitem" tabindex="-1"
                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</a>
-                                    <a asp-action="Remove" asp-controller="Transactions" role="menuitem" tabindex="-1"
+                                    <a asp-action="Remove" asp-controller="Transactions" asp-route-id="@transaction.Id"
+                                       role="menuitem" tabindex="-1"
                                        class="block px-4 py-2 text-sm text-red-500 hover:text-red-600 hover:bg-gray-100">Remove</a>
                                 </div>
                             </div>

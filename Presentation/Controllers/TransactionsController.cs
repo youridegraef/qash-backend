@@ -1,12 +1,12 @@
 using System.Text.Json;
-using System.Transactions;
+using Application.Domain;
 using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Models;
 
 namespace Presentation.Controllers;
 
-public class TransactionsController : Controller
+public class TransactionsController : BaseController
 {
     private readonly ILogger<HomeController> _logger;
     private readonly ITransactionService _transactionService;
@@ -22,71 +22,125 @@ public class TransactionsController : Controller
 
     public IActionResult Index()
     {
-        User? user = GetLoggedInUser();
-        ViewBag.User = user;
+        var transactions = _transactionService.GetAll();
+        var categories = _categoryService.GetByUserId((int)LoggedInUser.Id);
 
-        if (user != null)
+        var viewModel = new TransactionsModel
         {
-            var transactions = _transactionService.GetAll();
-            var categories = _categoryService.GetByUserId((int)user.Id);
+            Transactions = transactions,
+            Categories = categories
+        };
 
-            var viewModel = new TransactionsModel
+        return View(viewModel);
+    }
+
+    public IActionResult Edit(int id)
+    {
+        var transaction = _transactionService.GetById(id);
+        TransactionModel viewModel = new TransactionModel
+        {
+            Id = transaction.Id,
+            Amount = transaction.Amount,
+            Date = transaction.Date,
+            UserId = transaction.UserId,
+            CategoryId = transaction.CategoryId
+        };
+
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Edit(TransactionModel model)
+    {
+        if (ModelState.IsValid)
+        {
+            Transaction newTransaction =
+                new Transaction(model.Id, model.Amount, model.Date, (int)LoggedInUser.Id, model.CategoryId);
+
+            bool isEdited = _transactionService.Edit(newTransaction);
+            if (isEdited)
             {
-                Transactions = transactions,
-                Categories = categories
-            };
-
-            return View(viewModel);
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                ViewBag.ErrorMessage = "Editing transaction failed";
+                return View(model);
+            }
         }
 
-        return RedirectToAction("Login", "Account");
+        if (!ModelState.IsValid)
+        {
+            foreach (var modelStateKey in ModelState.Keys)
+            {
+                var modelStateVal = ModelState[modelStateKey];
+                foreach (var error in modelStateVal.Errors)
+                {
+                    var errorMessage = error.ErrorMessage;
+                    // Of error.Exception, om de daadwerkelijke uitzondering te krijgen
+                    Console.WriteLine($"Key: {modelStateKey}, Error: {errorMessage}");
+                }
+            }
+
+            return View(model);
+        }
+
+        return View(model);
     }
 
-    public IActionResult Edit()
+    public IActionResult Details(int id)
     {
-        throw new NotImplementedException();
-    }
+        var transaction = _transactionService.GetById(id);
 
-    public IActionResult Details()
-    {
-        throw new NotImplementedException();
+        TransactionModel viewModel = new TransactionModel
+        {
+            Id = transaction.Id,
+            Amount = transaction.Amount,
+            Date = transaction.Date,
+            UserId = transaction.UserId,
+            CategoryId = transaction.CategoryId
+        };
+
+        return View(viewModel);
     }
 
     public IActionResult Add()
     {
-        User? user = GetLoggedInUser();
-        ViewBag.User = user;
-
-        if (user != null)
-        {
-            return View();
-        }
-
-        return RedirectToAction("Login", "Account");
+        return View();
     }
 
-    public IActionResult Remove()
+    [HttpPost]
+    public async Task<IActionResult> Add(TransactionModel model)
     {
-        throw new NotImplementedException();
+        if (ModelState.IsValid)
+        {
+            var transaction = _transactionService.Add(model.Amount, model.Date, (int)LoggedInUser.Id, model.CategoryId);
+
+            if (transaction != null)
+            {
+                return RedirectToAction("index");
+            }
+            else
+            {
+                ViewBag.ErrorMessage = "Failed to add transaction.";
+                return View(model);
+            }
+        }
+
+        return View(model);
     }
 
-    public User? GetLoggedInUser()
+    public IActionResult Remove(int id)
     {
-        var userJson = HttpContext.Session.GetString("LoggedInUser");
+        bool isDeleted = _transactionService.Delete(id);
 
-        if (string.IsNullOrEmpty(userJson))
+        if (isDeleted)
         {
-            return null; // Gebruiker is niet ingelogd
+            ViewBag.SuccesMessage = "Transaction has succesfully been deleted.";
+            return RedirectToAction("Index");
         }
 
-        try
-        {
-            var _user = JsonSerializer.Deserialize<User>(userJson);
-            return _user;
-        }
-        catch (JsonException)
-        {
-            return null; // Ongeldige JSON in de sessie
-        }
+        ViewBag.ErrorMessage = "Transaction has not been deleted";
+        return RedirectToAction("Index");
     }
 }

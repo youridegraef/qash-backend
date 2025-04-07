@@ -1,8 +1,51 @@
 @model Presentation.Models.TransactionModel
 
 @{
-    ViewBag.Title = "Edit Transaction";
+    ViewBag.Title = "Edit Transactions";
     Layout = "_Layout";
+    string ErrorMessage = ViewBag.ErrorMessage;
 }
 
-<h2>title</h2>
+<main class="flex flex-col h-screen w-full justify-center items-center">
+    <div class="bg-[#F7F7F7] p-8 w-full max-w-sm rounded-2xl shadow-xl border-1">
+        <h2 class="text-2xl font-semibold mb-6 text-center text-gray-700">Add Transaction</h2>
+
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                <strong class="font-bold">Error!</strong>
+                <span class="block sm:inline">@ErrorMessage</span>
+            </div>
+        }
+
+        <form asp-action="Edit" asp-controller="Transactions" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="mb-4">
+                <label asp-for="Amount" class="block text-gray-700 text-sm font-bold mb-2">Amount</label>
+                <input asp-for="Amount" type="number"
+                       class="appearance-none border rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+                <span asp-validation-for="Amount" class="text-red-500 text-xs mt-1"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Date" class="block text-gray-700 text-sm font-bold mb-2">Date</label>
+                <input asp-for="Date" type="date"
+                       class="appearance-none border rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+                <span asp-validation-for="Date" class="text-red-500 text-xs mt-1"></span>
+            </div>
+
+            <div class="mb-6">
+                <label asp-for="CategoryId" class="block text-gray-700 text-sm font-bold mb-2">Category</label>
+                <input asp-for="CategoryId" type="number"
+                       class="appearance-none border rounded-xl w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"/>
+                <span asp-validation-for="CategoryId" class="text-red-500 text-xs mt-1"></span>
+            </div>
+
+            <button type="submit"
+                    class="bg-blue-600 hover:bg-blue-700 py-2 px-4 w-full rounded-xl text-white inline-block">
+                Add
+            </button>
+        </form>
+    </div>
+</main>

@@ -91,23 +91,36 @@ public class TransactionRepository : ITransactionRepository
 
     public bool Edit(Transaction transaction)
     {
-        using MySqlConnection connection = _dbConnection.GetMySqlConnection();
-        connection.Open();
+        try
+        {
+            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            connection.Open();
 
-        string sql =
-            "UPDATE transactions SET amount = @amount, date = @date, user_id = @user_id, category_id = @category_id WHERE id = @id";
+            string sql =
+                "UPDATE transactions SET amount = @amount, date = @date, user_id = @user_id, category_id = @category_id WHERE id = @id";
 
-        using MySqlCommand command = new MySqlCommand(sql, connection);
+            using MySqlCommand command = new MySqlCommand(sql, connection);
 
-        command.Parameters.AddWithValue("@id", transaction.Id);
-        command.Parameters.AddWithValue("@amount", transaction.Amount);
-        command.Parameters.AddWithValue("@date", transaction.Date.ToDateTime(TimeOnly.MinValue));
-        command.Parameters.AddWithValue("@user_id", transaction.UserId);
-        command.Parameters.AddWithValue("@category_id", transaction.CategoryId);
+            command.Parameters.AddWithValue("@id", transaction.Id);
+            command.Parameters.AddWithValue("@amount", transaction.Amount);
+            command.Parameters.AddWithValue("@date", transaction.Date.ToDateTime(TimeOnly.MinValue));
+            command.Parameters.AddWithValue("@user_id", transaction.UserId);
+            command.Parameters.AddWithValue("@category_id", transaction.CategoryId);
 
-        int rowsAffected = command.ExecuteNonQuery();
+            int rowsAffected = command.ExecuteNonQuery();
 
-        return rowsAffected > 0;
+            return rowsAffected > 0;
+        }
+        catch (MySqlException ex)
+        {
+            Console.WriteLine($"Error updating user: {ex.Message}");
+            return false;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"General Error updating user: {ex.Message}");
+            return false;
+        }
     }
 
     public bool Delete(Transaction transaction)
