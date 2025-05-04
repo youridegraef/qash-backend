@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Application\Application.csproj" />
+      <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Pages\Account\Login.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\Account\Logout.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\Account\Register.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\SavingGoals\Create.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\SavingGoals\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\Transactions\Create.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\Transactions\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\Profile\Index.cshtml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Pages\Shared\_Layout.cshtml" />
+      <AdditionalFiles Include="Pages\Shared\_Layout2.cshtml" />
+      <AdditionalFiles Include="Pages\Shared\_ValidationScriptsPartial.cshtml" />
+    </ItemGroup>
+
+</Project>
