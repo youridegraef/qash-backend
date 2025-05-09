@@ -1,5 +1,5 @@
 @page
-@model Presentation.Pages.Transactions.Add
+@model Presentation.Pages.Transactions.Edit
 
 @{
     Layout = "_Layout";
@@ -8,7 +8,7 @@
 
 <main class="flex flex-col h-screen w-full justify-center items-center">
     <div class="bg-[#F7F7F7] p-8 w-full max-w-sm rounded-2xl shadow-xl border-1">
-        <h2 class="text-2xl font-semibold mb-6 text-center text-gray-700">Add Transaction</h2>
+        <h2 class="text-2xl font-semibold mb-6 text-center text-gray-700">Edit Transaction</h2>
 
         @if (ViewBag.ErrorMessage != null)
         {
@@ -22,41 +22,42 @@
             @Html.AntiForgeryToken()
 
             <div class="mb-4">
-                <label asp-for="Description" class="block text-gray-700 text-sm font-bold mb-2">Description</label>
-                <input asp-for="Description" type="text"
+                <label asp-for="Transaction.Description" class="block text-gray-700 text-sm font-bold mb-2">Description</label>
+                <input asp-for="Transaction.Description" type="text"
                        class="appearance-none border rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
-                <span asp-validation-for="Description" class="text-red-500 text-xs mt-1"></span>
-            </div>
-            
-            <div class="mb-4">
-                <label asp-for="Amount" class="block text-gray-700 text-sm font-bold mb-2">Amount</label>
-                <input asp-for="Amount" type="number"
-                       class="appearance-none border rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
-                <span asp-validation-for="Amount" class="text-red-500 text-xs mt-1"></span>
+                <span asp-validation-for="Transaction.Description" class="text-red-500 text-xs mt-1"></span>
             </div>
 
             <div class="mb-4">
-                <label asp-for="Date" class="block text-gray-700 text-sm font-bold mb-2">Date</label>
-                <input asp-for="Date" type="date"
+                <label asp-for="Transaction.Amount"
+                       class="block text-gray-700 text-sm font-bold mb-2">Amount</label>
+                <input asp-for="Transaction.Amount" type="number"
                        class="appearance-none border rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
-                <span asp-validation-for="Date" class="text-red-500 text-xs mt-1"></span>
+                <span asp-validation-for="Transaction.Amount" class="text-red-500 text-xs mt-1"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Transaction.Date" class="block text-gray-700 text-sm font-bold mb-2">Date</label>
+                <input asp-for="Transaction.Date" type="date"
+                       class="appearance-none border rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+                <span asp-validation-for="Transaction.Date" class="text-red-500 text-xs mt-1"></span>
             </div>
 
             <div class="mb-6">
-                <label asp-for="CategoryId" class="block text-gray-700 text-sm font-bold mb-2">Category</label>
-                <select asp-for="CategoryId" type="number"
+                <label asp-for="Transaction.CategoryId" class="block text-gray-700 text-sm font-bold mb-2">Category</label>
+                <select asp-for="Transaction.CategoryId" type="number"
                         class="appearance-none border rounded-xl w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline">
-                    @foreach (var category in Model.Categories)
+                    @foreach (var cat in Model.Categories)
                     {
-                        <option value="@category.Id">@category.Name</option>
+                        <option value="@cat.Id">@cat.Name</option>
                     }
                 </select>
-                <span asp-validation-for="CategoryId" class="text-red-500 text-xs mt-1"></span>
+                <span asp-validation-for="Transaction.CategoryId" class="text-red-500 text-xs mt-1"></span>
             </div>
 
             <button type="submit"
                     class="bg-blue-600 hover:bg-blue-700 py-2 px-4 w-full rounded-xl text-white inline-block">
-                Add Transaction
+                Edit Transaction
             </button>
         </form>
     </div>

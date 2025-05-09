@@ -17,8 +17,9 @@ public class Add : BasePageModel
         _categoryService = categoryService;
     }
     
+    [BindProperty] public string Description { get; set; }
     [BindProperty] public double Amount { get; set; }
-    [BindProperty] public DateOnly Date { get; set; }
+    [BindProperty] public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Today);
     [BindProperty] public int UserId { get; set; }
     [BindProperty] public int CategoryId { get; set; }
     [BindProperty] public List<Category> Categories { get; set; }
@@ -26,7 +27,7 @@ public class Add : BasePageModel
 
     public IActionResult OnGet()
     {
-        var categories = _categoryService.GetALl();
+        var categories = _categoryService.GetAll();
 
         Categories = categories;
 
@@ -37,11 +38,11 @@ public class Add : BasePageModel
     {
         if (ModelState.IsValid)
         {
-            var transaction = _transactionService.Add(Amount, Date, LoggedInUser.Id, CategoryId);
+            var transaction = _transactionService.Add(Description, Amount, Date, LoggedInUser.Id, CategoryId);
 
             if (transaction != null)
             {
-                return RedirectToPage("/../index");
+                return RedirectToPage("/index");
             }
             else
             {

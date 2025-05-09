@@ -24,6 +24,7 @@ public class TransactionRepository : ITransactionRepository
             allTransactions.Add(
                 new Transaction(
                     Convert.ToInt32(reader["id"]),
+                    (string)reader["description"],
                     Convert.ToDouble(reader["amount"]),
                     DateOnly.FromDateTime(Convert.ToDateTime(reader["date"])),
                     Convert.ToInt32(reader["user_id"]),
@@ -51,6 +52,7 @@ public class TransactionRepository : ITransactionRepository
         {
             return new Transaction(
                 Convert.ToInt32(reader["id"]),
+                (string)reader["description"],
                 Convert.ToDouble(reader["amount"]),
                 DateOnly.FromDateTime(Convert.ToDateTime(reader["date"])),
                 Convert.ToInt32(reader["user_id"]),
@@ -67,10 +69,11 @@ public class TransactionRepository : ITransactionRepository
         connection.Open();
 
         string sql =
-            "INSERT INTO transactions (amount, date, user_id, category_id) VALUES (@amount, @date, @user_id, @category_id)";
+            "INSERT INTO transactions (description, amount, date, user_id, category_id) VALUES (@description, @amount, @date, @user_id, @category_id)";
 
         using MySqlCommand command = new MySqlCommand(sql, connection);
 
+        command.Parameters.AddWithValue("@description", transaction.Description);
         command.Parameters.AddWithValue("@amount", transaction.Amount);
         command.Parameters.AddWithValue("@date", transaction.Date.ToDateTime(TimeOnly.MinValue));
         command.Parameters.AddWithValue("@user_id", transaction.UserId);
@@ -97,11 +100,12 @@ public class TransactionRepository : ITransactionRepository
             connection.Open();
 
             string sql =
-                "UPDATE transactions SET amount = @amount, date = @date, user_id = @user_id, category_id = @category_id WHERE id = @id";
+                "UPDATE transactions SET description = @description, amount = @amount, date = @date, user_id = @user_id, category_id = @category_id WHERE id = @id";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
 
             command.Parameters.AddWithValue("@id", transaction.Id);
+            command.Parameters.AddWithValue("@description", transaction.Description);
             command.Parameters.AddWithValue("@amount", transaction.Amount);
             command.Parameters.AddWithValue("@date", transaction.Date.ToDateTime(TimeOnly.MinValue));
             command.Parameters.AddWithValue("@user_id", transaction.UserId);
@@ -132,65 +136,6 @@ public class TransactionRepository : ITransactionRepository
 
         using MySqlCommand command = new MySqlCommand(sql, connection);
         command.Parameters.AddWithValue("@id", transaction.Id);
-
-        int rowsAffected = command.ExecuteNonQuery();
-
-        return rowsAffected > 0;
-    }
-
-    public List<Tag> FindTransactionTags(int id)
-    {
-        List<Tag> transactionTags = new List<Tag>();
-        using MySqlConnection connection = _dbConnection.GetMySqlConnection();
-        connection.Open();
-
-        string sql = "SELECT t.* FROM tag t JOIN transaction_tag tt ON t.id = tt.tag_id WHERE tt.transaction_id = @id";
-
-        using MySqlCommand command = new MySqlCommand(sql, connection);
-        command.Parameters.AddWithValue("@id", id);
-        using MySqlDataReader reader = command.ExecuteReader();
-
-        while (reader.Read())
-        {
-            transactionTags.Add(
-                new Tag(
-                    Convert.ToInt32(reader["id"]),
-                    reader["name"].ToString(),
-                    reader["color_hex_code"].ToString(),
-                    Convert.ToInt32(reader["user_id"])
-                )
-            );
-        }
-
-        return transactionTags;
-    }
-
-    public bool AssignTagToTransaction(int transactionId, int tagId)
-    {
-        using MySqlConnection connection = _dbConnection.GetMySqlConnection();
-        connection.Open();
-
-        string sql = "INSERT INTO transaction_tag (transaction_id, tag_id) VALUES (@transactionId, @tagId)";
-
-        using MySqlCommand command = new MySqlCommand(sql, connection);
-        command.Parameters.AddWithValue("@transactionId", transactionId);
-        command.Parameters.AddWithValue("@tagId", tagId);
-
-        int rowsAffected = command.ExecuteNonQuery();
-
-        return rowsAffected > 0;
-    }
-
-    public bool DeleteTagFromTransaction(int transactionId, int tagId)
-    {
-        using MySqlConnection connection = _dbConnection.GetMySqlConnection();
-        connection.Open();
-
-        string sql = "DELETE FROM transaction_tag WHERE transaction_id = @transactionId AND tag_id = @tagId";
-
-        using MySqlCommand command = new MySqlCommand(sql, connection);
-        command.Parameters.AddWithValue("@transactionId", transactionId);
-        command.Parameters.AddWithValue("@tagId", tagId);
 
         int rowsAffected = command.ExecuteNonQuery();
 

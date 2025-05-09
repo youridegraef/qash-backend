@@ -16,21 +16,20 @@ public class Details : BasePageModel
         _transactionService = transactionService;
         _categoryService = categoryService;
     }
+    
+    [BindProperty]
+    public Transaction transaction { get; set; }
+    public Category category { get; set; }
+    public List<Category> Categories { get; set; }
 
-    [BindProperty] public int Id { get; set; }
-    [BindProperty] public double Amount { get; set; }
-    [BindProperty] public DateOnly Date { get; set; }
-    [BindProperty] public int UserId { get; set; }
-    [BindProperty] public int CategoryId { get; set; }
-    [BindProperty] public List<Category> Categories { get; set; }
-
-
-    public IActionResult OnGet()
+    public IActionResult OnGet(int id)
     {
-        var categories = _categoryService.GetALl();
-
+        transaction = _transactionService.GetById(id);
+        var categories = _categoryService.GetAll();
         Categories = categories;
+        category = categories.FirstOrDefault(c => c.Id == transaction.CategoryId);
 
+        
         return Page();
     }
 }

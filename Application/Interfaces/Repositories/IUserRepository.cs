@@ -16,12 +16,4 @@ public interface IUserRepository
     public bool Edit(User user);
 
     public bool Delete(User user);
-
-    public List<Transaction> FindUserTransactions(int id);
-
-    public List<Tag> FindUserTags(int id);
-
-    public List<SavingGoal> FindUserSavingGoals(int id);
-
-    public List<Category> FindUserCategories(int id);
 }

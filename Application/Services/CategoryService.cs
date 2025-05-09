@@ -6,13 +6,15 @@ namespace Application.Services;
 public class CategoryService : ICategoryService
 {
     private readonly ICategoryRepository _categoryRepository;
+    private readonly ITransactionRepository _transactionRepository;
 
-    public CategoryService(ICategoryRepository categoryRepository)
+    public CategoryService(ICategoryRepository categoryRepository, ITransactionRepository transactionRepository)
     {
         _categoryRepository = categoryRepository;
+        _transactionRepository = transactionRepository;
     }
-    
-    public List<Category> GetALl()
+
+    public List<Category> GetAll()
     {
         try
         {
@@ -106,6 +108,56 @@ public class CategoryService : ICategoryService
         catch
         {
             return false;
+        }
+    }
+
+    public double CalculateSpendingsByCategory(int categoryId)
+    {
+        try
+        {
+            double spendings = 0;
+            List<Transaction> transactions = _transactionRepository.FindAll();
+
+            var filteredTransactions = transactions
+                .Where(t => t.CategoryId == categoryId).ToList();
+
+            foreach (var transaction in filteredTransactions)
+            {
+                spendings += transaction.Amount;
+            }
+
+            return spendings;
+        }
+        catch
+        {
+            throw new Exception($"No transactions found with category id: {categoryId}");
+        }
+    }
+    
+    public double CalculateSpendingsByCategoryAndDateRange(int categoryId, DateOnly startDate, DateOnly endDate)
+    {
+        try
+        {
+            double spendings = 0;
+            List<Transaction> transactions = _transactionRepository.FindAll();
+
+            var filteredTransactions = transactions
+                .Where(t => 
+                    t.CategoryId == categoryId &&
+                    t.Date >= startDate &&
+                    t.Date <= endDate
+                ).ToList();
+
+            foreach (var transaction in filteredTransactions)
+            {
+                spendings += transaction.Amount;
+            }
+
+            return spendings;
+        }
+        catch
+        {
+            throw new Exception($"No transactions found with category id: {categoryId}");
         }
     }
 }

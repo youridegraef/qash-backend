@@ -1,10 +1,32 @@
 @page
-@model Presentation.Pages.Transactions.Index
+@model Presentation.Pages.Transactions.TransactionsModel
 
 @{
     Layout = "_Layout";
 }
 
 <main>
-    Transactions
+    <div class="flex flex-row justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold">Transactions</h1>
+
+        <a asp-page="/Transactions/Add"
+           class="bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded-xl text-white inline-block">Add</a>
+
+    </div>
+    
+    <div class="flex flex-col gap-2">
+        @foreach (var transaction in Model.Transactions)
+        {
+            var category = Model.Categories.FirstOrDefault(c => c.Id == transaction.CategoryId);
+            <a asp-page="/Transactions/Details" asp-route-id="@transaction.Id"
+               class="h-30 w-full hover:bg-gray-100 hover:text-gray-800 rounded-xl px-3 py-3 flex flex-row justify-between border-1">
+                <div class="flex flex-row gap-12 items-center">
+                    <h2 class="text-md font-semibold w-[200px]">@transaction.Description</h2>
+                    <span class="text-md w-[100px]">@transaction.Date.ToString("dd MMM yyyy")</span>
+                    <span class="text-md w-[100px]">@category.Name</span>
+                </div>
+                <span class="text-md font-bold">€@transaction.Amount</span>
+            </a>
+        }
+    </div>
 </main>

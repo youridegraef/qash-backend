@@ -37,16 +37,16 @@ public class BudgetService : IBudgetService
         throw new KeyNotFoundException($"No budget with id: {id} found.");
     }
 
-    public List<Budget> GetByCategoryId(int categoryId)
+    public Budget GetByCategoryId(int categoryId)
     {
         try
         {
             List<Budget> allBudgets = _budgetRepository.FindAll();
 
-            var filteredBudgets = allBudgets
-                .Where(b => b.CategoryId == categoryId).ToList();
+            var filteredBudget = allBudgets
+                .FirstOrDefault(b => b.CategoryId == categoryId);
 
-            return filteredBudgets;
+            return filteredBudget;
         }
         catch
         {

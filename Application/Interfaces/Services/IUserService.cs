@@ -13,5 +13,7 @@ public interface IUserService
     bool Delete(int id);
     public double CalculateBalance(int userId);
     public double CalculateExpenses(int userId);
+    public double CalculateExpensesByDateRange(int userId, DateOnly startDate, DateOnly endDate);
     public double CalculateIncome(int userId);
+    public double CalculateIncomeByDateRange(int userId, DateOnly startDate, DateOnly endDate);
 }

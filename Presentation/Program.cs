@@ -18,12 +18,14 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ISavingGoalRepository, SavingGoalRepository>();
+builder.Services.AddScoped<IBudgetRepository, BudgetRepository>();
 
 // Services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ISavingGoalService, SavingGoalService>();
+builder.Services.AddScoped<IBudgetService, BudgetService>();
 
 // Session and Context
 builder.Services.AddSession(options =>

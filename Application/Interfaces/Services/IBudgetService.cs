@@ -7,7 +7,7 @@ public interface IBudgetService
 {
     public List<Budget> GetAll();
     public Budget GetById(int id);
-    public List<Budget> GetByCategoryId(int categoryId);
+    public Budget GetByCategoryId(int categoryId);
     public Budget Add(DateOnly startDate, DateOnly endDate, double target, int categoryId);
     public bool Edit(Budget budget);
     public bool Delete(int id);

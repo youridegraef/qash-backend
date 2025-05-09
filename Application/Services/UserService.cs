@@ -144,6 +144,26 @@ public class UserService : IUserService
         return income;
     }
 
+    public double CalculateIncomeByDateRange(int userId, DateOnly startDate, DateOnly endDate)
+    {
+        double income = 0;
+        
+        List<Transaction> transactions = _transactionRepository.FindAll();
+        var filteredTransactions = transactions.Where(t =>
+            t.UserId == userId &&
+            t.Amount > 00.00 &&
+            t.Date >= startDate &&
+            t.Date <= endDate)
+            .ToList();
+        
+        foreach (var transaction in filteredTransactions)
+        {
+            income += transaction.Amount;
+        }
+
+        return income;
+    }
+
     public double CalculateExpenses(int userId)
     {
         double expenses = 0;
@@ -163,5 +183,25 @@ public class UserService : IUserService
         }
 
         return expenses * -1;
+    }
+
+    public double CalculateExpensesByDateRange(int userId, DateOnly startDate, DateOnly endDate)
+    {
+        double expenses = 0;
+        
+        List<Transaction> transactions = _transactionRepository.FindAll();
+        var filteredTransactions = transactions.Where(t =>
+                t.UserId == userId &&
+                t.Amount < 00.00 &&
+                t.Date >= startDate &&
+                t.Date <= endDate)
+            .ToList();
+        
+        foreach (var transaction in filteredTransactions)
+        {
+            expenses += transaction.Amount;
+        }
+
+        return expenses;
     }
 }

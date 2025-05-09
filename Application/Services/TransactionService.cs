@@ -12,7 +12,6 @@ public class TransactionService : ITransactionService
     {
         _transactionRepository = transactionRepository;
     }
-    
 
 
     public Transaction GetById(int id)
@@ -32,6 +31,21 @@ public class TransactionService : ITransactionService
         try
         {
             return _transactionRepository.FindAll();
+        }
+        catch (Exception)
+        {
+            throw new Exception($"No transactions found.");
+        }
+    }
+
+    public List<Transaction> GetByDateRange(DateOnly startDate, DateOnly endDate)
+    {
+        try
+        {
+            List<Transaction> allTransactions = _transactionRepository.FindAll();
+            var filteredTransactions = allTransactions
+                .Where(t => t.Date >= startDate && t.Date <= endDate).ToList();
+            return filteredTransactions;
         }
         catch (Exception)
         {
@@ -105,11 +119,11 @@ public class TransactionService : ITransactionService
         }
     }
 
-    public Transaction Add(double amount, DateOnly date, int userId, int categoryId)
+    public Transaction Add(string description, double amount, DateOnly date, int userId, int categoryId)
     {
         try
         {
-            Transaction transaction = new Transaction(amount, date, userId, categoryId);
+            Transaction transaction = new Transaction(amount, description, date, userId, categoryId);
             transaction.Id = _transactionRepository.Add(transaction);
             return transaction;
         }
@@ -123,11 +137,14 @@ public class TransactionService : ITransactionService
         }
     }
 
-    public bool Edit(Transaction transaction)
+    public bool Edit(int id, double amount, string description, DateOnly date, int userId, int categoryId)
     {
         try
         {
-            return _transactionRepository.Edit(transaction);
+            Transaction newTransaction = new Transaction(amount, description, date,
+                userId, categoryId);
+
+            return _transactionRepository.Edit(newTransaction);
         }
         catch (TransactionNotFoundException)
         {
@@ -158,25 +175,11 @@ public class TransactionService : ITransactionService
 
     public bool AssignTag(int transactionId, int tagId)
     {
-        try
-        {
-            return _transactionRepository.AssignTagToTransaction(transactionId, tagId);
-        }
-        catch (Exception)
-        {
-            return false;
-        }
+        throw new NotImplementedException();
     }
 
     public bool UnAssignTag(int transactionId, int tagId)
     {
-        try
-        {
-            return _transactionRepository.DeleteTagFromTransaction(transactionId, tagId);
-        }
-        catch (Exception)
-        {
-            return false;
-        }
+        throw new NotImplementedException();
     }
 }

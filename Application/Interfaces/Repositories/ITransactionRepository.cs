@@ -14,7 +14,5 @@ public interface ITransactionRepository
     public bool Edit(Transaction transaction);
 
     public bool Delete(Transaction transaction);
-    public bool AssignTagToTransaction(int transactionId, int tagId);
-    public bool DeleteTagFromTransaction(int transactionId, int tagId);
 
 }
