@@ -172,14 +172,4 @@ public class TransactionService : ITransactionService
             return false;
         }
     }
-
-    public bool AssignTag(int transactionId, int tagId)
-    {
-        throw new NotImplementedException();
-    }
-
-    public bool UnAssignTag(int transactionId, int tagId)
-    {
-        throw new NotImplementedException();
-    }
 }

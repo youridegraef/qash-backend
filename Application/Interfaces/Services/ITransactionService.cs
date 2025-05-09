@@ -12,6 +12,4 @@ public interface ITransactionService
     public Transaction Add(string description, double amount, DateOnly date, int userId, int categoryId);
     public bool Edit(int id, double amount, string description, DateOnly date, int userId, int categoryId);
     public bool Delete(int id);
-    public bool AssignTag(int transactionId, int tagId);
-    public bool UnAssignTag(int transactionId, int tagId);
 }
