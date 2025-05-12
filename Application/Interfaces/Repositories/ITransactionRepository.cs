@@ -14,5 +14,5 @@ public interface ITransactionRepository
     public bool Edit(Transaction transaction);
 
     public bool Delete(Transaction transaction);
-
+    public List<Tag> GetTagsByTransactionId(int transactionId);
 }

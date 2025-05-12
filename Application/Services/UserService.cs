@@ -9,12 +9,19 @@ namespace Application.Services;
 public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
-    private readonly ITransactionRepository _transactionRepository;
+    private readonly ITransactionService _transactionService;
+    private readonly ICategoryService _categoryService;
+    private readonly ITagService _tagService;
+    private readonly ISavingGoalService _savingGoalService;
 
-    public UserService(IUserRepository userRepository, ITransactionRepository transactionRepository)
+    public UserService(IUserRepository userRepository, ITransactionService transactionService,
+        ICategoryService categoryService, ITagService tagService, ISavingGoalService savingGoalService)
     {
         _userRepository = userRepository;
-        _transactionRepository = transactionRepository;
+        _transactionService = transactionService;
+        _categoryService = categoryService;
+        _tagService = tagService;
+        _savingGoalService = savingGoalService;
     }
 
 
@@ -65,6 +72,18 @@ public class UserService : IUserService
 
         if (user != null)
         {
+            user.Transactions = _transactionService.GetAll()
+                .Where(t => t.UserId == user.Id).ToList();
+
+            user.Tags = _tagService.GetAll()
+                .Where(t => t.UserId == user.Id).ToList();
+
+            user.SavingGoals = _savingGoalService.GetAll()
+                .Where(s => s.UserId == user.Id).ToList();
+
+            user.Categories = _categoryService.GetAll()
+                .Where(c => c.UserId == user.Id).ToList();
+
             return user;
         }
 
@@ -77,6 +96,18 @@ public class UserService : IUserService
 
         if (user != null)
         {
+            user.Transactions = _transactionService.GetAll()
+                .Where(t => t.UserId == user.Id).ToList();
+
+            user.Tags = _tagService.GetAll()
+                .Where(t => t.UserId == user.Id).ToList();
+
+            user.SavingGoals = _savingGoalService.GetAll()
+                .Where(s => s.UserId == user.Id).ToList();
+
+            user.Categories = _categoryService.GetAll()
+                .Where(c => c.UserId == user.Id).ToList();
+            
             return user;
         }
 
@@ -118,7 +149,7 @@ public class UserService : IUserService
     {
         double balance = 0;
 
-        List<Transaction> transactions = _transactionRepository.FindAll();
+        List<Transaction> transactions = _transactionService.GetAll();
         var filteredTransactions = transactions.Where(t => t.UserId == userId).ToList();
 
         foreach (var transaction in filteredTransactions)
@@ -133,7 +164,7 @@ public class UserService : IUserService
     {
         double income = 0;
 
-        List<Transaction> transactions = _transactionRepository.FindAll();
+        List<Transaction> transactions = _transactionService.GetAll();
         var filteredTransactions = transactions.Where(t => t.UserId == userId && t.Amount > 00.00).ToList();
 
         foreach (var transaction in filteredTransactions)
@@ -147,15 +178,15 @@ public class UserService : IUserService
     public double CalculateIncomeByDateRange(int userId, DateOnly startDate, DateOnly endDate)
     {
         double income = 0;
-        
-        List<Transaction> transactions = _transactionRepository.FindAll();
+
+        List<Transaction> transactions = _transactionService.GetAll();
         var filteredTransactions = transactions.Where(t =>
-            t.UserId == userId &&
-            t.Amount > 00.00 &&
-            t.Date >= startDate &&
-            t.Date <= endDate)
+                t.UserId == userId &&
+                t.Amount > 00.00 &&
+                t.Date >= startDate &&
+                t.Date <= endDate)
             .ToList();
-        
+
         foreach (var transaction in filteredTransactions)
         {
             income += transaction.Amount;
@@ -168,7 +199,7 @@ public class UserService : IUserService
     {
         double expenses = 0;
 
-        List<Transaction> transactions = _transactionRepository.FindAll();
+        List<Transaction> transactions = _transactionService.GetAll();
         var filteredTransactions = transactions.Where(t => t.UserId == userId && t.Amount < 00.00).ToList();
 
         foreach (var transaction in filteredTransactions)
@@ -188,15 +219,15 @@ public class UserService : IUserService
     public double CalculateExpensesByDateRange(int userId, DateOnly startDate, DateOnly endDate)
     {
         double expenses = 0;
-        
-        List<Transaction> transactions = _transactionRepository.FindAll();
+
+        List<Transaction> transactions = _transactionService.GetAll();
         var filteredTransactions = transactions.Where(t =>
                 t.UserId == userId &&
                 t.Amount < 00.00 &&
                 t.Date >= startDate &&
                 t.Date <= endDate)
             .ToList();
-        
+
         foreach (var transaction in filteredTransactions)
         {
             expenses += transaction.Amount;

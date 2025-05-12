@@ -141,4 +141,34 @@ public class TransactionRepository : ITransactionRepository
 
         return rowsAffected > 0;
     }
+
+    public List<Tag> GetTagsByTransactionId(int transactionId)
+    {
+        var tags = new List<Tag>();
+        using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+        connection.Open();
+
+        string sql = "SELECT t.Id, t.Name FROM Tag t " +
+                     "INNER JOIN TransactionTag tt ON t.Id = tt.TagId " +
+                     "WHERE tt.TransactionId = @TransactionId";
+
+        using MySqlCommand command = new MySqlCommand(sql, connection);
+
+        command.Parameters.AddWithValue("@TransactionId", transactionId);
+
+        using (var reader = command.ExecuteReader())
+        {
+            while (reader.Read())
+            {
+                tags.Add(new Tag(
+                    (int)reader["id"],
+                    (string)reader["name"],
+                    (string)reader["color_hex_code"],
+                    (int)reader["user_id"]
+                ));
+            }
+        }
+
+        return tags;
+    }
 }

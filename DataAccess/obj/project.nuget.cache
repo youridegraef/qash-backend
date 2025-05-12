@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "xB8Crps1OrU=",
+  "dgSpecHash": "kcBbhT76MdA=",
   "success": true,
-  "projectFilePath": "/Volumes/PortableSSD/SchoolProjects/ExpenseTracker/DataAccess/DataAccess.csproj",
+  "projectFilePath": "/Users/macbook/RiderProjects/ExpenseTracker/ExpenseTracker/DataAccess/DataAccess.csproj",
   "expectedPackageFiles": [
     "/Users/macbook/.nuget/packages/bcrypt.net-next/4.0.3/bcrypt.net-next.4.0.3.nupkg.sha512",
     "/Users/macbook/.nuget/packages/bouncycastle.cryptography/2.3.1/bouncycastle.cryptography.2.3.1.nupkg.sha512",

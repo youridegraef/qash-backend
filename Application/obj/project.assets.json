@@ -375,11 +375,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Volumes/PortableSSD/SchoolProjects/ExpenseTracker/Application/Application.csproj",
+      "projectUniqueName": "/Users/macbook/RiderProjects/ExpenseTracker/ExpenseTracker/Application/Application.csproj",
       "projectName": "Application",
-      "projectPath": "/Volumes/PortableSSD/SchoolProjects/ExpenseTracker/Application/Application.csproj",
+      "projectPath": "/Users/macbook/RiderProjects/ExpenseTracker/ExpenseTracker/Application/Application.csproj",
       "packagesPath": "/Users/macbook/.nuget/packages/",
-      "outputPath": "/Volumes/PortableSSD/SchoolProjects/ExpenseTracker/Application/obj/",
+      "outputPath": "/Users/macbook/RiderProjects/ExpenseTracker/ExpenseTracker/Application/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/macbook/.nuget/NuGet/NuGet.Config"
