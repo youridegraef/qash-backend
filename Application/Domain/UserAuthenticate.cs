@@ -1,6 +1,6 @@
 using Application.Domain;
 
-public class User
+public class UserAuthenticate
 {
     public int Id { get; set; }
     public string Name { get; set; }
@@ -8,11 +8,11 @@ public class User
     public string PasswordHash { get; private set; }
     public DateOnly DateOfBirth { get; set; }
 
-    public User()
+    public UserAuthenticate()
     {
     }
 
-    public User(string name, string email, string passwordHash, DateOnly dateOfBirth)
+    public UserAuthenticate(string name, string email, string passwordHash, DateOnly dateOfBirth)
     {
         Name = name;
         Email = email;
@@ -20,7 +20,7 @@ public class User
         DateOfBirth = dateOfBirth;
     }
 
-    public User(int id, string name, string email, string passwordHash, DateOnly dateOfBirth)
+    public UserAuthenticate(int id, string name, string email, string passwordHash, DateOnly dateOfBirth)
     {
         Id = id;
         Name = name;

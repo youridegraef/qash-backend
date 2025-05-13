@@ -4,32 +4,32 @@ namespace TestLayer.MockData;
 
 public class UserRepositoryMock : IUserRepository
 {
-    public List<User> FindAll()
+    public List<UserAuthenticate> FindAll()
     {
         throw new NotImplementedException();
     }
 
-    public User? FindById(int id)
+    public UserAuthenticate? FindById(int id)
     {
         throw new NotImplementedException();
     }
 
-    public User? FindByEmail(string email)
+    public UserAuthenticate? FindByEmail(string email)
     {
         throw new NotImplementedException();
     }
 
-    public int Add(User user)
+    public int Add(UserAuthenticate userAuthenticate)
     {
         throw new NotImplementedException();
     }
 
-    public bool Edit(User user)
+    public bool Edit(UserAuthenticate userAuthenticate)
     {
         throw new NotImplementedException();
     }
 
-    public bool Delete(User user)
+    public bool Delete(UserAuthenticate userAuthenticate)
     {
         throw new NotImplementedException();
     }

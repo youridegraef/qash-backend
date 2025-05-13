@@ -19,30 +19,30 @@ public class UserService : IUserService
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
     }
 
-    public User Register(string name, string email, string password, DateOnly dateOfBirth)
+    public UserAuthenticate Register(string name, string email, string password, DateOnly dateOfBirth)
     {
         try
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("Name cannot be empty", nameof(name));
+                throw new ArgumentException($"Name cannot be empty: {name}");
 
             if (string.IsNullOrWhiteSpace(email))
-                throw new ArgumentException("Email cannot be empty", nameof(email));
+                throw new ArgumentException($"Email cannot be empty: {email}");
 
             if (string.IsNullOrWhiteSpace(password))
-                throw new ArgumentException("Password cannot be empty", nameof(password));
+                throw new ArgumentException($"Password cannot be empty: {password}");
 
             // Validate email format
             MailAddress m = new MailAddress(email);
 
-            // Check if user already exists
+            // Check if userAuthenticate already exists
             if (_userRepository.FindByEmail(email) != null)
-                throw new UserAlreadyExistsException($"User with email {email} already exists");
+                throw new UserAlreadyExistsException($"UserAuthenticate with email {email} already exists");
 
             string hashedPassword = PasswordHasher.HashPassword(password);
-            User newUser = new User(name, email, hashedPassword, dateOfBirth);
-            _userRepository.Add(newUser);
-            return newUser;
+            UserAuthenticate newUserAuthenticate = new UserAuthenticate(name, email, hashedPassword, dateOfBirth);
+            _userRepository.Add(newUserAuthenticate);
+            return newUserAuthenticate;
         }
         catch (FormatException ex)
         {
@@ -62,8 +62,8 @@ public class UserService : IUserService
         catch (Exception ex)
         {
             // Log the error
-            Console.WriteLine($"Error registering user: {ex.Message}, {ex.StackTrace}");
-            throw new RegistrationFailedException("Error registering user", ex);
+            Console.WriteLine($"Error registering userAuthenticate: {ex.Message}, {ex.StackTrace}");
+            throw new RegistrationFailedException("Error registering userAuthenticate", ex);
         }
     }
 
@@ -72,21 +72,21 @@ public class UserService : IUserService
         try
         {
             if (string.IsNullOrWhiteSpace(email))
-                throw new ArgumentException("Email cannot be empty", nameof(email));
+                throw new ArgumentException($"Email cannot be empty: {email}");
 
             if (string.IsNullOrWhiteSpace(password))
-                throw new ArgumentException("Password cannot be empty", nameof(password));
+                throw new ArgumentException($"Password cannot be empty: {password}");
 
             if (string.IsNullOrWhiteSpace(jwtKey))
-                throw new ArgumentException("JWT key cannot be empty", nameof(jwtKey));
+                throw new ArgumentException($"JWT key cannot be empty: {jwtKey}");
 
             if (string.IsNullOrWhiteSpace(jwtIssuer))
-                throw new ArgumentException("JWT issuer cannot be empty", nameof(jwtIssuer));
+                throw new ArgumentException($"JWT issuer cannot be empty: {jwtIssuer}");
 
-            User? user = _userRepository.FindByEmail(email);
+            UserAuthenticate? user = _userRepository.FindByEmail(email);
 
             if (user == null)
-                throw new UserNotFoundException("User not found");
+                throw new UserNotFoundException("UserAuthenticate not found");
 
             if (!PasswordHasher.VerifyPassword(password, user.PasswordHash))
                 throw new AuthenticationException("Invalid email or password");
@@ -139,17 +139,17 @@ public class UserService : IUserService
         }
     }
 
-    public User GetById(int userId)
+    public UserAuthenticate GetById(int userId)
     {
         try
         {
             if (userId <= 0)
-                throw new ArgumentException("User ID must be greater than zero", nameof(userId));
+                throw new ArgumentException($"UserAuthenticate ID must be greater than zero: {userId}");
 
-            User? user = _userRepository.FindById(userId);
+            UserAuthenticate? user = _userRepository.FindById(userId);
 
             if (user == null)
-                throw new UserNotFoundException($"User with ID {userId} not found");
+                throw new UserNotFoundException($"UserAuthenticate with ID {userId} not found");
 
             return user;
         }
@@ -166,22 +166,22 @@ public class UserService : IUserService
         catch (Exception ex)
         {
             // Log the error
-            Console.WriteLine($"Error retrieving user by ID: {ex.Message}, {ex.StackTrace}");
-            throw new UserRetrievalException($"Error retrieving user with ID {userId}", ex);
+            Console.WriteLine($"Error retrieving userAuthenticate by ID: {ex.Message}, {ex.StackTrace}");
+            throw new UserRetrievalException($"Error retrieving userAuthenticate with ID {userId}", ex);
         }
     }
 
-    public User GetByEmail(string email)
+    public UserAuthenticate GetByEmail(string email)
     {
         try
         {
             if (string.IsNullOrWhiteSpace(email))
-                throw new ArgumentException("Email cannot be empty", nameof(email));
+                throw new ArgumentException($"Email cannot be empty: {email}");
 
-            User? user = _userRepository.FindByEmail(email);
+            UserAuthenticate? user = _userRepository.FindByEmail(email);
 
             if (user == null)
-                throw new UserNotFoundException($"User with email {email} not found");
+                throw new UserNotFoundException($"UserAuthenticate with email {email} not found");
 
             return user;
         }
@@ -198,44 +198,44 @@ public class UserService : IUserService
         catch (Exception ex)
         {
             // Log the error
-            Console.WriteLine($"Error retrieving user by email: {ex.Message}, {ex.StackTrace}");
-            throw new UserRetrievalException($"Error retrieving user with email {email}", ex);
+            Console.WriteLine($"Error retrieving userAuthenticate by email: {ex.Message}, {ex.StackTrace}");
+            throw new UserRetrievalException($"Error retrieving userAuthenticate with email {email}", ex);
         }
     }
 
-    public bool Update(User user)
+    public bool Update(UserAuthenticate userAuthenticate)
     {
         try
         {
-            if (user == null)
-                throw new ArgumentNullException(nameof(user), "User cannot be null");
+            if (userAuthenticate == null)
+                throw new ArgumentException($"UserAuthenticate cannot be null: {userAuthenticate}");
 
-            if (user.Id <= 0)
-                throw new ArgumentException("User ID must be greater than zero", nameof(user));
+            if (userAuthenticate.Id <= 0)
+                throw new ArgumentException($"UserAuthenticate ID must be greater than zero: {userAuthenticate.Id}");
 
-            // Check if user exists
-            if (_userRepository.FindById(user.Id) == null)
-                throw new UserNotFoundException($"User with ID {user.Id} not found");
+            // Check if userAuthenticate exists
+            if (_userRepository.FindById(userAuthenticate.Id) == null)
+                throw new UserNotFoundException($"UserAuthenticate with ID {userAuthenticate.Id} not found");
 
-            _userRepository.Edit(user);
+            _userRepository.Edit(userAuthenticate);
             return true;
         }
         catch (UserNotFoundException ex)
         {
             // Log the error
-            Console.WriteLine($"User not found during update: {ex.Message}");
+            Console.WriteLine($"UserAuthenticate not found during update: {ex.Message}");
             return false;
         }
         catch (ArgumentException ex)
         {
             // Log the error
-            Console.WriteLine($"Invalid argument during user update: {ex.Message}");
+            Console.WriteLine($"Invalid argument during userAuthenticate update: {ex.Message}");
             return false;
         }
         catch (Exception ex)
         {
             // Log the error
-            Console.WriteLine($"Error updating user: {ex.Message}, {ex.StackTrace}");
+            Console.WriteLine($"Error updating userAuthenticate: {ex.Message}, {ex.StackTrace}");
             return false;
         }
     }
@@ -245,12 +245,12 @@ public class UserService : IUserService
         try
         {
             if (id <= 0)
-                throw new ArgumentException("User ID must be greater than zero", nameof(id));
+                throw new ArgumentException($"UserAuthenticate ID must be greater than zero: {id}");
 
-            User? user = _userRepository.FindById(id);
+            UserAuthenticate? user = _userRepository.FindById(id);
 
             if (user == null)
-                throw new UserNotFoundException($"User with ID {id} not found");
+                throw new UserNotFoundException($"UserAuthenticate with ID {id} not found");
 
             _userRepository.Delete(user);
             return true;
@@ -258,19 +258,19 @@ public class UserService : IUserService
         catch (UserNotFoundException ex)
         {
             // Log the error
-            Console.WriteLine($"User not found during delete: {ex.Message}");
+            Console.WriteLine($"UserAuthenticate not found during delete: {ex.Message}");
             return false;
         }
         catch (ArgumentException ex)
         {
             // Log the error
-            Console.WriteLine($"Invalid argument during user delete: {ex.Message}");
+            Console.WriteLine($"Invalid argument during userAuthenticate delete: {ex.Message}");
             return false;
         }
         catch (Exception ex)
         {
             // Log the error
-            Console.WriteLine($"Error deleting user: {ex.Message}, {ex.StackTrace}");
+            Console.WriteLine($"Error deleting userAuthenticate: {ex.Message}, {ex.StackTrace}");
             return false;
         }
     }
