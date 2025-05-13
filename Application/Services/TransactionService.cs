@@ -22,7 +22,6 @@ public class TransactionService : ITransactionService
 
         if (transaction != null)
         {
-            transaction.Tags = _transactionRepository.GetTagsByTransactionId(id);
             return transaction;
         }
 
@@ -34,16 +33,11 @@ public class TransactionService : ITransactionService
         try
         {
             List<Transaction> transactions = _transactionRepository.FindAll();
-            foreach (var transaction in transactions)
-            {
-                transaction.Tags = _transactionRepository.GetTagsByTransactionId(transaction.Id);
-            }
-
             return transactions;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            throw new Exception($"No transactions found.");
+            throw new Exception($"No transactions found. {ex.Message}");
         }
     }
 
@@ -55,10 +49,7 @@ public class TransactionService : ITransactionService
             var filteredTransactions = allTransactions
                 .Where(t => t.Date >= startDate && t.Date <= endDate).ToList();
 
-            foreach (var transaction in filteredTransactions)
-            {
-                transaction.Tags = _transactionRepository.GetTagsByTransactionId(transaction.Id);
-            }
+
 
             return filteredTransactions;
         }
@@ -76,10 +67,7 @@ public class TransactionService : ITransactionService
             var filteredTransactions = allTransactions
                 .Where(t => t.UserId == userId).ToList();
 
-            foreach (var transaction in filteredTransactions)
-            {
-                transaction.Tags = _transactionRepository.GetTagsByTransactionId(transaction.Id);
-            }
+     
 
             return filteredTransactions;
         }
@@ -97,10 +85,7 @@ public class TransactionService : ITransactionService
             var filteredTransactions = allTransactions
                 .Where(t => t.CategoryId == id).ToList();
 
-            foreach (var transaction in filteredTransactions)
-            {
-                transaction.Tags = _transactionRepository.GetTagsByTransactionId(transaction.Id);
-            }
+         
 
             return filteredTransactions;
         }
@@ -110,36 +95,12 @@ public class TransactionService : ITransactionService
         }
     }
 
-    public List<Transaction> GetByTag(int tagId)
-    {
-        try
-        {
-            List<Transaction> allTransactions = _transactionRepository.FindAll();
-
-            var filteredTransactions = allTransactions
-                .Where(t => t.Tags != null && t.Tags.Any(tag => tag.Id == tagId))
-                .ToList();
-
-            foreach (var transaction in filteredTransactions)
-            {
-                transaction.Tags = _transactionRepository.GetTagsByTransactionId(transaction.Id);
-            }
-
-            return filteredTransactions;
-        }
-        catch
-        {
-            throw new Exception($"No transactions under tag with id: {tagId} found.");
-        }
-    }
-
     public Transaction Add(string description, double amount, DateOnly date, int userId, int categoryId)
     {
         try
         {
             Transaction transaction = new Transaction(amount, description, date, userId, categoryId);
             transaction.Id = _transactionRepository.Add(transaction);
-            transaction.Tags = _transactionRepository.GetTagsByTransactionId(transaction.Id);
 
             return transaction;
         }

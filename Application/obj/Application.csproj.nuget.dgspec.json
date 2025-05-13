@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/macbook/RiderProjects/ExpenseTracker/ExpenseTracker/Application/Application.csproj": {}
+    "/Users/macbook/Tech/SchoolProjects/ExpenseTracker/Application/Application.csproj": {}
   },
   "projects": {
-    "/Users/macbook/RiderProjects/ExpenseTracker/ExpenseTracker/Application/Application.csproj": {
+    "/Users/macbook/Tech/SchoolProjects/ExpenseTracker/Application/Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/macbook/RiderProjects/ExpenseTracker/ExpenseTracker/Application/Application.csproj",
+        "projectUniqueName": "/Users/macbook/Tech/SchoolProjects/ExpenseTracker/Application/Application.csproj",
         "projectName": "Application",
-        "projectPath": "/Users/macbook/RiderProjects/ExpenseTracker/ExpenseTracker/Application/Application.csproj",
+        "projectPath": "/Users/macbook/Tech/SchoolProjects/ExpenseTracker/Application/Application.csproj",
         "packagesPath": "/Users/macbook/.nuget/packages/",
-        "outputPath": "/Users/macbook/RiderProjects/ExpenseTracker/ExpenseTracker/Application/obj/",
+        "outputPath": "/Users/macbook/Tech/SchoolProjects/ExpenseTracker/Application/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/macbook/.nuget/NuGet/NuGet.Config"
@@ -55,6 +55,10 @@
             "Microsoft.Data.Sqlite.Core": {
               "target": "Package",
               "version": "[8.0.14, )"
+            },
+            "System.IdentityModel.Tokens.Jwt": {
+              "target": "Package",
+              "version": "[8.9.0, )"
             }
           },
           "imports": [

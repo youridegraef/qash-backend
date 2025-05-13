@@ -8,11 +8,6 @@ public class User
     public string PasswordHash { get; private set; }
     public DateOnly DateOfBirth { get; set; }
 
-    public List<Transaction> Transactions { get; set; } = new List<Transaction>();
-    public List<Tag> Tags { get; set; } = new List<Tag>();
-    public List<SavingGoal> SavingGoals { get; set; } = new List<SavingGoal>();
-    public List<Category> Categories { get; set; } = new List<Category>();
-
     public User()
     {
     }
