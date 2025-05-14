@@ -41,14 +41,14 @@ public class UserController : ControllerBase
         string issuer = _configuration["Jwt:Issuer"];
         AuthenticationDto dto = _userService.Authenticate(loginRequest.Email, loginRequest.Password, key, issuer);
 
-        if (dto.UserAuthenticate == null)
+        if (dto.User == null)
         {
             return Unauthorized(new { message = "Invalid email or password." });
         }
 
-        UserModel loggedInUser = new UserModel(dto.UserAuthenticate.Id, dto.UserAuthenticate.Name, dto.UserAuthenticate.Email, dto.UserAuthenticate.DateOfBirth);
+        UserModel loggedInUser = new UserModel(dto.User.Id, dto.User.Name, dto.User.Email, dto.User.DateOfBirth);
 
-        // Geef token én userAuthenticate terug
+        // Geef token én user terug
         return Ok(new
         {
             dto.Token,
@@ -65,16 +65,16 @@ public class UserController : ControllerBase
             return BadRequest(new { messae = "Name, Email, Passowrd and DateOfBirth are required." });
         }
 
-        UserAuthenticate userAuthenticate = _userService.Register(registerRequest.Name, registerRequest.Email, registerRequest.Password,
+        User user = _userService.Register(registerRequest.Name, registerRequest.Email, registerRequest.Password,
             registerRequest.DateOfBirth);
 
-        if (userAuthenticate == null)
+        if (user == null)
         {
-            return Conflict(new { message = "UserAuthenticate registration failed. Email might already be in use." });
+            return Conflict(new { message = "User registration failed. Email might already be in use." });
         }
 
-        userAuthenticate = _userService.GetByEmail(userAuthenticate.Email);
-        UserModel LoggedInUser = new UserModel(userAuthenticate.Id, userAuthenticate.Name, userAuthenticate.Email, userAuthenticate.DateOfBirth);
+        user = _userService.GetByEmail(user.Email);
+        UserModel LoggedInUser = new UserModel(user.Id, user.Name, user.Email, user.DateOfBirth);
 
         return Ok(LoggedInUser);
     }

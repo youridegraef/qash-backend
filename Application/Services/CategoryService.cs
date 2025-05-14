@@ -51,7 +51,7 @@ public class CategoryService : ICategoryService
         }
         catch
         {
-            throw new Exception($"No categories with userAuthenticate id: {userId} found.");
+            throw new Exception($"No categories with user id: {userId} found.");
         }
     }
 
@@ -68,7 +68,7 @@ public class CategoryService : ICategoryService
         }
         catch
         {
-            throw new Exception($"No categories with userAuthenticate id: {name} found.");
+            throw new Exception($"No categories with user id: {name} found.");
         }
     }
 

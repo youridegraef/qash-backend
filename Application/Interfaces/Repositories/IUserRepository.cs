@@ -5,15 +5,15 @@ namespace Application.Interfaces;
 
 public interface IUserRepository
 {
-    public List<UserAuthenticate> FindAll();
+    public List<User> FindAll();
 
-    public UserAuthenticate? FindById(int id);
+    public User? FindById(int id);
 
-    public UserAuthenticate? FindByEmail(string email);
+    public User? FindByEmail(string email);
 
-    public int Add(UserAuthenticate userAuthenticate);
+    public int Add(User user);
 
-    public bool Edit(UserAuthenticate userAuthenticate);
+    public bool Edit(User user);
 
-    public bool Delete(UserAuthenticate userAuthenticate);
+    public bool Delete(User user);
 }

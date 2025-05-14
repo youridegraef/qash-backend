@@ -78,6 +78,48 @@ public class TransactionRepository : ITransactionRepository
         }
     }
 
+    public List<Transaction> FindByUserId(int userId)
+    {
+        try
+        {
+            List<Transaction> allTransactions = new List<Transaction>();
+
+            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            connection.Open();
+
+            string sql = "SELECT * FROM transactions WHERE user_id = @user_id";
+
+            using MySqlCommand command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@user_id", userId);
+
+            using MySqlDataReader reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                allTransactions.Add(
+                    new Transaction(
+                        Convert.ToInt32(reader["id"]),
+                        (string)reader["description"],
+                        Convert.ToDouble(reader["amount"]),
+                        DateOnly.FromDateTime(Convert.ToDateTime(reader["date"])),
+                        Convert.ToInt32(reader["user_id"]),
+                        Convert.ToInt32(reader["category_id"])
+                    )
+                );
+            }
+
+            return allTransactions;
+        }
+        catch (TransactionNotFoundException)
+        {
+            throw new TransactionNotFoundException($"Transaction with UserID {userId} was not found.");
+        }
+        catch (MySqlException ex)
+        {
+            throw new DatabaseException($"Error retrieving transaction with UserID {userId} from the database.", ex);
+        }
+    }
+
     public int Add(Transaction transaction)
     {
         try

@@ -3,11 +3,11 @@ namespace Application.Dtos;
 public class AuthenticationDto
 {
     public string Token { get; set; }
-    public UserAuthenticate UserAuthenticate { get; set; }
+    public User User { get; set; }
 
-    public AuthenticationDto(string token, UserAuthenticate userAuthenticate)
+    public AuthenticationDto(string token, User user)
     {
         Token = token;
-        UserAuthenticate = userAuthenticate;
+        User = user;
     }
 }

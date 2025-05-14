@@ -8,270 +8,236 @@ using Application.Dtos;
 using Application.Exceptions;
 using Application.Interfaces;
 
-namespace Application.Services;
-
-public class UserService : IUserService
+namespace Application.Services
 {
-    private readonly IUserRepository _userRepository;
-
-    public UserService(IUserRepository userRepository)
+    public class UserService : IUserService
     {
-        _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
-    }
+        private readonly IUserRepository _userRepository;
 
-    public UserAuthenticate Register(string name, string email, string password, DateOnly dateOfBirth)
-    {
-        try
+        public UserService(IUserRepository userRepository)
         {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException($"Name cannot be empty: {name}");
-
-            if (string.IsNullOrWhiteSpace(email))
-                throw new ArgumentException($"Email cannot be empty: {email}");
-
-            if (string.IsNullOrWhiteSpace(password))
-                throw new ArgumentException($"Password cannot be empty: {password}");
-
-            // Validate email format
-            MailAddress m = new MailAddress(email);
-
-            // Check if userAuthenticate already exists
-            if (_userRepository.FindByEmail(email) != null)
-                throw new UserAlreadyExistsException($"UserAuthenticate with email {email} already exists");
-
-            string hashedPassword = PasswordHasher.HashPassword(password);
-            UserAuthenticate newUserAuthenticate = new UserAuthenticate(name, email, hashedPassword, dateOfBirth);
-            _userRepository.Add(newUserAuthenticate);
-            return newUserAuthenticate;
+            _userRepository = userRepository;
         }
-        catch (FormatException ex)
+
+        public User Register(string name, string email, string password, DateOnly dateOfBirth)
         {
-            // Log the error
-            throw new InvalidEmailFormatException($"Invalid email format {ex}");
-        }
-        catch (UserAlreadyExistsException)
-        {
-            // Re-throw the exception
-            throw;
-        }
-        catch (ArgumentException)
-        {
-            // Re-throw the exception
-            throw;
-        }
-        catch (Exception ex)
-        {
-            // Log the error
-            Console.WriteLine($"Error registering userAuthenticate: {ex.Message}, {ex.StackTrace}");
-            throw new RegistrationFailedException("Error registering userAuthenticate", ex);
-        }
-    }
-
-    public AuthenticationDto Authenticate(string email, string password, string jwtKey, string jwtIssuer)
-    {
-        try
-        {
-            if (string.IsNullOrWhiteSpace(email))
-                throw new ArgumentException($"Email cannot be empty: {email}");
-
-            if (string.IsNullOrWhiteSpace(password))
-                throw new ArgumentException($"Password cannot be empty: {password}");
-
-            if (string.IsNullOrWhiteSpace(jwtKey))
-                throw new ArgumentException($"JWT key cannot be empty: {jwtKey}");
-
-            if (string.IsNullOrWhiteSpace(jwtIssuer))
-                throw new ArgumentException($"JWT issuer cannot be empty: {jwtIssuer}");
-
-            UserAuthenticate? user = _userRepository.FindByEmail(email);
-
-            if (user == null)
-                throw new UserNotFoundException("UserAuthenticate not found");
-
-            if (!PasswordHasher.VerifyPassword(password, user.PasswordHash))
-                throw new AuthenticationException("Invalid email or password");
-
-            // JWT claims
-            var claims = new[]
+            try
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim("userId", user.Id.ToString()),
-                new Claim("name", user.Name)
-            };
+                if (string.IsNullOrWhiteSpace(name))
+                    throw new ArgumentException($"Name cannot be empty: {name}");
 
-            // JWT settings
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+                if (string.IsNullOrWhiteSpace(email))
+                    throw new ArgumentException($"Email cannot be empty: {email}");
 
-            var token = new JwtSecurityToken(
-                issuer: jwtIssuer,
-                audience: null,
-                claims: claims,
-                expires: DateTime.UtcNow.AddDays(7),
-                signingCredentials: creds
-            );
+                if (string.IsNullOrWhiteSpace(password))
+                    throw new ArgumentException($"Password cannot be empty: {password}");
 
-            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-            AuthenticationDto dto = new AuthenticationDto(tokenString, user);
-            return dto;
-        }
-        catch (UserNotFoundException)
-        {
-            // Re-throw the exception
-            throw;
-        }
-        catch (AuthenticationException)
-        {
-            // Re-throw the exception
-            throw;
-        }
-        catch (ArgumentException)
-        {
-            // Re-throw the exception
-            throw;
-        }
-        catch (Exception ex)
-        {
-            // Log the error
-            Console.WriteLine($"Authentication error: {ex.Message}, {ex.StackTrace}");
-            throw new AuthenticationFailedException("Authentication failed", ex);
-        }
-    }
+                MailAddress m = new MailAddress(email);
 
-    public UserAuthenticate GetById(int userId)
-    {
-        try
-        {
-            if (userId <= 0)
-                throw new ArgumentException($"UserAuthenticate ID must be greater than zero: {userId}");
+                if (_userRepository.FindByEmail(email) != null)
+                    throw new UserAlreadyExistsException($"User with email {email} already exists");
 
-            UserAuthenticate? user = _userRepository.FindById(userId);
+                string hashedPassword = PasswordHasher.HashPassword(password);
+                User newUser = new User(name, email, hashedPassword, dateOfBirth);
+                _userRepository.Add(newUser);
+                return newUser;
+            }
+            catch (ArgumentException)
+            {
+                throw;
+            }
+            catch (UserAlreadyExistsException)
+            {
+                throw;
+            }
+            catch (FormatException ex)
+            {
+                throw new InvalidEmailFormatException($"Invalid email format {email}");
+            }
+            catch (Exception ex)
+            {
+                throw new RegistrationFailedException("Error registering user", ex);
+            }
+        }
 
-            if (user == null)
-                throw new UserNotFoundException($"UserAuthenticate with ID {userId} not found");
+        public AuthenticationDto Authenticate(string email, string password, string jwtKey, string jwtIssuer)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(email))
+                    throw new ArgumentException($"Email cannot be empty: {email}");
 
-            return user;
-        }
-        catch (UserNotFoundException)
-        {
-            // Re-throw the exception
-            throw;
-        }
-        catch (ArgumentException)
-        {
-            // Re-throw the exception
-            throw;
-        }
-        catch (Exception ex)
-        {
-            // Log the error
-            Console.WriteLine($"Error retrieving userAuthenticate by ID: {ex.Message}, {ex.StackTrace}");
-            throw new UserRetrievalException($"Error retrieving userAuthenticate with ID {userId}", ex);
-        }
-    }
+                if (string.IsNullOrWhiteSpace(password))
+                    throw new ArgumentException($"Password cannot be empty: {password}");
 
-    public UserAuthenticate GetByEmail(string email)
-    {
-        try
-        {
-            if (string.IsNullOrWhiteSpace(email))
-                throw new ArgumentException($"Email cannot be empty: {email}");
+                if (string.IsNullOrWhiteSpace(jwtKey))
+                    throw new ArgumentException($"JWT key cannot be empty: {jwtKey}");
 
-            UserAuthenticate? user = _userRepository.FindByEmail(email);
+                if (string.IsNullOrWhiteSpace(jwtIssuer))
+                    throw new ArgumentException($"JWT issuer cannot be empty: {jwtIssuer}");
 
-            if (user == null)
-                throw new UserNotFoundException($"UserAuthenticate with email {email} not found");
+                User? user = _userRepository.FindByEmail(email);
 
-            return user;
-        }
-        catch (UserNotFoundException)
-        {
-            // Re-throw the exception
-            throw;
-        }
-        catch (ArgumentException)
-        {
-            // Re-throw the exception
-            throw;
-        }
-        catch (Exception ex)
-        {
-            // Log the error
-            Console.WriteLine($"Error retrieving userAuthenticate by email: {ex.Message}, {ex.StackTrace}");
-            throw new UserRetrievalException($"Error retrieving userAuthenticate with email {email}", ex);
-        }
-    }
+                if (user == null)
+                    throw new UserNotFoundException("User not found");
 
-    public bool Update(UserAuthenticate userAuthenticate)
-    {
-        try
-        {
-            if (userAuthenticate == null)
-                throw new ArgumentException($"UserAuthenticate cannot be null: {userAuthenticate}");
+                if (!PasswordHasher.VerifyPassword(password, user.PasswordHash))
+                    throw new AuthenticationException("Invalid email or password");
 
-            if (userAuthenticate.Id <= 0)
-                throw new ArgumentException($"UserAuthenticate ID must be greater than zero: {userAuthenticate.Id}");
+                var claims = new[]
+                {
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim("userId", user.Id.ToString()),
+                    new Claim("name", user.Name)
+                };
 
-            // Check if userAuthenticate exists
-            if (_userRepository.FindById(userAuthenticate.Id) == null)
-                throw new UserNotFoundException($"UserAuthenticate with ID {userAuthenticate.Id} not found");
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            _userRepository.Edit(userAuthenticate);
-            return true;
-        }
-        catch (UserNotFoundException ex)
-        {
-            // Log the error
-            Console.WriteLine($"UserAuthenticate not found during update: {ex.Message}");
-            return false;
-        }
-        catch (ArgumentException ex)
-        {
-            // Log the error
-            Console.WriteLine($"Invalid argument during userAuthenticate update: {ex.Message}");
-            return false;
-        }
-        catch (Exception ex)
-        {
-            // Log the error
-            Console.WriteLine($"Error updating userAuthenticate: {ex.Message}, {ex.StackTrace}");
-            return false;
-        }
-    }
+                var token = new JwtSecurityToken(
+                    issuer: jwtIssuer,
+                    audience: null,
+                    claims: claims,
+                    expires: DateTime.UtcNow.AddDays(7),
+                    signingCredentials: creds
+                );
 
-    public bool Delete(int id)
-    {
-        try
-        {
-            if (id <= 0)
-                throw new ArgumentException($"UserAuthenticate ID must be greater than zero: {id}");
-
-            UserAuthenticate? user = _userRepository.FindById(id);
-
-            if (user == null)
-                throw new UserNotFoundException($"UserAuthenticate with ID {id} not found");
-
-            _userRepository.Delete(user);
-            return true;
+                var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+                AuthenticationDto dto = new AuthenticationDto(tokenString, user);
+                return dto;
+            }
+            catch (UserNotFoundException)
+            {
+                throw;
+            }
+            catch (AuthenticationException)
+            {
+                throw;
+            }
+            catch (ArgumentException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new AuthenticationFailedException("Authentication failed", ex);
+            }
         }
-        catch (UserNotFoundException ex)
+
+        public User GetById(int userId)
         {
-            // Log the error
-            Console.WriteLine($"UserAuthenticate not found during delete: {ex.Message}");
-            return false;
+            try
+            {
+                if (userId <= 0)
+                    throw new ArgumentException($"User ID must be greater than zero: {userId}");
+
+                User? user = _userRepository.FindById(userId);
+
+                if (user == null)
+                    throw new UserNotFoundException($"User with ID {userId} not found");
+
+                return user;
+            }
+            catch (UserNotFoundException)
+            {
+                throw;
+            }
+            catch (ArgumentException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new UserRetrievalException($"Error retrieving user with ID {userId}", ex);
+            }
         }
-        catch (ArgumentException ex)
+
+        public User GetByEmail(string email)
         {
-            // Log the error
-            Console.WriteLine($"Invalid argument during userAuthenticate delete: {ex.Message}");
-            return false;
+            try
+            {
+                if (string.IsNullOrWhiteSpace(email))
+                    throw new ArgumentException($"Email cannot be empty: {email}");
+
+                User? user = _userRepository.FindByEmail(email);
+
+                if (user == null)
+                    throw new UserNotFoundException($"User with email {email} not found");
+
+                return user;
+            }
+            catch (UserNotFoundException)
+            {
+                throw;
+            }
+            catch (ArgumentException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new UserRetrievalException($"Error retrieving user with email {email}", ex);
+            }
         }
-        catch (Exception ex)
+
+        public bool Update(User user)
         {
-            // Log the error
-            Console.WriteLine($"Error deleting userAuthenticate: {ex.Message}, {ex.StackTrace}");
-            return false;
+            try
+            {
+                if (user == null)
+                    throw new ArgumentException($"User cannot be null: {user}");
+
+                if (user.Id <= 0)
+                    throw new ArgumentException($"User ID must be greater than zero: {user.Id}");
+
+                if (_userRepository.FindById(user.Id) == null)
+                    throw new UserNotFoundException($"User with ID {user.Id} not found");
+
+                _userRepository.Edit(user);
+                return true;
+            }
+            catch (UserNotFoundException ex)
+            {
+                throw;
+            }
+            catch (ArgumentException ex)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public bool Delete(int id)
+        {
+            try
+            {
+                if (id <= 0)
+                    throw new ArgumentException($"User ID must be greater than zero: {id}");
+
+                User? user = _userRepository.FindById(id);
+
+                if (user == null)
+                    throw new UserNotFoundException($"User with ID {id} not found");
+
+                _userRepository.Delete(user);
+                return true;
+            }
+            catch (UserNotFoundException ex)
+            {
+                return false;
+            }
+            catch (ArgumentException ex)
+            {
+                return false;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
     }
 }

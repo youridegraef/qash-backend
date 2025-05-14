@@ -1,4 +1,5 @@
 using Application.Domain;
+using Application.Dtos;
 using Application.Exceptions;
 using Application.Interfaces;
 
@@ -50,7 +51,6 @@ public class TransactionService : ITransactionService
                 .Where(t => t.Date >= startDate && t.Date <= endDate).ToList();
 
 
-
             return filteredTransactions;
         }
         catch (Exception)
@@ -67,7 +67,6 @@ public class TransactionService : ITransactionService
             var filteredTransactions = allTransactions
                 .Where(t => t.UserId == userId).ToList();
 
-     
 
             return filteredTransactions;
         }
@@ -85,7 +84,6 @@ public class TransactionService : ITransactionService
             var filteredTransactions = allTransactions
                 .Where(t => t.CategoryId == id).ToList();
 
-         
 
             return filteredTransactions;
         }
@@ -147,6 +145,58 @@ public class TransactionService : ITransactionService
         catch (Exception)
         {
             return false;
+        }
+    }
+
+    public double GetBalance(int userId)
+    {
+        try
+        {
+            double balance = 0.00;
+            var transactions = _transactionRepository.FindByUserId(userId);
+            foreach (var transaction in transactions)
+            {
+                balance += transaction.Amount;
+            }
+
+            return balance;
+        }
+        catch (TransactionNotFoundException)
+        {
+            throw new TransactionNotFoundException($"No transactions found with category id: {userId}");
+        }
+    }
+
+    public List<ChartDataDto> GetChartData(int userId)
+    {
+        try
+        {
+            List<ChartDataDto> chartData = new List<ChartDataDto>();
+            double balance = 0;
+            var transactions = GetByUserId(userId);
+
+            var transactionsByDay = transactions
+                .GroupBy(t => t.Date)
+                .OrderBy(g => g.Key);
+
+            foreach (var dayGroup in transactionsByDay)
+            {
+                double dailyChange = 0;
+                foreach (var transaction in dayGroup)
+                {
+                    dailyChange += transaction.Amount;
+                }
+
+                balance += dailyChange;
+
+                chartData.Add(new ChartDataDto(dayGroup.Key, balance));
+            }
+
+            return chartData;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception();
         }
     }
 }

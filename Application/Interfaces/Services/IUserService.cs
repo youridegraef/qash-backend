@@ -6,10 +6,10 @@ namespace Application.Interfaces;
 
 public interface IUserService
 {
-    UserAuthenticate Register(string name, string email, string password, DateOnly dateOfBirth);
+    User Register(string name, string email, string password, DateOnly dateOfBirth);
     AuthenticationDto Authenticate(string email, string password, string jwtKey, string jwtIssuer);
-    UserAuthenticate GetById(int userId);
-    UserAuthenticate GetByEmail(string email);
-    bool Update(UserAuthenticate userAuthenticate);
+    User GetById(int userId);
+    User GetByEmail(string email);
+    bool Update(User user);
     bool Delete(int id);
 }

@@ -9,15 +9,15 @@ public class UserRepository : IUserRepository
 {
     private readonly DatabaseConnection _dbConnection = new DatabaseConnection();
 
-    public List<UserAuthenticate> FindAll()
+    public List<User> FindAll()
     {
         try
         {
-            List<UserAuthenticate> allUsers = new List<UserAuthenticate>();
+            List<User> allUsers = new List<User>();
             using MySqlConnection connection = _dbConnection.GetMySqlConnection();
             connection.Open();
 
-            string sql = "SELECT * FROM userAuthenticate";
+            string sql = "SELECT * FROM user";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             using MySqlDataReader reader = command.ExecuteReader();
@@ -25,7 +25,7 @@ public class UserRepository : IUserRepository
             while (reader.Read())
             {
                 allUsers.Add(
-                    new UserAuthenticate(
+                    new User(
                         Convert.ToInt32(reader["id"]),
                         reader["name"].ToString(),
                         reader["email"].ToString(),
@@ -43,14 +43,14 @@ public class UserRepository : IUserRepository
         }
     }
 
-    public UserAuthenticate? FindById(int id)
+    public User FindById(int id)
     {
         try
         {
             using MySqlConnection connection = _dbConnection.GetMySqlConnection();
             connection.Open();
 
-            string sql = "SELECT * FROM userAuthenticate WHERE id = @id";
+            string sql = "SELECT * FROM user WHERE id = @id";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@id", id);
@@ -59,7 +59,7 @@ public class UserRepository : IUserRepository
 
             if (reader.Read())
             {
-                return new UserAuthenticate(
+                return new User(
                     Convert.ToInt32(reader["id"]),
                     reader["name"].ToString(),
                     reader["email"].ToString(),
@@ -68,22 +68,22 @@ public class UserRepository : IUserRepository
                 );
             }
 
-            throw new UserNotFoundException($"UserAuthenticate with ID {id} was not found.");
+            throw new UserNotFoundException($"User with ID {id} was not found.");
         }
         catch (MySqlException ex)
         {
-            throw new DatabaseException($"Error retrieving userAuthenticate with ID {id} from the database.", ex);
+            throw new DatabaseException($"Error retrieving user with ID {id} from the database.", ex);
         }
     }
 
-    public UserAuthenticate? FindByEmail(string email)
+    public User FindByEmail(string email)
     {
         try
         {
             using MySqlConnection connection = _dbConnection.GetMySqlConnection();
             connection.Open();
 
-            string sql = "SELECT * FROM userAuthenticate WHERE email = @email";
+            string sql = "SELECT * FROM user WHERE email = @email";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@email", email);
@@ -92,7 +92,7 @@ public class UserRepository : IUserRepository
 
             if (reader.Read())
             {
-                return new UserAuthenticate(
+                return new User(
                     Convert.ToInt32(reader["id"]),
                     reader["name"].ToString(),
                     reader["email"].ToString(),
@@ -101,15 +101,15 @@ public class UserRepository : IUserRepository
                 );
             }
 
-            throw new UserNotFoundException($"UserAuthenticate with email {email} was not found.");
+            throw new UserNotFoundException($"User with email {email} was not found.");
         }
         catch (MySqlException ex)
         {
-            throw new DatabaseException($"Error retrieving userAuthenticate with email {email} from the database.", ex);
+            throw new DatabaseException($"Error retrieving user with email {email} from the database.", ex);
         }
     }
 
-    public int Add(UserAuthenticate userAuthenticate)
+    public int Add(User user)
     {
         try
         {
@@ -117,15 +117,15 @@ public class UserRepository : IUserRepository
             connection.Open();
 
             string sql =
-                "INSERT INTO userAuthenticate (name, email, password_hash, date_of_birth) " +
+                "INSERT INTO user (name, email, password_hash, date_of_birth) " +
                 "VALUES (@name, @email, @password_hash, @date_of_birth)";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
 
-            command.Parameters.AddWithValue("@name", userAuthenticate.Name);
-            command.Parameters.AddWithValue("@email", userAuthenticate.Email);
-            command.Parameters.AddWithValue("@password_hash", userAuthenticate.PasswordHash);
-            command.Parameters.AddWithValue("@date_of_birth", userAuthenticate.DateOfBirth.ToDateTime(TimeOnly.MinValue));
+            command.Parameters.AddWithValue("@name", user.Name);
+            command.Parameters.AddWithValue("@email", user.Email);
+            command.Parameters.AddWithValue("@password_hash", user.PasswordHash);
+            command.Parameters.AddWithValue("@date_of_birth", user.DateOfBirth.ToDateTime(TimeOnly.MinValue));
 
             int rowsAffected = command.ExecuteNonQuery();
 
@@ -137,15 +137,15 @@ public class UserRepository : IUserRepository
                 return newId;
             }
 
-            throw new DatabaseException("Failed to add the userAuthenticate to the database. No rows were affected.");
+            throw new DatabaseException("Failed to add the user to the database. No rows were affected.");
         }
         catch (MySqlException ex)
         {
-            throw new DatabaseException("Error adding a new userAuthenticate to the database.", ex);
+            throw new DatabaseException("Error adding a new user to the database.", ex);
         }
     }
 
-    public bool Edit(UserAuthenticate userAuthenticate)
+    public bool Edit(User user)
     {
         try
         {
@@ -153,15 +153,15 @@ public class UserRepository : IUserRepository
             connection.Open();
 
             string sql =
-                "UPDATE userAuthenticate SET name = @name, email = @email, password_hash = @password_hash, date_of_birth = @date_of_birth WHERE id = @id";
+                "UPDATE user SET name = @name, email = @email, password_hash = @password_hash, date_of_birth = @date_of_birth WHERE id = @id";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
 
-            command.Parameters.AddWithValue("@id", userAuthenticate.Id);
-            command.Parameters.AddWithValue("@name", userAuthenticate.Name);
-            command.Parameters.AddWithValue("@email", userAuthenticate.Email);
-            command.Parameters.AddWithValue("@password_hash", userAuthenticate.PasswordHash);
-            command.Parameters.AddWithValue("@date_of_birth", userAuthenticate.DateOfBirth);
+            command.Parameters.AddWithValue("@id", user.Id);
+            command.Parameters.AddWithValue("@name", user.Name);
+            command.Parameters.AddWithValue("@email", user.Email);
+            command.Parameters.AddWithValue("@password_hash", user.PasswordHash);
+            command.Parameters.AddWithValue("@date_of_birth", user.DateOfBirth);
 
             int rowsAffected = command.ExecuteNonQuery();
 
@@ -170,25 +170,25 @@ public class UserRepository : IUserRepository
                 return true;
             }
 
-            throw new UserNotFoundException($"UserAuthenticate with ID {userAuthenticate.Id} was not found for update.");
+            throw new UserNotFoundException($"User with ID {user.Id} was not found for update.");
         }
         catch (MySqlException ex)
         {
-            throw new DatabaseException($"Error updating userAuthenticate with ID {userAuthenticate.Id} in the database.", ex);
+            throw new DatabaseException($"Error updating user with ID {user.Id} in the database.", ex);
         }
     }
 
-    public bool Delete(UserAuthenticate userAuthenticate)
+    public bool Delete(User user)
     {
         try
         {
             using MySqlConnection connection = _dbConnection.GetMySqlConnection();
             connection.Open();
 
-            string sql = "DELETE FROM userAuthenticate WHERE id = @id";
+            string sql = "DELETE FROM user WHERE id = @id";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@id", userAuthenticate.Id);
+            command.Parameters.AddWithValue("@id", user.Id);
 
             int rowsAffected = command.ExecuteNonQuery();
 
@@ -197,11 +197,11 @@ public class UserRepository : IUserRepository
                 return true;
             }
 
-            throw new UserNotFoundException($"UserAuthenticate with ID {userAuthenticate.Id} was not found for deletion.");
+            throw new UserNotFoundException($"User with ID {user.Id} was not found for deletion.");
         }
         catch (MySqlException ex)
         {
-            throw new DatabaseException($"Error deleting userAuthenticate with ID {userAuthenticate.Id} from the database.", ex);
+            throw new DatabaseException($"Error deleting user with ID {user.Id} from the database.", ex);
         }
     }
 }

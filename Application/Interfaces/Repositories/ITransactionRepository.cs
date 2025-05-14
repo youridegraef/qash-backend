@@ -8,6 +8,7 @@ public interface ITransactionRepository
     public List<Transaction> FindAll();
 
     public Transaction? FindById(int id);
+    public List<Transaction> FindByUserId(int userId);
 
     public int Add(Transaction transaction);
 
