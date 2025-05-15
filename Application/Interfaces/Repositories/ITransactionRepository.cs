@@ -7,7 +7,7 @@ public interface ITransactionRepository
 {
     public List<Transaction> FindAll();
 
-    public Transaction? FindById(int id);
+    public Transaction FindById(int id);
     public List<Transaction> FindByUserId(int userId);
 
     public int Add(Transaction transaction);
@@ -15,5 +15,4 @@ public interface ITransactionRepository
     public bool Edit(Transaction transaction);
 
     public bool Delete(Transaction transaction);
-    public List<Tag> GetTagsByTransactionId(int transactionId);
 }

@@ -2,43 +2,51 @@ using Application.Domain;
 using Application.Dtos;
 using Application.Exceptions;
 using Application.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
 
-public class TransactionService : ITransactionService
+public class TransactionService(
+    ITransactionRepository transactionRepository,
+    ILogger<TransactionService> logger)
+    : ITransactionService
 {
-    private readonly ITransactionRepository _transactionRepository;
-    private readonly ITagService _tagService;
-
-    public TransactionService(ITransactionRepository transactionRepository, ITagService tagService)
-    {
-        _transactionRepository = transactionRepository;
-        _tagService = tagService;
-    }
-
-
     public Transaction GetById(int id)
     {
-        Transaction transaction = _transactionRepository.FindById(id);
-
-        if (transaction != null)
+        try
         {
-            return transaction;
-        }
+            Transaction transaction = transactionRepository.FindById(id);
 
-        throw new KeyNotFoundException($"No transaction with id: {id} found.");
+            if (transaction != null!)
+            {
+                return transaction;
+            }
+
+            throw new KeyNotFoundException($"No transaction with id: {id} found.");
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogError(ex, "No transaction with id: {TransactionId} found.", id);
+            throw;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error retrieving transaction with id: {TransactionId}", id);
+            throw new Exception($"Error retrieving transaction with id: {id}", ex);
+        }
     }
 
     public List<Transaction> GetAll()
     {
         try
         {
-            List<Transaction> transactions = _transactionRepository.FindAll();
+            List<Transaction> transactions = transactionRepository.FindAll();
             return transactions;
         }
         catch (Exception ex)
         {
-            throw new Exception($"No transactions found. {ex.Message}");
+            logger.LogError(ex, "No transactions found.");
+            throw new Exception($"No transactions found. {ex.Message}", ex);
         }
     }
 
@@ -46,16 +54,16 @@ public class TransactionService : ITransactionService
     {
         try
         {
-            List<Transaction> allTransactions = _transactionRepository.FindAll();
+            List<Transaction> allTransactions = transactionRepository.FindAll();
             var filteredTransactions = allTransactions
                 .Where(t => t.Date >= startDate && t.Date <= endDate).ToList();
 
-
             return filteredTransactions;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            throw new Exception($"No transactions found.");
+            logger.LogError(ex, "No transactions found in date range {StartDate} - {EndDate}.", startDate, endDate);
+            throw new Exception($"No transactions found in date range {startDate} - {endDate}.", ex);
         }
     }
 
@@ -63,16 +71,16 @@ public class TransactionService : ITransactionService
     {
         try
         {
-            List<Transaction> allTransactions = _transactionRepository.FindAll();
+            List<Transaction> allTransactions = transactionRepository.FindAll();
             var filteredTransactions = allTransactions
                 .Where(t => t.UserId == userId).ToList();
 
-
             return filteredTransactions;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            throw new Exception($"No transactions found with user_id: {userId}");
+            logger.LogError(ex, "No transactions found with user_id: {UserId}", userId);
+            throw new Exception($"No transactions found with user_id: {userId}", ex);
         }
     }
 
@@ -80,16 +88,16 @@ public class TransactionService : ITransactionService
     {
         try
         {
-            List<Transaction> allTransactions = _transactionRepository.FindAll();
+            List<Transaction> allTransactions = transactionRepository.FindAll();
             var filteredTransactions = allTransactions
                 .Where(t => t.CategoryId == id).ToList();
 
-
             return filteredTransactions;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            throw new Exception($"No transactions found with category id: {id}");
+            logger.LogError(ex, "No transactions found with category id: {CategoryId}", id);
+            throw new Exception($"No transactions found with category id: {id}", ex);
         }
     }
 
@@ -98,16 +106,18 @@ public class TransactionService : ITransactionService
         try
         {
             Transaction transaction = new Transaction(amount, description, date, userId, categoryId);
-            transaction.Id = _transactionRepository.Add(transaction);
+            transaction.Id = transactionRepository.Add(transaction);
 
             return transaction;
         }
         catch (ArgumentException ex)
         {
+            logger.LogError(ex, "Invalid transaction data: {Message}", ex.Message);
             throw new InvalidDataException("Invalid transaction data: " + ex.Message, ex);
         }
         catch (Exception ex)
         {
+            logger.LogError(ex, "An unexpected error occurred while adding a transaction.");
             throw new Exception("An unexpected error occurred.", ex);
         }
     }
@@ -116,17 +126,19 @@ public class TransactionService : ITransactionService
     {
         try
         {
-            Transaction newTransaction = new Transaction(amount, description, date,
+            Transaction newTransaction = new Transaction(id, description, amount, date,
                 userId, categoryId);
 
-            return _transactionRepository.Edit(newTransaction);
+            return transactionRepository.Edit(newTransaction);
         }
-        catch (TransactionNotFoundException)
+        catch (TransactionNotFoundException ex)
         {
+            logger.LogError(ex, "Transaction with ID {TransactionId} was not found for update.", id);
             return false;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            logger.LogError(ex, "Error updating transaction with ID {TransactionId}", id);
             return false;
         }
     }
@@ -135,15 +147,17 @@ public class TransactionService : ITransactionService
     {
         try
         {
-            var transaction = _transactionRepository.FindById(id);
-            return _transactionRepository.Delete(transaction);
+            var transaction = transactionRepository.FindById(id);
+            return transactionRepository.Delete(transaction);
         }
-        catch (TransactionNotFoundException)
+        catch (TransactionNotFoundException ex)
         {
+            logger.LogError(ex, "Transaction with ID {TransactionId} was not found for deletion.", id);
             return false;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            logger.LogError(ex, "Error deleting transaction with ID {TransactionId}", id);
             return false;
         }
     }
@@ -153,7 +167,7 @@ public class TransactionService : ITransactionService
         try
         {
             double balance = 0.00;
-            var transactions = _transactionRepository.FindByUserId(userId);
+            var transactions = transactionRepository.FindByUserId(userId);
             foreach (var transaction in transactions)
             {
                 balance += transaction.Amount;
@@ -161,9 +175,15 @@ public class TransactionService : ITransactionService
 
             return balance;
         }
-        catch (TransactionNotFoundException)
+        catch (TransactionNotFoundException ex)
         {
-            throw new TransactionNotFoundException($"No transactions found with category id: {userId}");
+            logger.LogError(ex, "No transactions found with user_id: {UserId}", userId);
+            throw new TransactionNotFoundException($"No transactions found with user_id: {userId}", ex);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error calculating balance for user_id: {UserId}", userId);
+            throw;
         }
     }
 
@@ -196,7 +216,8 @@ public class TransactionService : ITransactionService
         }
         catch (Exception ex)
         {
-            throw new Exception();
+            logger.LogError(ex, "Error generating chart data for user_id: {UserId}", userId);
+            throw new Exception("Error generating chart data.", ex);
         }
     }
 }

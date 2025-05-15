@@ -6,26 +6,17 @@ using MySql.Data.MySqlClient;
 
 namespace DataAccess.Repositories;
 
-public class TagRepository : ITagRepository
+public class TagRepository(string connectionString, ILogger<TagRepository> logger) : ITagRepository
 {
-    private readonly string _connectionString;
-    private readonly ILogger<TagRepository> _logger;
-
-    public TagRepository(string connectionString, ILogger<TagRepository> logger)
-    {
-        _connectionString = connectionString;
-        _logger = logger;
-    }
-
     public List<Tag> FindAll()
     {
         try
         {
             List<Tag> allTags = new List<Tag>();
-            using MySqlConnection connection = new MySqlConnection(_connectionString);
+            using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            string sql = "SELECT * FROM tag";
+            string sql = "SELECT id, name, color_hex_code, user_id FROM tag";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             using MySqlDataReader reader = command.ExecuteReader();
@@ -34,10 +25,10 @@ public class TagRepository : ITagRepository
             {
                 allTags.Add(
                     new Tag(
-                        Convert.ToInt32(reader["id"]),
-                        reader["name"].ToString(),
-                        reader["color_hex_code"].ToString(),
-                        Convert.ToInt32(reader["user_id"])
+                        reader.GetInt32(reader.GetOrdinal("id")),
+                        reader.GetString(reader.GetOrdinal("name")),
+                        reader.GetString(reader.GetOrdinal("color_hex_code")),
+                        reader.GetInt32(reader.GetOrdinal("user_id"))
                     )
                 );
             }
@@ -46,18 +37,19 @@ public class TagRepository : ITagRepository
         }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, "Error retrieving all tags from the database.");
             throw new DatabaseException("Error retrieving all tags from the database.", ex);
         }
     }
 
-    public Tag? FindById(int id)
+    public Tag FindById(int id)
     {
         try
         {
-            using MySqlConnection connection = new MySqlConnection(_connectionString);
+            using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            string sql = "SELECT * FROM tag WHERE id = @id";
+            string sql = "SELECT id, name, color_hex_code, user_id FROM tag WHERE id = @id";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@id", id);
@@ -67,17 +59,23 @@ public class TagRepository : ITagRepository
             if (reader.Read())
             {
                 return new Tag(
-                    Convert.ToInt32(reader["id"]),
-                    reader["name"].ToString(),
-                    reader["color_hex_code"].ToString(),
-                    Convert.ToInt32(reader["user_id"])
+                    reader.GetInt32(reader.GetOrdinal("id")),
+                    reader.GetString(reader.GetOrdinal("name")),
+                    reader.GetString(reader.GetOrdinal("color_hex_code")),
+                    reader.GetInt32(reader.GetOrdinal("user_id"))
                 );
             }
 
             throw new TagNotFoundException($"Tag with ID {id} was not found.");
         }
+        catch (TagNotFoundException ex)
+        {
+            logger.LogError(ex, $"Tag with ID {id} was not found.");
+            throw;
+        }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, $"Error retrieving tag with ID {id} from the database.");
             throw new DatabaseException($"Error retrieving tag with ID {id} from the database.", ex);
         }
     }
@@ -86,7 +84,7 @@ public class TagRepository : ITagRepository
     {
         try
         {
-            using MySqlConnection connection = new MySqlConnection(_connectionString);
+            using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
             string sql = "INSERT INTO tag (name, color_hex_code, user_id) VALUES (@name, @color_hex_code, @user_id)";
@@ -109,8 +107,14 @@ public class TagRepository : ITagRepository
 
             throw new DatabaseException("Failed to add the tag to the database. No rows were affected.");
         }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Failed to add the tag to the database. No rows were affected.");
+            throw;
+        }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, "Error adding a new tag to the database.");
             throw new DatabaseException("Error adding a new tag to the database.", ex);
         }
     }
@@ -119,7 +123,7 @@ public class TagRepository : ITagRepository
     {
         try
         {
-            using MySqlConnection connection = new MySqlConnection(_connectionString);
+            using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
             string sql =
@@ -141,8 +145,14 @@ public class TagRepository : ITagRepository
 
             throw new TagNotFoundException($"Tag with ID {tag.Id} was not found for update.");
         }
+        catch (TagNotFoundException ex)
+        {
+            logger.LogError(ex, $"Tag with ID {tag.Id} was not found for update.");
+            throw;
+        }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, $"Error updating tag with ID {tag.Id} in the database.");
             throw new DatabaseException($"Error updating tag with ID {tag.Id} in the database.", ex);
         }
     }
@@ -151,7 +161,7 @@ public class TagRepository : ITagRepository
     {
         try
         {
-            using MySqlConnection connection = new MySqlConnection(_connectionString);
+            using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
             string sql = "DELETE FROM tag WHERE id = @id";
@@ -169,8 +179,14 @@ public class TagRepository : ITagRepository
 
             throw new TagNotFoundException($"Tag with ID {tag.Id} was not found for deletion.");
         }
+        catch (TagNotFoundException ex)
+        {
+            logger.LogError(ex, $"Tag with ID {tag.Id} was not found for deletion.");
+            throw;
+        }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, $"Error deleting tag with ID {tag.Id} from the database.");
             throw new DatabaseException($"Error deleting tag with ID {tag.Id} from the database.", ex);
         }
     }

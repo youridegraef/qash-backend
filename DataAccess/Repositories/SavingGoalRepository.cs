@@ -6,26 +6,18 @@ using MySql.Data.MySqlClient;
 
 namespace DataAccess.Repositories;
 
-public class SavingGoalRepository : ISavingGoalRepository
+public class SavingGoalRepository(string connectionString, ILogger<SavingGoalRepository> logger)
+    : ISavingGoalRepository
 {
-    private readonly string _connectionString;
-    private readonly ILogger<SavingGoalRepository> _logger;
-
-    public SavingGoalRepository(string connectionString, ILogger<SavingGoalRepository> logger)
-    {
-        _connectionString = connectionString;
-        _logger = logger;
-    }
-
     public List<SavingGoal> FindAll()
     {
         try
         {
             List<SavingGoal> allSavingGoals = new List<SavingGoal>();
-            using MySqlConnection connection = new MySqlConnection(_connectionString);
+            using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            string sql = "SELECT * FROM saving_goal";
+            string sql = "SELECT id, name, target, deadline, user_id FROM saving_goal";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             using MySqlDataReader reader = command.ExecuteReader();
@@ -34,11 +26,11 @@ public class SavingGoalRepository : ISavingGoalRepository
             {
                 allSavingGoals.Add(
                     new SavingGoal(
-                        Convert.ToInt32(reader["id"]),
-                        reader["name"].ToString(),
-                        Convert.ToDouble(reader["target"]),
-                        DateOnly.FromDateTime(Convert.ToDateTime(reader["deadline"])),
-                        Convert.ToInt32(reader["user_id"])
+                        reader.GetInt32(reader.GetOrdinal("id")),
+                        reader.GetString(reader.GetOrdinal("name")),
+                        reader.GetDouble(reader.GetOrdinal("target")),
+                        DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("deadline"))),
+                        reader.GetInt32(reader.GetOrdinal("user_id"))
                     )
                 );
             }
@@ -47,18 +39,19 @@ public class SavingGoalRepository : ISavingGoalRepository
         }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, "Error retrieving all saving goals from the database.");
             throw new DatabaseException("Error retrieving all saving goals from the database.", ex);
         }
     }
 
-    public SavingGoal? FindById(int id)
+    public SavingGoal FindById(int id)
     {
         try
         {
-            using MySqlConnection connection = new MySqlConnection(_connectionString);
+            using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            string sql = "SELECT * FROM saving_goal WHERE id = @id";
+            string sql = "SELECT id, name, target, deadline, user_id FROM saving_goal WHERE id = @id";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@id", id);
@@ -67,18 +60,24 @@ public class SavingGoalRepository : ISavingGoalRepository
             if (reader.Read())
             {
                 return new SavingGoal(
-                    Convert.ToInt32(reader["id"]),
-                    reader["name"].ToString(),
-                    Convert.ToDouble(reader["target"]),
-                    DateOnly.FromDateTime(Convert.ToDateTime(reader["deadline"])),
-                    Convert.ToInt32(reader["user_id"])
+                    reader.GetInt32(reader.GetOrdinal("id")),
+                    reader.GetString(reader.GetOrdinal("name")),
+                    reader.GetDouble(reader.GetOrdinal("target")),
+                    DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("deadline"))),
+                    reader.GetInt32(reader.GetOrdinal("user_id"))
                 );
             }
 
             throw new SavingGoalNotFoundException($"Saving goal with ID {id} was not found.");
         }
+        catch (SavingGoalNotFoundException ex)
+        {
+            logger.LogError(ex, $"Saving goal with ID {id} was not found.");
+            throw;
+        }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, $"Error retrieving saving goal with ID {id} from the database.");
             throw new DatabaseException($"Error retrieving saving goal with ID {id} from the database.", ex);
         }
     }
@@ -87,7 +86,7 @@ public class SavingGoalRepository : ISavingGoalRepository
     {
         try
         {
-            using MySqlConnection connection = new MySqlConnection(_connectionString);
+            using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
             string sql =
@@ -112,8 +111,14 @@ public class SavingGoalRepository : ISavingGoalRepository
 
             throw new DatabaseException("Failed to add the saving goal to the database. No rows were affected.");
         }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Failed to add the saving goal to the database. No rows were affected.");
+            throw;
+        }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, "Error adding a new saving goal to the database.");
             throw new DatabaseException("Error adding a new saving goal to the database.", ex);
         }
     }
@@ -122,7 +127,7 @@ public class SavingGoalRepository : ISavingGoalRepository
     {
         try
         {
-            using MySqlConnection connection = new MySqlConnection(_connectionString);
+            using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
             string sql =
@@ -145,8 +150,14 @@ public class SavingGoalRepository : ISavingGoalRepository
 
             throw new SavingGoalNotFoundException($"Saving goal with ID {savingGoal.Id} was not found for update.");
         }
+        catch (SavingGoalNotFoundException ex)
+        {
+            logger.LogError(ex, $"Saving goal with ID {savingGoal.Id} was not found for update.");
+            throw;
+        }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, $"Error updating saving goal with ID {savingGoal.Id} in the database.");
             throw new DatabaseException($"Error updating saving goal with ID {savingGoal.Id} in the database.", ex);
         }
     }
@@ -155,7 +166,7 @@ public class SavingGoalRepository : ISavingGoalRepository
     {
         try
         {
-            using MySqlConnection connection = new MySqlConnection(_connectionString);
+            using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
             string sql = "DELETE FROM saving_goal WHERE id = @id";
@@ -173,8 +184,14 @@ public class SavingGoalRepository : ISavingGoalRepository
 
             throw new SavingGoalNotFoundException($"Saving goal with ID {savingGoal.Id} was not found for deletion.");
         }
+        catch (SavingGoalNotFoundException ex)
+        {
+            logger.LogError(ex, $"Saving goal with ID {savingGoal.Id} was not found for deletion.");
+            throw;
+        }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, $"Error deleting saving goal with ID {savingGoal.Id} from the database.");
             throw new DatabaseException($"Error deleting saving goal with ID {savingGoal.Id} from the database.", ex);
         }
     }

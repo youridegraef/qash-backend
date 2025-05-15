@@ -3,6 +3,10 @@
     <words>
       <w>acces</w>
       <w>creds</w>
+      <w>datumstring</w>
+      <w>hashedpassword</w>
+      <w>janedoe</w>
+      <w>johndoe</w>
     </words>
   </dictionary>
 </component>

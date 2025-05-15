@@ -6,26 +6,17 @@ using MySql.Data.MySqlClient;
 
 namespace DataAccess.Repositories;
 
-public class BudgetRepository : IBudgetRepository
+public class BudgetRepository(string connectionString, ILogger<BudgetRepository> logger) : IBudgetRepository
 {
-    private readonly string _connectionString;
-    private readonly ILogger<BudgetRepository> _logger;
-
-    public BudgetRepository(string connectionString, ILogger<BudgetRepository> logger)
-    {
-        _connectionString = connectionString;
-        _logger = logger;
-    }
-
     public List<Budget> FindAll()
     {
         try
         {
             List<Budget> allBudgets = new List<Budget>();
-            using MySqlConnection connection = new MySqlConnection(_connectionString);
+            using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            string sql = "SELECT * FROM budget";
+            string sql = "SELECT id, start_date, end_date, budget, category_id FROM budget";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             using MySqlDataReader reader = command.ExecuteReader();
@@ -34,11 +25,11 @@ public class BudgetRepository : IBudgetRepository
             {
                 allBudgets.Add(
                     new Budget(
-                        Convert.ToInt32(reader["id"]),
-                        DateOnly.FromDateTime(Convert.ToDateTime(reader["start_date"])),
-                        DateOnly.FromDateTime(Convert.ToDateTime(reader["end_date"])),
-                        Convert.ToDouble(reader["budget"]),
-                        Convert.ToInt32(reader["category_id"])
+                        reader.GetInt32(reader.GetOrdinal("id")),
+                        DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("start_date"))),
+                        DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("end_date"))),
+                        reader.GetDouble(reader.GetOrdinal("budget")),
+                        reader.GetInt32(reader.GetOrdinal("category_id"))
                     )
                 );
             }
@@ -47,18 +38,19 @@ public class BudgetRepository : IBudgetRepository
         }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, "Error retrieving all budgets from the database.");
             throw new DatabaseException("Error retrieving all budgets from the database.", ex);
         }
     }
 
-    public Budget? FindById(int id)
+    public Budget FindById(int id)
     {
         try
         {
-            using MySqlConnection connection = new MySqlConnection(_connectionString);
+            using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            string sql = "SELECT * FROM budget WHERE id = @id";
+            string sql = "SELECT id, start_date, end_date, budget, category_id FROM budget WHERE id = @id";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@id", id);
@@ -68,18 +60,24 @@ public class BudgetRepository : IBudgetRepository
             if (reader.Read())
             {
                 return new Budget(
-                    Convert.ToInt32(reader["id"]),
-                    DateOnly.FromDateTime(Convert.ToDateTime(reader["start_date"])),
-                    DateOnly.FromDateTime(Convert.ToDateTime(reader["end_date"])),
-                    Convert.ToDouble(reader["budget"]),
-                    Convert.ToInt32(reader["category_id"])
+                    reader.GetInt32(reader.GetOrdinal("id")),
+                    DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("start_date"))),
+                    DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("end_date"))),
+                    reader.GetDouble(reader.GetOrdinal("budget")),
+                    reader.GetInt32(reader.GetOrdinal("category_id"))
                 );
             }
 
             throw new BudgetNotFoundException($"Budget with ID {id} was not found.");
         }
+        catch (BudgetNotFoundException ex)
+        {
+            logger.LogError(ex, "Budget with ID {BudgetId} was not found.", id);
+            throw;
+        }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, "Error retrieving budget with ID {BudgetId} from the database.", id);
             throw new DatabaseException($"Error retrieving budget with ID {id} from the database.", ex);
         }
     }
@@ -88,7 +86,7 @@ public class BudgetRepository : IBudgetRepository
     {
         try
         {
-            using MySqlConnection connection = new MySqlConnection(_connectionString);
+            using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
             string sql =
@@ -112,8 +110,14 @@ public class BudgetRepository : IBudgetRepository
 
             throw new DatabaseException("Failed to add the budget to the database. No rows were affected.");
         }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Failed to add the budget to the database. No rows were affected.");
+            throw;
+        }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, "Error adding a new budget to the database.");
             throw new DatabaseException("Error adding a new budget to the database.", ex);
         }
     }
@@ -122,7 +126,7 @@ public class BudgetRepository : IBudgetRepository
     {
         try
         {
-            using MySqlConnection connection = new MySqlConnection(_connectionString);
+            using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
             string sql =
@@ -145,8 +149,14 @@ public class BudgetRepository : IBudgetRepository
 
             throw new BudgetNotFoundException($"Budget with ID {budget.Id} was not found for update.");
         }
+        catch (BudgetNotFoundException ex)
+        {
+            logger.LogError(ex, "Budget with ID {BudgetId} was not found for update.", budget.Id);
+            throw;
+        }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, "Error updating budget with ID {BudgetId} in the database.", budget.Id);
             throw new DatabaseException($"Error updating budget with ID {budget.Id} in the database.", ex);
         }
     }
@@ -155,7 +165,7 @@ public class BudgetRepository : IBudgetRepository
     {
         try
         {
-            using MySqlConnection connection = new MySqlConnection(_connectionString);
+            using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
             string sql = "DELETE FROM budget WHERE id = @id";
@@ -172,8 +182,14 @@ public class BudgetRepository : IBudgetRepository
 
             throw new BudgetNotFoundException($"Budget with ID {budget.Id} was not found for deletion.");
         }
+        catch (BudgetNotFoundException ex)
+        {
+            logger.LogError(ex, "Budget with ID {BudgetId} was not found for deletion.", budget.Id);
+            throw;
+        }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, "Error deleting budget with ID {BudgetId} from the database.", budget.Id);
             throw new DatabaseException($"Error deleting budget with ID {budget.Id} from the database.", ex);
         }
     }

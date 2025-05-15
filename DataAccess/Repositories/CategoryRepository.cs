@@ -6,26 +6,18 @@ using MySql.Data.MySqlClient;
 
 namespace DataAccess.Repositories;
 
-public class CategoryRepository : ICategoryRepository
+public class CategoryRepository(string connectionString, ILogger<CategoryRepository> logger)
+    : ICategoryRepository
 {
-    private readonly string _connectionString;
-    private readonly ILogger<CategoryRepository> _logger;
-
-    public CategoryRepository(string connectionString, ILogger<CategoryRepository> logger)
-    {
-        _connectionString = connectionString;
-        _logger = logger;
-    }
-
     public List<Category> FindAll()
     {
         try
         {
             List<Category> allCategories = new List<Category>();
-            using MySqlConnection connection = new MySqlConnection(_connectionString);
+            using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            string sql = "SELECT * FROM category";
+            string sql = "SELECT id, name, user_id FROM category";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             using MySqlDataReader reader = command.ExecuteReader();
@@ -34,9 +26,9 @@ public class CategoryRepository : ICategoryRepository
             {
                 allCategories.Add(
                     new Category(
-                        Convert.ToInt32(reader["id"]),
-                        reader["name"].ToString(),
-                        Convert.ToInt32(reader["user_id"])
+                        reader.GetInt32(reader.GetOrdinal("id")),
+                        reader.GetString(reader.GetOrdinal("name")),
+                        reader.GetInt32(reader.GetOrdinal("user_id"))
                     )
                 );
             }
@@ -45,18 +37,19 @@ public class CategoryRepository : ICategoryRepository
         }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, "Error retrieving all categories from the database.");
             throw new DatabaseException("Error retrieving all categories from the database.", ex);
         }
     }
 
-    public Category? FindById(int id)
+    public Category FindById(int id)
     {
         try
         {
-            using MySqlConnection connection = new MySqlConnection(_connectionString);
+            using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            string sql = "SELECT * FROM category WHERE id = @id";
+            string sql = "SELECT id, name, user_id FROM category WHERE id = @id";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@id", id);
@@ -66,16 +59,22 @@ public class CategoryRepository : ICategoryRepository
             if (reader.Read())
             {
                 return new Category(
-                    Convert.ToInt32(reader["id"]),
-                    reader["name"].ToString(),
-                    Convert.ToInt32(reader["user_id"])
+                    reader.GetInt32(reader.GetOrdinal("id")),
+                    reader.GetString(reader.GetOrdinal("name")),
+                    reader.GetInt32(reader.GetOrdinal("user_id"))
                 );
             }
 
             throw new CategoryNotFoundException($"Category with ID {id} was not found.");
         }
+        catch (CategoryNotFoundException ex)
+        {
+            logger.LogError(ex, "Category with ID {CategoryId} was not found.", id);
+            throw;
+        }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, "Error retrieving category with ID {CategoryId} from the database.", id);
             throw new DatabaseException($"Error retrieving category with ID {id} from the database.", ex);
         }
     }
@@ -84,7 +83,7 @@ public class CategoryRepository : ICategoryRepository
     {
         try
         {
-            using MySqlConnection connection = new MySqlConnection(_connectionString);
+            using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
             string sql = "INSERT INTO category (name, user_id) VALUES (@name, @user_id)";
@@ -105,8 +104,14 @@ public class CategoryRepository : ICategoryRepository
 
             throw new DatabaseException("Failed to add the category to the database. No rows were affected.");
         }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Failed to add the category to the database. No rows were affected.");
+            throw;
+        }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, "Error adding a new category to the database.");
             throw new DatabaseException("Error adding a new category to the database.", ex);
         }
     }
@@ -115,7 +120,7 @@ public class CategoryRepository : ICategoryRepository
     {
         try
         {
-            using MySqlConnection connection = new MySqlConnection(_connectionString);
+            using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
             string sql = "UPDATE category SET name = @name, user_id = @user_id WHERE id = @id";
@@ -134,8 +139,14 @@ public class CategoryRepository : ICategoryRepository
 
             throw new CategoryNotFoundException($"Category with ID {category.Id} was not found for update.");
         }
+        catch (CategoryNotFoundException ex)
+        {
+            logger.LogError(ex, "Category with ID {CategoryId} was not found for update.", category.Id);
+            throw;
+        }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, "Error updating category with ID {CategoryId} in the database.", category.Id);
             throw new DatabaseException($"Error updating category with ID {category.Id} in the database.", ex);
         }
     }
@@ -144,7 +155,7 @@ public class CategoryRepository : ICategoryRepository
     {
         try
         {
-            using MySqlConnection connection = new MySqlConnection(_connectionString);
+            using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
             string sql = "DELETE FROM category WHERE id = @id";
@@ -161,8 +172,14 @@ public class CategoryRepository : ICategoryRepository
 
             throw new CategoryNotFoundException($"Category with ID {category.Id} was not found for deletion.");
         }
+        catch (CategoryNotFoundException ex)
+        {
+            logger.LogError(ex, "Category with ID {CategoryId} was not found for deletion.", category.Id);
+            throw;
+        }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, "Error deleting category with ID {CategoryId} from the database.", category.Id);
             throw new DatabaseException($"Error deleting category with ID {category.Id} from the database.", ex);
         }
     }

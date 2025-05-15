@@ -7,7 +7,7 @@ public interface ITagRepository
 {
     public List<Tag> FindAll();
 
-    public Tag? FindById(int id);
+    public Tag FindById(int id);
 
     public int Add(Tag tag);
 

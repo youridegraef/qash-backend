@@ -7,7 +7,7 @@ public interface ICategoryRepository
 {
     public List<Category> FindAll();
 
-    public Category? FindById(int id);
+    public Category FindById(int id);
 
     public int Add(Category category);
 

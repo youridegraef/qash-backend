@@ -6,26 +6,18 @@ using MySql.Data.MySqlClient;
 
 namespace DataAccess.Repositories;
 
-public class TransactionRepository : ITransactionRepository
+public class TransactionRepository(string connectionString, ILogger<TransactionRepository> logger)
+    : ITransactionRepository
 {
-    private readonly string _connectionString;
-    private readonly ILogger<TransactionRepository> _logger;
-
-    public TransactionRepository(string connectionString, ILogger<TransactionRepository> logger)
-    {
-        _connectionString = connectionString;
-        _logger = logger;
-    }
-
     public List<Transaction> FindAll()
     {
         try
         {
             List<Transaction> allTransactions = new List<Transaction>();
-            using MySqlConnection connection = new MySqlConnection(_connectionString);
+            using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            string sql = "SELECT * FROM transactions";
+            string sql = "SELECT id, description, amount, date, user_id, category_id FROM transactions";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             using MySqlDataReader reader = command.ExecuteReader();
@@ -34,12 +26,12 @@ public class TransactionRepository : ITransactionRepository
             {
                 allTransactions.Add(
                     new Transaction(
-                        Convert.ToInt32(reader["id"]),
-                        (string)reader["description"],
-                        Convert.ToDouble(reader["amount"]),
-                        DateOnly.FromDateTime(Convert.ToDateTime(reader["date"])),
-                        Convert.ToInt32(reader["user_id"]),
-                        Convert.ToInt32(reader["category_id"])
+                        reader.GetInt32(reader.GetOrdinal("id")),
+                        reader.GetString(reader.GetOrdinal("description")),
+                        reader.GetDouble(reader.GetOrdinal("amount")),
+                        DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("date"))),
+                        reader.GetInt32(reader.GetOrdinal("user_id")),
+                        reader.GetInt32(reader.GetOrdinal("category_id"))
                     )
                 );
             }
@@ -48,18 +40,19 @@ public class TransactionRepository : ITransactionRepository
         }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, "Error retrieving all transactions from the database.");
             throw new DatabaseException("Error retrieving all transactions from the database.", ex);
         }
     }
 
-    public Transaction? FindById(int id)
+    public Transaction FindById(int id)
     {
         try
         {
-            using MySqlConnection connection = new MySqlConnection(_connectionString);
+            using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            string sql = "SELECT * FROM transactions WHERE id = @id";
+            string sql = "SELECT id, description, amount, date, user_id, category_id FROM transactions WHERE id = @id";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@id", id);
@@ -69,19 +62,25 @@ public class TransactionRepository : ITransactionRepository
             if (reader.Read())
             {
                 return new Transaction(
-                    Convert.ToInt32(reader["id"]),
-                    (string)reader["description"],
-                    Convert.ToDouble(reader["amount"]),
-                    DateOnly.FromDateTime(Convert.ToDateTime(reader["date"])),
-                    Convert.ToInt32(reader["user_id"]),
-                    Convert.ToInt32(reader["category_id"])
+                    reader.GetInt32(reader.GetOrdinal("id")),
+                    reader.GetString(reader.GetOrdinal("description")),
+                    reader.GetDouble(reader.GetOrdinal("amount")),
+                    DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("date"))),
+                    reader.GetInt32(reader.GetOrdinal("user_id")),
+                    reader.GetInt32(reader.GetOrdinal("category_id"))
                 );
             }
 
             throw new TransactionNotFoundException($"Transaction with ID {id} was not found.");
         }
+        catch (TransactionNotFoundException ex)
+        {
+            logger.LogError(ex, $"Transaction with ID {id} was not found.");
+            throw;
+        }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, $"Error retrieving transaction with ID {id} from the database.");
             throw new DatabaseException($"Error retrieving transaction with ID {id} from the database.", ex);
         }
     }
@@ -92,10 +91,11 @@ public class TransactionRepository : ITransactionRepository
         {
             List<Transaction> allTransactions = new List<Transaction>();
 
-            using MySqlConnection connection = new MySqlConnection(_connectionString);
+            using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            string sql = "SELECT * FROM transactions WHERE user_id = @user_id";
+            string sql =
+                "SELECT id, description, amount, date, user_id, category_id FROM transactions WHERE user_id = @user_id";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@user_id", userId);
@@ -106,24 +106,26 @@ public class TransactionRepository : ITransactionRepository
             {
                 allTransactions.Add(
                     new Transaction(
-                        Convert.ToInt32(reader["id"]),
-                        (string)reader["description"],
-                        Convert.ToDouble(reader["amount"]),
-                        DateOnly.FromDateTime(Convert.ToDateTime(reader["date"])),
-                        Convert.ToInt32(reader["user_id"]),
-                        Convert.ToInt32(reader["category_id"])
+                        reader.GetInt32(reader.GetOrdinal("id")),
+                        reader.GetString(reader.GetOrdinal("description")),
+                        reader.GetDouble(reader.GetOrdinal("amount")),
+                        DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("date"))),
+                        reader.GetInt32(reader.GetOrdinal("user_id")),
+                        reader.GetInt32(reader.GetOrdinal("category_id"))
                     )
                 );
             }
 
             return allTransactions;
         }
-        catch (TransactionNotFoundException)
+        catch (TransactionNotFoundException ex)
         {
+            logger.LogError(ex, $"Transaction with UserID {userId} was not found.");
             throw new TransactionNotFoundException($"Transaction with UserID {userId} was not found.");
         }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, $"Error retrieving transaction with UserID {userId} from the database.");
             throw new DatabaseException($"Error retrieving transaction with UserID {userId} from the database.", ex);
         }
     }
@@ -132,7 +134,7 @@ public class TransactionRepository : ITransactionRepository
     {
         try
         {
-            using MySqlConnection connection = new MySqlConnection(_connectionString);
+            using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
             string sql =
@@ -158,8 +160,14 @@ public class TransactionRepository : ITransactionRepository
 
             throw new DatabaseException("Failed to add the transaction to the database. No rows were affected.");
         }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Failed to add the transaction to the database. No rows were affected.");
+            throw;
+        }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, "Error adding a new transaction to the database.");
             throw new DatabaseException("Error adding a new transaction to the database.", ex);
         }
     }
@@ -168,7 +176,7 @@ public class TransactionRepository : ITransactionRepository
     {
         try
         {
-            using MySqlConnection connection = new MySqlConnection(_connectionString);
+            using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
             string sql =
@@ -192,8 +200,14 @@ public class TransactionRepository : ITransactionRepository
 
             throw new TransactionNotFoundException($"Transaction with ID {transaction.Id} was not found for update.");
         }
+        catch (TransactionNotFoundException ex)
+        {
+            logger.LogError(ex, $"Transaction with ID {transaction.Id} was not found for update.");
+            throw;
+        }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, $"Error updating transaction with ID {transaction.Id} in the database.");
             throw new DatabaseException($"Error updating transaction with ID {transaction.Id} in the database.", ex);
         }
     }
@@ -202,7 +216,7 @@ public class TransactionRepository : ITransactionRepository
     {
         try
         {
-            using MySqlConnection connection = new MySqlConnection(_connectionString);
+            using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
             string sql = "DELETE FROM transactions WHERE id = @id";
@@ -219,46 +233,15 @@ public class TransactionRepository : ITransactionRepository
 
             throw new TransactionNotFoundException($"Transaction with ID {transaction.Id} was not found for deletion.");
         }
+        catch (TransactionNotFoundException ex)
+        {
+            logger.LogError(ex, $"Transaction with ID {transaction.Id} was not found for deletion.");
+            throw;
+        }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, $"Error deleting transaction with ID {transaction.Id} from the database.");
             throw new DatabaseException($"Error deleting transaction with ID {transaction.Id} from the database.", ex);
-        }
-    }
-
-    public List<Tag> GetTagsByTransactionId(int transactionId)
-    {
-        try
-        {
-            var tags = new List<Tag>();
-            using MySqlConnection connection = new MySqlConnection(_connectionString);
-            connection.Open();
-
-            string sql = "SELECT t.id, t.name, t.color_hex_code, t.user_id FROM tag t " +
-                         "INNER JOIN transaction_tag tt ON t.id = tt.tag_id " +
-                         "WHERE tt.transaction_id = @TransactionId";
-
-            using MySqlCommand command = new MySqlCommand(sql, connection);
-
-            command.Parameters.AddWithValue("@TransactionId", transactionId);
-
-            using (var reader = command.ExecuteReader())
-            {
-                while (reader.Read())
-                {
-                    tags.Add(new Tag(
-                        (int)reader["id"],
-                        (string)reader["name"],
-                        (string)reader["color_hex_code"],
-                        (int)reader["user_id"]
-                    ));
-                }
-            }
-
-            return tags;
-        }
-        catch (MySqlException ex)
-        {
-            throw new DatabaseException($"Error retrieving tags for transaction with ID {transactionId}.", ex);
         }
     }
 }

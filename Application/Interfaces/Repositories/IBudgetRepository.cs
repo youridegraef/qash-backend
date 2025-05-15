@@ -7,7 +7,7 @@ public interface IBudgetRepository
 {
     public List<Budget> FindAll();
 
-    public Budget? FindById(int id);
+    public Budget FindById(int id);
 
     public int Add(Budget budget);
 

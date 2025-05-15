@@ -7,7 +7,7 @@ public interface ISavingGoalRepository
 {
     public List<SavingGoal> FindAll();
 
-    public SavingGoal? FindById(int id);
+    public SavingGoal FindById(int id);
 
     public int Add(SavingGoal savingGoal);
 
