@@ -1,23 +1,31 @@
 using Application.Domain;
 using Application.Exceptions;
 using Application.Interfaces;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 
 namespace DataAccess.Repositories;
 
 public class UserRepository : IUserRepository
 {
-    private readonly DatabaseConnection _dbConnection = new DatabaseConnection();
+    private readonly string _connectionString;
+    private readonly ILogger<UserRepository> _logger;
+
+    public UserRepository(string connectionString, ILogger<UserRepository> logger)
+    {
+        _connectionString = connectionString;
+        _logger = logger;
+    }
 
     public List<User> FindAll()
     {
         try
         {
             List<User> allUsers = new List<User>();
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
-            string sql = "SELECT * FROM user";
+            string sql = "SELECT id, name, email, password_hash, date_of_birth FROM user";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             using MySqlDataReader reader = command.ExecuteReader();
@@ -26,7 +34,7 @@ public class UserRepository : IUserRepository
             {
                 allUsers.Add(
                     new User(
-                        Convert.ToInt32(reader["id"]),
+                        int.Parse(reader["id"].ToString()),
                         reader["name"].ToString(),
                         reader["email"].ToString(),
                         reader["password_hash"].ToString(),
@@ -39,6 +47,7 @@ public class UserRepository : IUserRepository
         }
         catch (MySqlException ex)
         {
+            _logger.LogError(ex, "Error retrieving all users from the database.");
             throw new DatabaseException("Error retrieving all users from the database.", ex);
         }
     }
@@ -47,10 +56,10 @@ public class UserRepository : IUserRepository
     {
         try
         {
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
-            string sql = "SELECT * FROM user WHERE id = @id";
+            string sql = "SELECT id, name, email, password_hash, date_of_birth FROM user WHERE id = @id";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@id", id);
@@ -60,7 +69,18 @@ public class UserRepository : IUserRepository
             if (reader.Read())
             {
                 return new User(
-                    Convert.ToInt32(reader["id"]),
+                    int.Parse(reader["id"].ToString()),
+                    reader["name"].ToString(),
+                    reader["email"].ToString(),
+                    reader["password_hash"].ToString(),
+                    DateOnly.FromDateTime(Convert.ToDateTime(reader["date_of_birth"]))
+                );
+            }
+
+            if (reader.Read())
+            {
+                return new User(
+                    reader.GetInt32(reader.GetOrdinal("id")),
                     reader["name"].ToString(),
                     reader["email"].ToString(),
                     reader["password_hash"].ToString(),
@@ -69,6 +89,11 @@ public class UserRepository : IUserRepository
             }
 
             throw new UserNotFoundException($"User with ID {id} was not found.");
+        }
+        catch (UserNotFoundException ex)
+        {
+            _logger.LogError($"User with ID {id} was not found.");
+            throw;
         }
         catch (MySqlException ex)
         {
@@ -80,7 +105,7 @@ public class UserRepository : IUserRepository
     {
         try
         {
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql = "SELECT * FROM user WHERE email = @email";
@@ -93,7 +118,7 @@ public class UserRepository : IUserRepository
             if (reader.Read())
             {
                 return new User(
-                    Convert.ToInt32(reader["id"]),
+                    int.Parse(reader["id"].ToString()),
                     reader["name"].ToString(),
                     reader["email"].ToString(),
                     reader["password_hash"].ToString(),
@@ -113,7 +138,7 @@ public class UserRepository : IUserRepository
     {
         try
         {
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql =
@@ -149,7 +174,7 @@ public class UserRepository : IUserRepository
     {
         try
         {
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql =
@@ -182,7 +207,7 @@ public class UserRepository : IUserRepository
     {
         try
         {
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql = "DELETE FROM user WHERE id = @id";

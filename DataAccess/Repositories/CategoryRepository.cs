@@ -1,20 +1,28 @@
 using Application.Domain;
 using Application.Exceptions;
 using Application.Interfaces;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 
 namespace DataAccess.Repositories;
 
 public class CategoryRepository : ICategoryRepository
 {
-    private readonly DatabaseConnection _dbConnection = new DatabaseConnection();
+    private readonly string _connectionString;
+    private readonly ILogger<CategoryRepository> _logger;
+
+    public CategoryRepository(string connectionString, ILogger<CategoryRepository> logger)
+    {
+        _connectionString = connectionString;
+        _logger = logger;
+    }
 
     public List<Category> FindAll()
     {
         try
         {
             List<Category> allCategories = new List<Category>();
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql = "SELECT * FROM category";
@@ -45,7 +53,7 @@ public class CategoryRepository : ICategoryRepository
     {
         try
         {
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql = "SELECT * FROM category WHERE id = @id";
@@ -76,7 +84,7 @@ public class CategoryRepository : ICategoryRepository
     {
         try
         {
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql = "INSERT INTO category (name, user_id) VALUES (@name, @user_id)";
@@ -107,7 +115,7 @@ public class CategoryRepository : ICategoryRepository
     {
         try
         {
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql = "UPDATE category SET name = @name, user_id = @user_id WHERE id = @id";
@@ -136,7 +144,7 @@ public class CategoryRepository : ICategoryRepository
     {
         try
         {
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql = "DELETE FROM category WHERE id = @id";

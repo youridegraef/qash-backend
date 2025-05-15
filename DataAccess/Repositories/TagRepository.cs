@@ -1,20 +1,28 @@
 using Application.Domain;
 using Application.Exceptions;
 using Application.Interfaces;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 
 namespace DataAccess.Repositories;
 
 public class TagRepository : ITagRepository
 {
-    private readonly DatabaseConnection _dbConnection = new DatabaseConnection();
+    private readonly string _connectionString;
+    private readonly ILogger<TagRepository> _logger;
+
+    public TagRepository(string connectionString, ILogger<TagRepository> logger)
+    {
+        _connectionString = connectionString;
+        _logger = logger;
+    }
 
     public List<Tag> FindAll()
     {
         try
         {
             List<Tag> allTags = new List<Tag>();
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql = "SELECT * FROM tag";
@@ -46,7 +54,7 @@ public class TagRepository : ITagRepository
     {
         try
         {
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql = "SELECT * FROM tag WHERE id = @id";
@@ -78,7 +86,7 @@ public class TagRepository : ITagRepository
     {
         try
         {
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql = "INSERT INTO tag (name, color_hex_code, user_id) VALUES (@name, @color_hex_code, @user_id)";
@@ -111,7 +119,7 @@ public class TagRepository : ITagRepository
     {
         try
         {
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql =
@@ -143,7 +151,7 @@ public class TagRepository : ITagRepository
     {
         try
         {
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql = "DELETE FROM tag WHERE id = @id";

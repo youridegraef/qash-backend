@@ -1,20 +1,28 @@
 using Application.Domain;
 using Application.Exceptions;
 using Application.Interfaces;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 
 namespace DataAccess.Repositories;
 
 public class SavingGoalRepository : ISavingGoalRepository
 {
-    private readonly DatabaseConnection _dbConnection = new DatabaseConnection();
+    private readonly string _connectionString;
+    private readonly ILogger<SavingGoalRepository> _logger;
+
+    public SavingGoalRepository(string connectionString, ILogger<SavingGoalRepository> logger)
+    {
+        _connectionString = connectionString;
+        _logger = logger;
+    }
 
     public List<SavingGoal> FindAll()
     {
         try
         {
             List<SavingGoal> allSavingGoals = new List<SavingGoal>();
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql = "SELECT * FROM saving_goal";
@@ -47,7 +55,7 @@ public class SavingGoalRepository : ISavingGoalRepository
     {
         try
         {
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql = "SELECT * FROM saving_goal WHERE id = @id";
@@ -79,7 +87,7 @@ public class SavingGoalRepository : ISavingGoalRepository
     {
         try
         {
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql =
@@ -114,7 +122,7 @@ public class SavingGoalRepository : ISavingGoalRepository
     {
         try
         {
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql =
@@ -147,7 +155,7 @@ public class SavingGoalRepository : ISavingGoalRepository
     {
         try
         {
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql = "DELETE FROM saving_goal WHERE id = @id";

@@ -1,20 +1,28 @@
 using Application.Domain;
 using Application.Exceptions;
 using Application.Interfaces;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 
 namespace DataAccess.Repositories;
 
 public class BudgetRepository : IBudgetRepository
 {
-    private readonly DatabaseConnection _dbConnection = new DatabaseConnection();
+    private readonly string _connectionString;
+    private readonly ILogger<BudgetRepository> _logger;
+
+    public BudgetRepository(string connectionString, ILogger<BudgetRepository> logger)
+    {
+        _connectionString = connectionString;
+        _logger = logger;
+    }
 
     public List<Budget> FindAll()
     {
         try
         {
             List<Budget> allBudgets = new List<Budget>();
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql = "SELECT * FROM budget";
@@ -47,7 +55,7 @@ public class BudgetRepository : IBudgetRepository
     {
         try
         {
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql = "SELECT * FROM budget WHERE id = @id";
@@ -80,7 +88,7 @@ public class BudgetRepository : IBudgetRepository
     {
         try
         {
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql =
@@ -114,7 +122,7 @@ public class BudgetRepository : IBudgetRepository
     {
         try
         {
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql =
@@ -147,7 +155,7 @@ public class BudgetRepository : IBudgetRepository
     {
         try
         {
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql = "DELETE FROM budget WHERE id = @id";

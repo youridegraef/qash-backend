@@ -1,20 +1,28 @@
 using Application.Domain;
 using Application.Exceptions;
 using Application.Interfaces;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 
 namespace DataAccess.Repositories;
 
 public class TransactionRepository : ITransactionRepository
 {
-    private readonly DatabaseConnection _dbConnection = new DatabaseConnection();
+    private readonly string _connectionString;
+    private readonly ILogger<TransactionRepository> _logger;
+
+    public TransactionRepository(string connectionString, ILogger<TransactionRepository> logger)
+    {
+        _connectionString = connectionString;
+        _logger = logger;
+    }
 
     public List<Transaction> FindAll()
     {
         try
         {
             List<Transaction> allTransactions = new List<Transaction>();
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql = "SELECT * FROM transactions";
@@ -48,7 +56,7 @@ public class TransactionRepository : ITransactionRepository
     {
         try
         {
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql = "SELECT * FROM transactions WHERE id = @id";
@@ -84,7 +92,7 @@ public class TransactionRepository : ITransactionRepository
         {
             List<Transaction> allTransactions = new List<Transaction>();
 
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql = "SELECT * FROM transactions WHERE user_id = @user_id";
@@ -124,7 +132,7 @@ public class TransactionRepository : ITransactionRepository
     {
         try
         {
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql =
@@ -160,7 +168,7 @@ public class TransactionRepository : ITransactionRepository
     {
         try
         {
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql =
@@ -194,7 +202,7 @@ public class TransactionRepository : ITransactionRepository
     {
         try
         {
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql = "DELETE FROM transactions WHERE id = @id";
@@ -222,7 +230,7 @@ public class TransactionRepository : ITransactionRepository
         try
         {
             var tags = new List<Tag>();
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(_connectionString);
             connection.Open();
 
             string sql = "SELECT t.id, t.name, t.color_hex_code, t.user_id FROM tag t " +
