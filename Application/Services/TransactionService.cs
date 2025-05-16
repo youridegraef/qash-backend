@@ -234,6 +234,68 @@ public class TransactionService(
         }
     }
 
+    public double GetExpenses(int userId)
+    {
+        try
+        {
+            double balance = 0.00;
+            var transactions = transactionRepository.FindByUserId(userId);
+            var filteredTransactions = transactions.Where(t => t.Amount < 0);
+            foreach (var transaction in filteredTransactions)
+            {
+                balance += transaction.Amount;
+            }
+
+            return -balance;
+        }
+        catch (TransactionNotFoundException ex)
+        {
+            logger.LogError(ex, "No transactions found with user_id: {UserId}", userId);
+            throw new TransactionNotFoundException($"No transactions found with user_id: {userId}", ex);
+        }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Database error calculating balance for user_id: {UserId}", userId);
+            throw new Exception($"Database error while calculating balance for user_id: {userId}", ex);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error calculating balance for user_id: {UserId}", userId);
+            throw new Exception($"Error calculating balance for user_id: {userId}", ex);
+        }
+    }
+
+    public double GetIncome(int userId)
+    {
+        try
+        {
+            double balance = 0.00;
+            var transactions = transactionRepository.FindByUserId(userId);
+            var filteredTransactions = transactions.Where(t => t.Amount > 0);
+            foreach (var transaction in filteredTransactions)
+            {
+                balance += transaction.Amount;
+            }
+
+            return balance;
+        }
+        catch (TransactionNotFoundException ex)
+        {
+            logger.LogError(ex, "No transactions found with user_id: {UserId}", userId);
+            throw new TransactionNotFoundException($"No transactions found with user_id: {userId}", ex);
+        }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Database error calculating balance for user_id: {UserId}", userId);
+            throw new Exception($"Database error while calculating balance for user_id: {userId}", ex);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error calculating balance for user_id: {UserId}", userId);
+            throw new Exception($"Error calculating balance for user_id: {userId}", ex);
+        }
+    }
+
     public List<ChartDataDto> GetChartData(int userId)
     {
         try

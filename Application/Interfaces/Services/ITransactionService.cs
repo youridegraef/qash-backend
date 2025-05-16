@@ -14,5 +14,7 @@ public interface ITransactionService
     public bool Edit(int id, double amount, string description, DateOnly date, int userId, int categoryId);
     public bool Delete(int id);
     public double GetBalance(int userId);
+    public double GetExpenses(int userId);
+    public double GetIncome(int userId);
     public List<ChartDataDto> GetChartData(int userId);
 }

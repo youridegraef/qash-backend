@@ -20,6 +20,18 @@ public class TransactionController : ControllerBase
         return Ok(_transactionService.GetBalance(userId));
     }
 
+    [HttpGet("income/{userId}")]
+    public IActionResult GetIncome(int userId)
+    {
+        return Ok(_transactionService.GetIncome(userId));
+    }
+
+    [HttpGet("expenses/{userId}")]
+    public IActionResult GetExpenses(int userId)
+    {
+        return Ok(_transactionService.GetExpenses(userId));
+    }
+
     [HttpGet("chart-data/{userId}")]
     public IActionResult GetChartData(int userId)
     {
