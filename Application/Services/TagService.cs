@@ -4,21 +4,13 @@ using Application.Interfaces;
 
 namespace Application.Services;
 
-public class TagService : ITagService
+public class TagService(ITagRepository tagRepository) : ITagService
 {
-    private readonly ITagRepository _tagRepository;
-
-    public TagService(ITagRepository tagRepository)
-    {
-        _tagRepository = tagRepository;
-    }
-
-
     public List<Tag> GetAll()
     {
         try
         {
-            return _tagRepository.FindAll();
+            return tagRepository.FindAll();
         }
         catch (Exception)
         {
@@ -30,7 +22,7 @@ public class TagService : ITagService
     {
         try
         {
-            return _tagRepository.FindById(id);
+            return tagRepository.FindById(id);
         }
         catch (KeyNotFoundException)
         {
@@ -46,7 +38,7 @@ public class TagService : ITagService
     {
         try
         {
-            List<Tag> allTags = _tagRepository.FindAll();
+            List<Tag> allTags = tagRepository.FindAll();
             var filteredTags = allTags
                 .Where(t => t.UserId == userId).ToList();
 
@@ -66,7 +58,7 @@ public class TagService : ITagService
     {
         try
         {
-            List<Tag> allTags = _tagRepository.FindAll();
+            List<Tag> allTags = tagRepository.FindAll();
             var filteredTags = allTags
                 .Where(t => t.Name == name).ToList();
 
@@ -86,7 +78,7 @@ public class TagService : ITagService
     {
         try
         {
-            List<Tag> allTags = _tagRepository.FindAll();
+            List<Tag> allTags = tagRepository.FindAll();
             var filteredTags = allTags
                 .Where(t => t.Name == name && t.UserId == userId).ToList();
 
@@ -107,7 +99,7 @@ public class TagService : ITagService
         try
         {
             Tag tag = new Tag(name, colorHexCode, userId);
-            tag.Id = _tagRepository.Add(tag);
+            tag.Id = tagRepository.Add(tag);
 
             return tag;
         }
@@ -121,7 +113,7 @@ public class TagService : ITagService
     {
         try
         {
-            return _tagRepository.Edit(tag);
+            return tagRepository.Edit(tag);
         }
         catch (Exception)
         {
@@ -133,8 +125,8 @@ public class TagService : ITagService
     {
         try
         {
-            Tag tag = _tagRepository.FindById(tagId);
-            return _tagRepository.Delete(tag);
+            Tag tag = tagRepository.FindById(tagId);
+            return tagRepository.Delete(tag);
         }
         catch (Exception)
         {

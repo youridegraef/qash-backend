@@ -22,12 +22,17 @@ public class TransactionService(
                 return transaction;
             }
 
-            throw new KeyNotFoundException($"No transaction with id: {id} found.");
+            throw new TransactionNotFoundException($"No transaction with id: {id} found.");
         }
-        catch (KeyNotFoundException ex)
+        catch (TransactionNotFoundException ex)
         {
             logger.LogError(ex, "No transaction with id: {TransactionId} found.", id);
             throw;
+        }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Database error retrieving transaction with id: {TransactionId}", id);
+            throw new Exception($"Database error retrieving transaction with id: {id}", ex);
         }
         catch (Exception ex)
         {
@@ -43,9 +48,14 @@ public class TransactionService(
             List<Transaction> transactions = transactionRepository.FindAll();
             return transactions;
         }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Database error retrieving all transactions.");
+            throw new Exception("Database error while retrieving all transactions.", ex);
+        }
         catch (Exception ex)
         {
-            logger.LogError(ex, "No transactions found.");
+            logger.LogError(ex, "Error retrieving all transactions.");
             throw new Exception($"No transactions found. {ex.Message}", ex);
         }
     }
@@ -59,6 +69,13 @@ public class TransactionService(
                 .Where(t => t.Date >= startDate && t.Date <= endDate).ToList();
 
             return filteredTransactions;
+        }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Database error retrieving transactions in date range {StartDate} - {EndDate}.",
+                startDate, endDate);
+            throw new Exception($"Database error while retrieving transactions in date range {startDate} - {endDate}.",
+                ex);
         }
         catch (Exception ex)
         {
@@ -77,6 +94,11 @@ public class TransactionService(
 
             return filteredTransactions;
         }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Database error retrieving transactions with user_id: {UserId}", userId);
+            throw new Exception($"Database error while retrieving transactions with user_id: {userId}", ex);
+        }
         catch (Exception ex)
         {
             logger.LogError(ex, "No transactions found with user_id: {UserId}", userId);
@@ -93,6 +115,11 @@ public class TransactionService(
                 .Where(t => t.CategoryId == id).ToList();
 
             return filteredTransactions;
+        }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Database error retrieving transactions with category id: {CategoryId}", id);
+            throw new Exception($"Database error while retrieving transactions with category id: {id}", ex);
         }
         catch (Exception ex)
         {
@@ -115,6 +142,11 @@ public class TransactionService(
             logger.LogError(ex, "Invalid transaction data: {Message}", ex.Message);
             throw new InvalidDataException("Invalid transaction data: " + ex.Message, ex);
         }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Database error while adding a transaction.");
+            throw new Exception("Database error while adding a transaction.", ex);
+        }
         catch (Exception ex)
         {
             logger.LogError(ex, "An unexpected error occurred while adding a transaction.");
@@ -136,6 +168,11 @@ public class TransactionService(
             logger.LogError(ex, "Transaction with ID {TransactionId} was not found for update.", id);
             return false;
         }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Database error while updating transaction with ID {TransactionId}", id);
+            return false;
+        }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error updating transaction with ID {TransactionId}", id);
@@ -153,6 +190,11 @@ public class TransactionService(
         catch (TransactionNotFoundException ex)
         {
             logger.LogError(ex, "Transaction with ID {TransactionId} was not found for deletion.", id);
+            return false;
+        }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Database error while deleting transaction with ID {TransactionId}", id);
             return false;
         }
         catch (Exception ex)
@@ -180,10 +222,15 @@ public class TransactionService(
             logger.LogError(ex, "No transactions found with user_id: {UserId}", userId);
             throw new TransactionNotFoundException($"No transactions found with user_id: {userId}", ex);
         }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Database error calculating balance for user_id: {UserId}", userId);
+            throw new Exception($"Database error while calculating balance for user_id: {userId}", ex);
+        }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error calculating balance for user_id: {UserId}", userId);
-            throw;
+            throw new Exception($"Error calculating balance for user_id: {userId}", ex);
         }
     }
 
@@ -214,10 +261,15 @@ public class TransactionService(
 
             return chartData;
         }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Database error generating chart data for user_id: {UserId}", userId);
+            throw new Exception($"Database error while generating chart data for user_id: {userId}", ex);
+        }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error generating chart data for user_id: {UserId}", userId);
-            throw new Exception("Error generating chart data.", ex);
+            throw new Exception($"Error generating chart data for user_id: {userId}", ex);
         }
     }
 }

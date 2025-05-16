@@ -76,6 +76,7 @@ public class UserRepository(string connectionString, ILogger<UserRepository> log
         }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, $"Error retrieving user with ID {id} from the database.");
             throw new DatabaseException($"Error retrieving user with ID {id} from the database.", ex);
         }
     }
@@ -143,8 +144,14 @@ public class UserRepository(string connectionString, ILogger<UserRepository> log
 
             throw new DatabaseException("Failed to add the user to the database. No rows were affected.");
         }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Failed to add the user to the database. No rows were affected.");
+            throw;
+        }
         catch (MySqlException ex)
         {
+            logger.LogError(ex, "Error adding a new user to the database.");
             throw new DatabaseException("Error adding a new user to the database.", ex);
         }
     }
