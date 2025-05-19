@@ -41,21 +41,32 @@ public class TransactionService(
         }
     }
 
-    public List<Transaction> GetAll()
+    public List<Transaction> GetByUserIdPaged(int userId, int page, int pageSize)
     {
         try
         {
-            List<Transaction> transactions = transactionRepository.FindAll();
+            List<Transaction> transactions = transactionRepository.FindByUserIdPaged(userId, page, pageSize);
+
+            if (transactions.Count == 0 || transactions == null)
+            {
+                throw new TransactionNotFoundException($"Transaction with UserID {userId} was not found.");
+            }
+
             return transactions;
+        }
+        catch (TransactionNotFoundException ex)
+        {
+            logger.LogError(ex, $"Transaction with UserID {userId} was not found.");
+            throw;
         }
         catch (DatabaseException ex)
         {
-            logger.LogError(ex, "Database error retrieving all transactions.");
-            throw new Exception("Database error while retrieving all transactions.", ex);
+            logger.LogError(ex, "Database error retrieving paged transactions.");
+            throw new Exception("Database error while retrieving paged transactions.", ex);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error retrieving all transactions.");
+            logger.LogError(ex, "Error retrieving paged transactions.");
             throw new Exception($"No transactions found. {ex.Message}", ex);
         }
     }

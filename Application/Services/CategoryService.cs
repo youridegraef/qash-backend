@@ -72,11 +72,11 @@ public class CategoryService : ICategoryService
         }
     }
 
-    public Category Add(string name, int userId)
+    public Category Add(string name, int userId, string colorHexCode)
     {
         try
         {
-            Category category = new Category(name, userId);
+            Category category = new Category(name, userId, colorHexCode);
             category.Id = _categoryRepository.Add(category);
             return category;
         }

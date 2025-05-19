@@ -45,6 +45,56 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
         }
     }
 
+    public List<Transaction> FindByUserIdPaged(int userId, int page, int pageSize)
+    {
+        try
+        {
+            List<Transaction> pagedTransactions = new List<Transaction>();
+            using MySqlConnection connection = new MySqlConnection(connectionString);
+            connection.Open();
+
+            int offset = (page - 1) * pageSize;
+            string sql =
+                "SELECT id, description, amount, date, user_id, category_id FROM transactions ORDER BY date DESC LIMIT @limit OFFSET @offset";
+
+            using MySqlCommand command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@limit", pageSize);
+            command.Parameters.AddWithValue("@offset", offset);
+
+            using MySqlDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                pagedTransactions.Add(
+                    new Transaction(
+                        reader.GetInt32(reader.GetOrdinal("id")),
+                        reader.GetString(reader.GetOrdinal("description")),
+                        reader.GetDouble(reader.GetOrdinal("amount")),
+                        DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("date"))),
+                        reader.GetInt32(reader.GetOrdinal("user_id")),
+                        reader.GetInt32(reader.GetOrdinal("category_id"))
+                    )
+                );
+            }
+
+            if (pagedTransactions.Count == 0)
+            {
+                throw new TransactionNotFoundException($"Transaction with UserID {userId} was not found.");
+            }
+
+            return pagedTransactions;
+        }
+        catch (TransactionNotFoundException ex)
+        {
+            logger.LogError(ex, $"Transaction with UserID {userId} was not found.");
+            throw;
+        }
+        catch (MySqlException ex)
+        {
+            logger.LogError(ex, "Error retrieving paged transactions from the database.");
+            throw new DatabaseException("Error retrieving paged transactions from the database.", ex);
+        }
+    }
+
     public Transaction FindById(int id)
     {
         try

@@ -10,7 +10,7 @@ public interface ICategoryService
     public Category GetById(int id);
     public List<Category> GetByUserId(int userId);
     public List<Category> GetByName(string name);
-    public Category Add(string name, int userId);
+    public Category Add(string name, int userId, string colorHexCode);
     public bool Edit(Category category);
     public bool Delete(int id);
 

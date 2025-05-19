@@ -77,17 +77,59 @@ public class TransactionTests
     }
 
     [TestMethod]
-    public void GetAll_DatabaseException_ThrowsExceptionWithMessage()
+    [DataRow(1, 1, 10)]
+    [DataRow(2, 2, 5)]
+    public void GetByUserIdPaged_DatabaseException_ThrowsExceptionWithMessage(int userId, int page, int pageSize)
     {
         var loggerMock = new Mock<ILogger<TransactionService>>();
         var transactionRepoMock = new Mock<ITransactionRepository>();
-        transactionRepoMock.Setup(r => r.FindAll()).Throws(new DatabaseException("DB error"));
+        transactionRepoMock.Setup(r => r.FindByUserIdPaged(userId, page, pageSize))
+            .Throws(new DatabaseException("DB error"));
         var transactionService = new TransactionService(transactionRepoMock.Object, loggerMock.Object);
 
         var ex = Assert.ThrowsException<Exception>(() =>
-            transactionService.GetAll()
+            transactionService.GetByUserIdPaged(userId, page, pageSize)
         );
-        Assert.AreEqual("Database error while retrieving all transactions.", ex.Message);
+        Assert.AreEqual("Database error while retrieving paged transactions.", ex.Message);
+    }
+
+    [TestMethod]
+    [DataRow(1, 1, 10)]
+    [DataRow(2, 2, 5)]
+    public void GetByUserIdPaged_RepositoryReturnsNull_ThrowsExceptionWithMessage(int userId, int page, int pageSize)
+    {
+        var loggerMock = new Mock<ILogger<TransactionService>>();
+        var transactionRepoMock = new Mock<ITransactionRepository>();
+        transactionRepoMock.Setup(r => r.FindByUserIdPaged(userId, page, pageSize)).Returns((List<Transaction>)null!);
+        var transactionService = new TransactionService(transactionRepoMock.Object, loggerMock.Object);
+
+        var exception = Assert.ThrowsException<Exception>(() =>
+            transactionService.GetByUserIdPaged(userId, page, pageSize)
+        );
+        Assert.AreEqual(
+            $"No transactions found. Object reference not set to an instance of an object.",
+            exception.Message);
+    }
+
+    [TestMethod]
+    [DataRow(1, 1, 10)]
+    [DataRow(2, 2, 5)]
+    public void GetByUserIdPaged_Valid_ReturnsTransactions(int userId, int page, int pageSize)
+    {
+        var loggerMock = new Mock<ILogger<TransactionService>>();
+        var transactionRepoMock = new Mock<ITransactionRepository>();
+        var transactionsList = new List<Transaction>
+        {
+            new Transaction(1, "Test", 100.0, DateOnly.FromDateTime(DateTime.Today), userId, 1)
+        };
+        transactionRepoMock.Setup(r => r.FindByUserIdPaged(userId, page, pageSize)).Returns(transactionsList);
+        var transactionService = new TransactionService(transactionRepoMock.Object, loggerMock.Object);
+
+        var result = transactionService.GetByUserIdPaged(userId, page, pageSize);
+
+        Assert.IsNotNull(result, "Transactions should not be null");
+        Assert.AreEqual(transactionsList.Count, result.Count, "Transaction count should match");
+        Assert.AreEqual(transactionsList[0].Id, result[0].Id, "Transaction id should match");
     }
 
     [TestMethod]

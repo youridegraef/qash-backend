@@ -140,11 +140,11 @@ public class SavingGoalService : ISavingGoalService
         return filteredGoals;
     }
 
-    public SavingGoal Add(string name, double target, DateOnly deadline, int userId)
+    public SavingGoal Add(string name, double target, DateOnly deadline, int userId, string colorHexCode)
     {
         try
         {
-            SavingGoal savingGoal = new SavingGoal(name, target, deadline, userId);
+            SavingGoal savingGoal = new SavingGoal(name, target, deadline, userId, colorHexCode);
             savingGoal.Id = _savingGoalRepository.Add(savingGoal);
             return savingGoal;
         }

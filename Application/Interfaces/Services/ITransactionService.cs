@@ -7,7 +7,7 @@ namespace Application.Interfaces;
 public interface ITransactionService
 {
     public Transaction GetById(int id);
-    public List<Transaction> GetAll();
+    public List<Transaction> GetByUserIdPaged(int userId, int page, int pageSize);
     public List<Transaction> GetByDateRange(DateOnly startDate, DateOnly endDate);
     public List<Transaction> GetByUserId(int userId);
     public Transaction Add(string description, double amount, DateOnly date, int userId, int categoryId);

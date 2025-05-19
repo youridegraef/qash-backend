@@ -29,9 +29,6 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
 
             _ = new MailAddress(email); //Check Email Format > FormatException
 
-            if (userRepository.FindByEmail(email) != null!)
-                throw new UserAlreadyExistsException($"User with email {email} already exists");
-
             string hashedPassword = PasswordHasher.HashPassword(password);
             User newUser = new User(name, email, hashedPassword, dateOfBirth);
             userRepository.Add(newUser);

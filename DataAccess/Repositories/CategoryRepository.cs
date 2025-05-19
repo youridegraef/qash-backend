@@ -28,7 +28,8 @@ public class CategoryRepository(string connectionString, ILogger<CategoryReposit
                     new Category(
                         reader.GetInt32(reader.GetOrdinal("id")),
                         reader.GetString(reader.GetOrdinal("name")),
-                        reader.GetInt32(reader.GetOrdinal("user_id"))
+                        reader.GetInt32(reader.GetOrdinal("user_id")),
+                        reader.GetString(reader.GetOrdinal("color_hex_code"))
                     )
                 );
             }
@@ -61,7 +62,8 @@ public class CategoryRepository(string connectionString, ILogger<CategoryReposit
                 return new Category(
                     reader.GetInt32(reader.GetOrdinal("id")),
                     reader.GetString(reader.GetOrdinal("name")),
-                    reader.GetInt32(reader.GetOrdinal("user_id"))
+                    reader.GetInt32(reader.GetOrdinal("user_id")),
+                    reader.GetString(reader.GetOrdinal("color_hex_code"))
                 );
             }
 
@@ -86,11 +88,13 @@ public class CategoryRepository(string connectionString, ILogger<CategoryReposit
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            string sql = "INSERT INTO category (name, user_id) VALUES (@name, @user_id)";
+            string sql = "INSERT INTO category (name, user_id, color_hex_code) VALUES (@name, @user_id, @color_hex_code)";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@name", category.Name);
             command.Parameters.AddWithValue("@user_id", category.UserId);
+            command.Parameters.AddWithValue("@color_hex_code", category.ColorHexCode);
+
 
             int rowsAffected = command.ExecuteNonQuery();
 
@@ -123,12 +127,13 @@ public class CategoryRepository(string connectionString, ILogger<CategoryReposit
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            string sql = "UPDATE category SET name = @name, user_id = @user_id WHERE id = @id";
+            string sql = "UPDATE category SET name = @name, user_id = @user_id, color_hex_code = @color_hex_code WHERE id = @id";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@id", category.Id);
             command.Parameters.AddWithValue("@name", category.Name);
             command.Parameters.AddWithValue("@user_id", category.UserId);
+            command.Parameters.AddWithValue("@color_hex_code", category.ColorHexCode);
 
             int rowsAffected = command.ExecuteNonQuery();
 

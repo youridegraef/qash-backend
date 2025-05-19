@@ -13,7 +13,7 @@ public interface ISavingGoalService
     public List<SavingGoal> GetByName(string name);
     public List<SavingGoal> GetByNameAndUserId(string name, int userId);
     public List<SavingGoal> GetByDeadlineRange(DateOnly startDate, DateOnly endDate);
-    public SavingGoal Add(string name, double target, DateOnly deadline, int userId);
+    public SavingGoal Add(string name, double target, DateOnly deadline, int userId, string colorHexCode);
     public bool Edit(SavingGoal savingGoal);
     public bool Delete(int id);
 }
