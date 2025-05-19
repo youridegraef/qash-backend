@@ -7,22 +7,14 @@ using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using RestAPI.Models;
 using RestAPI.Models.RequestModels;
+using RestAPI.Models.ResponseModels;
 
 namespace RestAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UserController : ControllerBase
+public class UserController(IUserService userService, IConfiguration configuration) : ControllerBase
 {
-    private readonly IUserService _userService;
-    private readonly IConfiguration _configuration;
-
-    public UserController(IUserService userService, IConfiguration configuration)
-    {
-        _userService = userService;
-        _configuration = configuration;
-    }
-
     [HttpGet]
     public IActionResult Get()
     {
@@ -32,23 +24,22 @@ public class UserController : ControllerBase
     [HttpPost("Login")]
     public IActionResult Login([FromBody] LoginRequest loginRequest)
     {
-        if (loginRequest == null)
+        if (loginRequest == null!)
         {
             return BadRequest(new { message = "Email and password are required." });
         }
 
-        string key = _configuration["Jwt:Key"];
-        string issuer = _configuration["Jwt:Issuer"];
-        AuthenticationDto dto = _userService.Authenticate(loginRequest.Email, loginRequest.Password, key, issuer);
+        string key = configuration["Jwt:Key"]!;
+        string issuer = configuration["Jwt:Issuer"]!;
+        AuthenticationDto dto = userService.Authenticate(loginRequest.Email, loginRequest.Password, key, issuer);
 
-        if (dto.User == null)
+        if (dto.User == null!)
         {
             return Unauthorized(new { message = "Invalid email or password." });
         }
 
-        UserModel loggedInUser = new UserModel(dto.User.Id, dto.User.Name, dto.User.Email, dto.User.DateOfBirth);
+        UserResponseModel loggedInUser = new UserResponseModel(dto.User.Id, dto.User.Name, dto.User.Email);
 
-        // Geef token én user terug
         return Ok(new
         {
             dto.Token,
@@ -60,22 +51,22 @@ public class UserController : ControllerBase
     [HttpPost("Register")]
     public IActionResult Register([FromBody] RegisterRequest registerRequest)
     {
-        if (registerRequest == null)
+        if (registerRequest == null!)
         {
             return BadRequest(new { messae = "Name, Email, Passowrd and DateOfBirth are required." });
         }
 
-        User user = _userService.Register(registerRequest.Name, registerRequest.Email, registerRequest.Password,
+        User user = userService.Register(registerRequest.Name, registerRequest.Email, registerRequest.Password,
             registerRequest.DateOfBirth);
 
-        if (user == null)
+        if (user == null!)
         {
             return Conflict(new { message = "User registration failed. Email might already be in use." });
         }
 
-        user = _userService.GetByEmail(user.Email);
-        UserModel LoggedInUser = new UserModel(user.Id, user.Name, user.Email, user.DateOfBirth);
+        user = userService.GetByEmail(user.Email);
+        UserResponseModel loggedInUser = new UserResponseModel(user.Id, user.Name, user.Email);
 
-        return Ok(LoggedInUser);
+        return Ok(loggedInUser);
     }
 }
