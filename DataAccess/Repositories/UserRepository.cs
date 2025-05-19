@@ -81,6 +81,21 @@ public class UserRepository(string connectionString, ILogger<UserRepository> log
         }
     }
 
+    public bool IsEmailAvailable(string email)
+    {
+        using MySqlConnection connection = new MySqlConnection(connectionString);
+        connection.Open();
+
+        string sql = "SELECT email FROM user WHERE email = @email";
+
+        using MySqlCommand command = new MySqlCommand(sql, connection);
+        command.Parameters.AddWithValue("@email", email);
+
+        using MySqlDataReader reader = command.ExecuteReader();
+
+        return !reader.Read();
+    }
+
     public User FindByEmail(string email)
     {
         try

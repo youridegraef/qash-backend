@@ -13,18 +13,19 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
     {
         try
         {
-            List<Transaction> allTransactions = new List<Transaction>();
+            List<Transaction> transactions = new List<Transaction>();
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            string sql = "SELECT id, description, amount, date, user_id, category_id FROM transactions";
+            string sql =
+                "SELECT id, description, amount, date, user_id, category_id FROM transactions ORDER BY date DESC";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
-            using MySqlDataReader reader = command.ExecuteReader();
 
+            using MySqlDataReader reader = command.ExecuteReader();
             while (reader.Read())
             {
-                allTransactions.Add(
+                transactions.Add(
                     new Transaction(
                         reader.GetInt32(reader.GetOrdinal("id")),
                         reader.GetString(reader.GetOrdinal("description")),
@@ -36,7 +37,7 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
                 );
             }
 
-            return allTransactions;
+            return transactions;
         }
         catch (MySqlException ex)
         {
@@ -45,11 +46,11 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
         }
     }
 
-    public List<Transaction> FindByUserIdPaged(int userId, int page, int pageSize)
+    public List<Transaction> FindAllPaged(int page, int pageSize)
     {
         try
         {
-            List<Transaction> pagedTransactions = new List<Transaction>();
+            List<Transaction> transactions = new List<Transaction>();
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
@@ -64,7 +65,7 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
             using MySqlDataReader reader = command.ExecuteReader();
             while (reader.Read())
             {
-                pagedTransactions.Add(
+                transactions.Add(
                     new Transaction(
                         reader.GetInt32(reader.GetOrdinal("id")),
                         reader.GetString(reader.GetOrdinal("description")),
@@ -76,12 +77,52 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
                 );
             }
 
-            if (pagedTransactions.Count == 0)
+            return transactions;
+        }
+        catch (MySqlException ex)
+        {
+            logger.LogError(ex, "Error retrieving all transactions from the database.");
+            throw new DatabaseException("Error retrieving all transactions from the database.", ex);
+        }
+    }
+
+    public List<Transaction> FindByUserIdPaged(int userId, int page, int pageSize)
+    {
+        try
+        {
+            List<Transaction> transactions = new List<Transaction>();
+            using MySqlConnection connection = new MySqlConnection(connectionString);
+            connection.Open();
+
+            int offset = (page - 1) * pageSize;
+            string sql =
+                "SELECT id, description, amount, date, user_id, category_id FROM transactions ORDER BY date DESC LIMIT @limit OFFSET @offset";
+
+            using MySqlCommand command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@limit", pageSize);
+            command.Parameters.AddWithValue("@offset", offset);
+
+            using MySqlDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                transactions.Add(
+                    new Transaction(
+                        reader.GetInt32(reader.GetOrdinal("id")),
+                        reader.GetString(reader.GetOrdinal("description")),
+                        reader.GetDouble(reader.GetOrdinal("amount")),
+                        DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("date"))),
+                        reader.GetInt32(reader.GetOrdinal("user_id")),
+                        reader.GetInt32(reader.GetOrdinal("category_id"))
+                    )
+                );
+            }
+
+            if (transactions.Count == 0)
             {
                 throw new TransactionNotFoundException($"Transaction with UserID {userId} was not found.");
             }
 
-            return pagedTransactions;
+            return transactions;
         }
         catch (TransactionNotFoundException ex)
         {
@@ -139,13 +180,13 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
     {
         try
         {
-            List<Transaction> allTransactions = new List<Transaction>();
+            List<Transaction> transactions = new List<Transaction>();
 
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
             string sql =
-                "SELECT id, description, amount, date, user_id, category_id FROM transactions WHERE user_id = @user_id";
+                "SELECT id, description, amount, date, user_id, category_id FROM transactions WHERE user_id = @user_id ORDER BY date DESC";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@user_id", userId);
@@ -154,7 +195,7 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
 
             while (reader.Read())
             {
-                allTransactions.Add(
+                transactions.Add(
                     new Transaction(
                         reader.GetInt32(reader.GetOrdinal("id")),
                         reader.GetString(reader.GetOrdinal("description")),
@@ -166,7 +207,7 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
                 );
             }
 
-            return allTransactions;
+            return transactions;
         }
         catch (TransactionNotFoundException ex)
         {

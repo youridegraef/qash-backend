@@ -10,6 +10,7 @@ public interface IUserRepository
     public User FindById(int id);
 
     public User FindByEmail(string email);
+    public bool IsEmailAvailable(string email);
 
     public int Add(User user);
 

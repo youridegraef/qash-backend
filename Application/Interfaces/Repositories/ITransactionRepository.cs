@@ -6,10 +6,11 @@ namespace Application.Interfaces;
 public interface ITransactionRepository
 {
     public List<Transaction> FindAll();
+    public List<Transaction> FindAllPaged(int page, int pageSize);
+    public List<Transaction> FindByUserId(int userId);
     public List<Transaction> FindByUserIdPaged(int userId, int page, int pageSize);
 
     public Transaction FindById(int id);
-    public List<Transaction> FindByUserId(int userId);
 
     public int Add(Transaction transaction);
 

@@ -5,7 +5,8 @@ namespace Application.Interfaces;
 
 public interface ITagRepository
 {
-    public List<Tag> FindAll();
+    public List<Tag> FindByUserIdPaged(int userId, int page, int pageSize);
+    public List<Tag> FindByUserId(int userId);
 
     public Tag FindById(int id);
 

@@ -5,7 +5,6 @@ namespace Application.Interfaces;
 
 public interface IBudgetService
 {
-    public List<Budget> GetAll();
     public Budget GetById(int id);
     public Budget GetByCategoryId(int categoryId);
     public Budget Add(DateOnly startDate, DateOnly endDate, double target, int categoryId);

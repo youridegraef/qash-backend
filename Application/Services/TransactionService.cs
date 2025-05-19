@@ -71,30 +71,6 @@ public class TransactionService(
         }
     }
 
-    public List<Transaction> GetByDateRange(DateOnly startDate, DateOnly endDate)
-    {
-        try
-        {
-            List<Transaction> allTransactions = transactionRepository.FindAll();
-            var filteredTransactions = allTransactions
-                .Where(t => t.Date >= startDate && t.Date <= endDate).ToList();
-
-            return filteredTransactions;
-        }
-        catch (DatabaseException ex)
-        {
-            logger.LogError(ex, "Database error retrieving transactions in date range {StartDate} - {EndDate}.",
-                startDate, endDate);
-            throw new Exception($"Database error while retrieving transactions in date range {startDate} - {endDate}.",
-                ex);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "No transactions found in date range {StartDate} - {EndDate}.", startDate, endDate);
-            throw new Exception($"No transactions found in date range {startDate} - {endDate}.", ex);
-        }
-    }
-
     public List<Transaction> GetByUserId(int userId)
     {
         try
@@ -114,28 +90,6 @@ public class TransactionService(
         {
             logger.LogError(ex, "No transactions found with user_id: {UserId}", userId);
             throw new Exception($"No transactions found with user_id: {userId}", ex);
-        }
-    }
-
-    public List<Transaction> GetByCategory(int id)
-    {
-        try
-        {
-            List<Transaction> allTransactions = transactionRepository.FindAll();
-            var filteredTransactions = allTransactions
-                .Where(t => t.CategoryId == id).ToList();
-
-            return filteredTransactions;
-        }
-        catch (DatabaseException ex)
-        {
-            logger.LogError(ex, "Database error retrieving transactions with category id: {CategoryId}", id);
-            throw new Exception($"Database error while retrieving transactions with category id: {id}", ex);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "No transactions found with category id: {CategoryId}", id);
-            throw new Exception($"No transactions found with category id: {id}", ex);
         }
     }
 

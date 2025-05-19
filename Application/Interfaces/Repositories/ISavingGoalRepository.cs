@@ -5,9 +5,9 @@ namespace Application.Interfaces;
 
 public interface ISavingGoalRepository
 {
-    public List<SavingGoal> FindAll();
-
     public SavingGoal FindById(int id);
+    public List<SavingGoal> FindByUserId(int userId);
+    public List<SavingGoal> FindByUserIdPaged(int userId, int page, int pageSize);
 
     public int Add(SavingGoal savingGoal);
 

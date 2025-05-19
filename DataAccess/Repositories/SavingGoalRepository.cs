@@ -9,42 +9,6 @@ namespace DataAccess.Repositories;
 public class SavingGoalRepository(string connectionString, ILogger<SavingGoalRepository> logger)
     : ISavingGoalRepository
 {
-    public List<SavingGoal> FindAll()
-    {
-        try
-        {
-            List<SavingGoal> allSavingGoals = new List<SavingGoal>();
-            using MySqlConnection connection = new MySqlConnection(connectionString);
-            connection.Open();
-
-            string sql = "SELECT id, name, target, deadline, user_id FROM saving_goal";
-
-            using MySqlCommand command = new MySqlCommand(sql, connection);
-            using MySqlDataReader reader = command.ExecuteReader();
-
-            while (reader.Read())
-            {
-                allSavingGoals.Add(
-                    new SavingGoal(
-                        reader.GetInt32(reader.GetOrdinal("id")),
-                        reader.GetString(reader.GetOrdinal("name")),
-                        reader.GetDouble(reader.GetOrdinal("target")),
-                        DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("deadline"))),
-                        reader.GetInt32(reader.GetOrdinal("user_id")),
-                        reader.GetString(reader.GetOrdinal("color_hex_code"))
-                    )
-                );
-            }
-
-            return allSavingGoals;
-        }
-        catch (MySqlException ex)
-        {
-            logger.LogError(ex, "Error retrieving all saving goals from the database.");
-            throw new DatabaseException("Error retrieving all saving goals from the database.", ex);
-        }
-    }
-
     public SavingGoal FindById(int id)
     {
         try
@@ -81,6 +45,104 @@ public class SavingGoalRepository(string connectionString, ILogger<SavingGoalRep
         {
             logger.LogError(ex, $"Error retrieving saving goal with ID {id} from the database.");
             throw new DatabaseException($"Error retrieving saving goal with ID {id} from the database.", ex);
+        }
+    }
+
+    public List<SavingGoal> FindByUserId(int userId)
+    {
+        try
+        {
+            List<SavingGoal> savingGoals = new List<SavingGoal>();
+
+            using MySqlConnection connection = new MySqlConnection(connectionString);
+            connection.Open();
+
+            string sql =
+                "SELECT id, name, target, deadline, user_id, color_hex_code FROM tag WHERE user_id = @user_id";
+
+            using MySqlCommand command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@user_id", userId);
+
+            using MySqlDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                savingGoals.Add(
+                    new SavingGoal(
+                        reader.GetInt32(reader.GetOrdinal("id")),
+                        reader.GetString(reader.GetOrdinal("name")),
+                        reader.GetInt32(reader.GetOrdinal("target")),
+                        DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("deadline"))),
+                        reader.GetInt32(reader.GetOrdinal("user_id")),
+                        reader.GetString(reader.GetOrdinal("color_hex_code"))
+                    ));
+            }
+
+            if (savingGoals.Count == 0)
+            {
+                throw new SavingGoalNotFoundException($"Saving goal with UserID {userId} was not found.");
+            }
+
+            return savingGoals;
+        }
+        catch (SavingGoalNotFoundException ex)
+        {
+            logger.LogError(ex, $"Saving goal with user ID {userId} was not found.");
+            throw;
+        }
+        catch (MySqlException ex)
+        {
+            logger.LogError(ex, $"Error retrieving saving goal with user ID {userId} from the database.");
+            throw new DatabaseException($"Error retrieving saving goal with user ID {userId} from the database.", ex);
+        }
+    }
+
+    public List<SavingGoal> FindByUserIdPaged(int userId, int page, int pageSize)
+    {
+        try
+        {
+            List<SavingGoal> savingGoals = new List<SavingGoal>();
+
+            using MySqlConnection connection = new MySqlConnection(connectionString);
+            connection.Open();
+
+            int offset = (page - 1) * pageSize;
+            string sql =
+                "SELECT id, name, target, deadline, user_id, color_hex_code FROM tag WHERE user_id = @user_id LIMIT @limit OFFSET @offset";
+
+            using MySqlCommand command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@user_id", userId);
+            command.Parameters.AddWithValue("@offset", offset);
+
+            using MySqlDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                savingGoals.Add(
+                    new SavingGoal(
+                        reader.GetInt32(reader.GetOrdinal("id")),
+                        reader.GetString(reader.GetOrdinal("name")),
+                        reader.GetInt32(reader.GetOrdinal("target")),
+                        DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("deadline"))),
+                        reader.GetInt32(reader.GetOrdinal("user_id")),
+                        reader.GetString(reader.GetOrdinal("color_hex_code"))
+                    ));
+            }
+
+            if (savingGoals.Count == 0)
+            {
+                throw new SavingGoalNotFoundException($"Saving goal with UserID {userId} was not found.");
+            }
+
+            return savingGoals;
+        }
+        catch (SavingGoalNotFoundException ex)
+        {
+            logger.LogError(ex, $"Saving goal with user ID {userId} was not found.");
+            throw;
+        }
+        catch (MySqlException ex)
+        {
+            logger.LogError(ex, $"Error retrieving saving goal with user ID {userId} from the database.");
+            throw new DatabaseException($"Error retrieving saving goal with user ID {userId} from the database.", ex);
         }
     }
 

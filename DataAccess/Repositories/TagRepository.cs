@@ -8,37 +8,96 @@ namespace DataAccess.Repositories;
 
 public class TagRepository(string connectionString, ILogger<TagRepository> logger) : ITagRepository
 {
-    public List<Tag> FindAll()
+    public List<Tag> FindByUserIdPaged(int userId, int page, int pageSize)
     {
         try
         {
-            List<Tag> allTags = new List<Tag>();
+            List<Tag> tags = new List<Tag>();
+
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            string sql = "SELECT id, name, color_hex_code, user_id FROM tag";
+            int offset = (page - 1) * pageSize;
+            string sql =
+                "SELECT id, name, color_hex_code, user_id FROM tag WHERE user_id = @user_id LIMIT @limit OFFSET @offset";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
-            using MySqlDataReader reader = command.ExecuteReader();
+            command.Parameters.AddWithValue("@user_id", userId);
+            command.Parameters.AddWithValue("@offset", offset);
 
+            using MySqlDataReader reader = command.ExecuteReader();
             while (reader.Read())
             {
-                allTags.Add(
+                tags.Add(
                     new Tag(
                         reader.GetInt32(reader.GetOrdinal("id")),
                         reader.GetString(reader.GetOrdinal("name")),
                         reader.GetString(reader.GetOrdinal("color_hex_code")),
                         reader.GetInt32(reader.GetOrdinal("user_id"))
-                    )
-                );
+                    ));
             }
 
-            return allTags;
+            if (tags.Count == 0)
+            {
+                throw new TagNotFoundException($"Tags with UserID {userId} was not found.");
+            }
+
+            return tags;
+        }
+        catch (TagNotFoundException ex)
+        {
+            logger.LogError(ex, $"Tag with user ID {userId} was not found.");
+            throw;
         }
         catch (MySqlException ex)
         {
-            logger.LogError(ex, "Error retrieving all tags from the database.");
-            throw new DatabaseException("Error retrieving all tags from the database.", ex);
+            logger.LogError(ex, $"Error retrieving tag with user ID {userId} from the database.");
+            throw new DatabaseException($"Error retrieving tag with user ID {userId} from the database.", ex);
+        }
+    }
+
+    public List<Tag> FindByUserId(int userId)
+    {
+        try
+        {
+            List<Tag> tags = new List<Tag>();
+
+            using MySqlConnection connection = new MySqlConnection(connectionString);
+            connection.Open();
+
+            string sql = "SELECT id, name, color_hex_code, user_id FROM tag WHERE user_id = @user_id";
+
+            using MySqlCommand command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@user_id", userId);
+
+            using MySqlDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                tags.Add(
+                    new Tag(
+                        reader.GetInt32(reader.GetOrdinal("id")),
+                        reader.GetString(reader.GetOrdinal("name")),
+                        reader.GetString(reader.GetOrdinal("color_hex_code")),
+                        reader.GetInt32(reader.GetOrdinal("user_id"))
+                    ));
+            }
+
+            if (tags.Count == 0)
+            {
+                throw new TagNotFoundException($"Tags with UserID {userId} was not found.");
+            }
+
+            return tags;
+        }
+        catch (TagNotFoundException ex)
+        {
+            logger.LogError(ex, $"Tag with user ID {userId} was not found.");
+            throw;
+        }
+        catch (MySqlException ex)
+        {
+            logger.LogError(ex, $"Error retrieving tag with user ID {userId} from the database.");
+            throw new DatabaseException($"Error retrieving tag with user ID {userId} from the database.", ex);
         }
     }
 

@@ -1,143 +1,87 @@
 using Application.Domain;
+using Application.Exceptions;
 using Application.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
 
-public class SavingGoalService : ISavingGoalService
+public class SavingGoalService(ISavingGoalRepository savingGoalRepository, ILogger<SavingGoalService> logger)
+    : ISavingGoalService
 {
-    private readonly ISavingGoalRepository _savingGoalRepository;
-
-    public SavingGoalService(ISavingGoalRepository savingGoalRepository)
-    {
-        _savingGoalRepository = savingGoalRepository;
-    }
-
-    public List<SavingGoal> GetAll()
+    public SavingGoal GetById(int id)
     {
         try
         {
-            return _savingGoalRepository.FindAll();
+            SavingGoal? savingGoal = savingGoalRepository.FindById(id);
+
+            if (savingGoal != null!)
+            {
+                return savingGoal;
+            }
+
+            throw new SavingGoalNotFoundException($"Saving goal with id {id} not found.");
         }
-        catch
+        catch (SavingGoalNotFoundException ex)
         {
-            throw new Exception("No saving goals found");
+            logger.LogError(ex, "Saving goal with id {SavingGoalId} not found.", id);
+            throw;
         }
-    }
-
-    public SavingGoal GetById(int id)
-    {
-        SavingGoal? savingGoal = _savingGoalRepository.FindById(id);
-
-        if (savingGoal != null)
+        catch (DatabaseException ex)
         {
-            return savingGoal;
+            logger.LogError(ex, "Database error retrieving saving goal with id {SavingGoalId}", id);
+            throw new Exception($"Database error retrieving saving goal with id: {id}", ex);
         }
-
-        throw new Exception("Saving goal not found");
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error retrieving saving goal with id {SavingGoalId}", id);
+            throw new Exception($"Error retrieving saving goal with id: {id}", ex);
+        }
     }
 
     public List<SavingGoal> GetByUserId(int userId)
     {
-        List<SavingGoal> allGoals = _savingGoalRepository.FindAll();
-
-        if (allGoals == null)
+        try
         {
-            throw new Exception("No saving goals found");
+            return savingGoalRepository.FindByUserId(userId);
         }
-
-        var filteredGoals = allGoals
-            .Where(g => g.UserId == userId).ToList();
-
-        return filteredGoals;
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogError(ex, "No saving goals found for user_id: {UserId}", userId);
+            throw new Exception($"No saving goals found for user_id: {userId}", ex);
+        }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Database error retrieving saving goals for user_id: {UserId}", userId);
+            throw new Exception($"Database error retrieving saving goals for user_id: {userId}", ex);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error retrieving saving goals for user_id: {UserId}", userId);
+            throw new Exception($"Error retrieving saving goals for user_id: {userId}", ex);
+        }
     }
 
-    public List<SavingGoal> GetActiveSavingGoals(int userId)
+    public List<SavingGoal> GetByUserIdPaged(int userId, int page, int pageSize)
     {
-        List<SavingGoal> allGoals = _savingGoalRepository.FindAll();
-        DateOnly today = DateOnly.FromDateTime(DateTime.Today);
-
-
-        if (allGoals == null)
+        try
         {
-            throw new Exception("No saving goals found");
+            return savingGoalRepository.FindByUserIdPaged(userId, page, pageSize);
         }
-
-        var filteredGoals = allGoals
-            .Where(g => g.Deadline > today).ToList();
-
-        return filteredGoals;
-    }
-
-    public List<SavingGoal> GetCompletedSavingGoals(int userId)
-    {
-        List<SavingGoal> allGoals = _savingGoalRepository.FindAll();
-        DateOnly today = DateOnly.FromDateTime(DateTime.Today);
-
-
-        if (allGoals == null)
+        catch (KeyNotFoundException ex)
         {
-            throw new Exception("No saving goals found");
+            logger.LogError(ex, "No saving goals found for user_id: {UserId}", userId);
+            throw new Exception($"No saving goals found for user_id: {userId}", ex);
         }
-
-        var filteredGoals = allGoals
-            .Where(g => g.Deadline < today).ToList();
-
-        return filteredGoals;
-    }
-
-    public List<SavingGoal> GetByName(string name)
-    {
-        List<SavingGoal> allGoals = _savingGoalRepository.FindAll();
-
-
-        if (allGoals == null)
+        catch (DatabaseException ex)
         {
-            throw new Exception("No saving goals found");
+            logger.LogError(ex, "Database error retrieving paged saving goals for user_id: {UserId}", userId);
+            throw new Exception($"Database error retrieving paged saving goals for user_id: {userId}", ex);
         }
-
-        var filteredGoals = allGoals
-            .Where(g => g.Name == name).ToList();
-
-        return filteredGoals;
-    }
-
-    public List<SavingGoal> GetByNameAndUserId(string name, int userId)
-    {
-        List<SavingGoal> allGoals = _savingGoalRepository.FindAll();
-
-
-        if (allGoals == null)
+        catch (Exception ex)
         {
-            throw new Exception("No saving goals found");
+            logger.LogError(ex, "Error retrieving paged saving goals for user_id: {UserId}", userId);
+            throw new Exception($"Error retrieving paged saving goals for user_id: {userId}", ex);
         }
-
-        var filteredGoals = allGoals
-            .Where(g =>
-                g.UserId == userId
-                && g.Name == name)
-            .ToList();
-
-        return filteredGoals;
-    }
-
-    public List<SavingGoal> GetByDeadlineRange(DateOnly startDate, DateOnly endDate)
-    {
-        List<SavingGoal> allGoals = _savingGoalRepository.FindAll();
-
-
-        if (allGoals == null)
-        {
-            throw new Exception("No saving goals found");
-        }
-
-        var filteredGoals = allGoals
-            .Where(g =>
-                g.Deadline >= startDate
-                && g.Deadline <= endDate
-            )
-            .ToList();
-
-        return filteredGoals;
     }
 
     public SavingGoal Add(string name, double target, DateOnly deadline, int userId, string colorHexCode)
@@ -145,12 +89,23 @@ public class SavingGoalService : ISavingGoalService
         try
         {
             SavingGoal savingGoal = new SavingGoal(name, target, deadline, userId, colorHexCode);
-            savingGoal.Id = _savingGoalRepository.Add(savingGoal);
+            savingGoal.Id = savingGoalRepository.Add(savingGoal);
             return savingGoal;
         }
-        catch
+        catch (ArgumentException ex)
         {
-            throw new Exception("");
+            logger.LogError(ex, "Invalid saving goal data: {Message}", ex.Message);
+            throw new InvalidDataException("Invalid saving goal data: " + ex.Message, ex);
+        }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Database error while adding a saving goal.");
+            throw new Exception("Database error while adding a saving goal.", ex);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "An unexpected error occurred while adding a saving goal.");
+            throw new Exception("An unexpected error occurred.", ex);
         }
     }
 
@@ -158,11 +113,22 @@ public class SavingGoalService : ISavingGoalService
     {
         try
         {
-            return _savingGoalRepository.Edit(savingGoal);
+            return savingGoalRepository.Edit(savingGoal);
         }
-        catch
+        catch (SavingGoalNotFoundException ex)
         {
-            throw new Exception("Invalid saving goal");
+            logger.LogError(ex, "Saving goal with ID {SavingGoalId} was not found for update.", savingGoal.Id);
+            return false;
+        }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Database error while updating saving goal with ID {SavingGoalId}", savingGoal.Id);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error updating saving goal with ID {SavingGoalId}", savingGoal.Id);
+            return false;
         }
     }
 
@@ -170,12 +136,23 @@ public class SavingGoalService : ISavingGoalService
     {
         try
         {
-            var savingGoal = _savingGoalRepository.FindById(id);
-            return _savingGoalRepository.Delete(savingGoal);
+            var savingGoal = savingGoalRepository.FindById(id);
+            return savingGoalRepository.Delete(savingGoal);
         }
-        catch
+        catch (SavingGoalNotFoundException ex)
         {
-            throw new Exception("Saving goal not deleted.");
+            logger.LogError(ex, "Saving goal with ID {SavingGoalId} was not found for deletion.", id);
+            return false;
+        }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Database error while deleting saving goal with ID {SavingGoalId}", id);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error deleting saving goal with ID {SavingGoalId}", id);
+            return false;
         }
     }
 }

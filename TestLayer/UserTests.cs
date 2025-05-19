@@ -149,7 +149,7 @@ public class UserTests
     {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
-        userRepoMock.Setup(r => r.FindByEmail(email)).Returns((User)null!);
+        userRepoMock.Setup(r => r.IsEmailAvailable(email)).Returns(true);
         userRepoMock.Setup(r => r.Add(It.IsAny<User>())).Returns(3);
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
 
@@ -178,7 +178,8 @@ public class UserTests
         // Arrange
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
-        userRepoMock.Setup(r => r.FindByEmail(It.IsAny<string>())).Throws(new DatabaseException("DB error"));
+        userRepoMock.Setup(r => r.IsEmailAvailable(It.IsAny<string>())).Returns(true);
+        userRepoMock.Setup(r => r.Add(It.IsAny<User>())).Throws(new DatabaseException());
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
 
         // Act

@@ -8,41 +8,6 @@ namespace DataAccess.Repositories;
 
 public class BudgetRepository(string connectionString, ILogger<BudgetRepository> logger) : IBudgetRepository
 {
-    public List<Budget> FindAll()
-    {
-        try
-        {
-            List<Budget> allBudgets = new List<Budget>();
-            using MySqlConnection connection = new MySqlConnection(connectionString);
-            connection.Open();
-
-            string sql = "SELECT id, start_date, end_date, budget, category_id FROM budget";
-
-            using MySqlCommand command = new MySqlCommand(sql, connection);
-            using MySqlDataReader reader = command.ExecuteReader();
-
-            while (reader.Read())
-            {
-                allBudgets.Add(
-                    new Budget(
-                        reader.GetInt32(reader.GetOrdinal("id")),
-                        DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("start_date"))),
-                        DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("end_date"))),
-                        reader.GetDouble(reader.GetOrdinal("budget")),
-                        reader.GetInt32(reader.GetOrdinal("category_id"))
-                    )
-                );
-            }
-
-            return allBudgets;
-        }
-        catch (MySqlException ex)
-        {
-            logger.LogError(ex, "Error retrieving all budgets from the database.");
-            throw new DatabaseException("Error retrieving all budgets from the database.", ex);
-        }
-    }
-
     public Budget FindById(int id)
     {
         try
@@ -81,6 +46,52 @@ public class BudgetRepository(string connectionString, ILogger<BudgetRepository>
             throw new DatabaseException($"Error retrieving budget with ID {id} from the database.", ex);
         }
     }
+
+    public Budget FindByCategoryId(int categoryId)
+    {
+        try
+        {
+            using MySqlConnection connection = new MySqlConnection(connectionString);
+            connection.Open();
+
+            string sql =
+                "SELECT id, start_date, end_date, budget, category_id FROM budget WHERE category_id = @categoryId";
+
+            using MySqlCommand command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@categoryId", categoryId);
+
+            using MySqlDataReader reader = command.ExecuteReader();
+
+            if (reader.Read())
+            {
+                return new Budget(
+                    reader.GetInt32(reader.GetOrdinal("id")),
+                    DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("start_date"))),
+                    DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("end_date"))),
+                    reader.GetDouble(reader.GetOrdinal("budget")),
+                    reader.GetInt32(reader.GetOrdinal("category_id"))
+                );
+            }
+
+            throw new BudgetNotFoundException($"Budget with category ID {categoryId} was not found.");
+        }
+        catch (BudgetNotFoundException ex)
+        {
+            logger.LogError(ex, "Budget with category ID {CategoryId} was not found.", categoryId);
+            throw;
+        }
+        catch (MySqlException ex)
+        {
+            logger.LogError(ex, "Database error retrieving budget with category ID {CategoryId}", categoryId);
+            throw new DatabaseException($"Database error retrieving budget with category ID {categoryId}", ex);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error retrieving budget with category ID {CategoryId}", categoryId);
+            throw new Exception($"Error retrieving budget with category ID {categoryId}", ex);
+        }
+    }
+
 
     public int Add(Budget budget)
     {

@@ -5,9 +5,9 @@ namespace Application.Interfaces;
 
 public interface ICategoryRepository
 {
-    public List<Category> FindAll();
-
     public Category FindById(int id);
+    public List<Category> FindByUserId(int userId);
+    public List<Category> FindByUserIdPaged(int userId, int page, int pageSize);
 
     public int Add(Category category);
 

@@ -1,56 +1,70 @@
 using Application.Domain;
+using Application.Exceptions;
 using Application.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
 
-public class BudgetService : IBudgetService
+public class BudgetService(IBudgetRepository budgetRepository, ILogger<BudgetService> logger)
+    : IBudgetService
 {
-    private readonly IBudgetRepository _budgetRepository;
-
-    public BudgetService(IBudgetRepository budgetRepository)
-    {
-        _budgetRepository = budgetRepository;
-    }
-    
-
-    public List<Budget> GetAll()
+    public Budget GetById(int id)
     {
         try
         {
-            return _budgetRepository.FindAll();
+            Budget budget = budgetRepository.FindById(id);
+
+            if (budget != null!)
+            {
+                return budget;
+            }
+
+            throw new BudgetNotFoundException($"No budget with id: {id} found.");
         }
-        catch
+        catch (BudgetNotFoundException ex)
         {
-            throw new Exception("No budgets found");
+            logger.LogError(ex, "No budget with id: {BudgetId} found.", id);
+            throw;
         }
-    }
-
-    public Budget GetById(int id)
-    {
-        Budget budget = _budgetRepository.FindById(id);
-
-        if (budget != null)
+        catch (DatabaseException ex)
         {
-            return budget;
+            logger.LogError(ex, "Database error retrieving budget with id: {BudgetId}", id);
+            throw new Exception($"Database error retrieving budget with id: {id}", ex);
         }
-
-        throw new KeyNotFoundException($"No budget with id: {id} found.");
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error retrieving budget with id: {BudgetId}", id);
+            throw new Exception($"Error retrieving budget with id: {id}", ex);
+        }
     }
 
     public Budget GetByCategoryId(int categoryId)
     {
         try
         {
-            List<Budget> allBudgets = _budgetRepository.FindAll();
+            Budget budget = budgetRepository.FindByCategoryId(categoryId);
 
-            var filteredBudget = allBudgets
-                .FirstOrDefault(b => b.CategoryId == categoryId);
+            if (budget != null!)
+            {
+                return budget;
+            }
 
-            return filteredBudget;
+            throw new BudgetNotFoundException($"No budget with category id: {categoryId} found.");
         }
-        catch
+        catch (BudgetNotFoundException ex)
         {
-            throw new Exception($"No budgets with category id: {categoryId} found.");
+            logger.LogError(ex, "No budget with category id: {CategoryId} found.", categoryId);
+            throw;
+        }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Database error retrieving budget with category id: {CategoryId}", categoryId);
+            throw new Exception($"Database error retrieving budget with category id: {categoryId}", ex);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error retrieving budget with category id: {CategoryId}", categoryId);
+            throw new Exception($"Error retrieving budget with category id: {categoryId}", ex);
         }
     }
 
@@ -59,12 +73,23 @@ public class BudgetService : IBudgetService
         try
         {
             Budget budget = new Budget(startDate, endDate, target, categoryId);
-            budget.Id = _budgetRepository.Add(budget);
+            budget.Id = budgetRepository.Add(budget);
             return budget;
         }
-        catch
+        catch (ArgumentException ex)
         {
-            throw new Exception("Budget couldn't be added.");
+            logger.LogError(ex, "Invalid budget data: {Message}", ex.Message);
+            throw new InvalidDataException("Invalid budget data: " + ex.Message, ex);
+        }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Database error while adding a budget.");
+            throw new Exception("Database error while adding a budget.", ex);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "An unexpected error occurred while adding a budget.");
+            throw new Exception("An unexpected error occurred.", ex);
         }
     }
 
@@ -72,10 +97,21 @@ public class BudgetService : IBudgetService
     {
         try
         {
-            return _budgetRepository.Edit(budget);
+            return budgetRepository.Edit(budget);
         }
-        catch
+        catch (BudgetNotFoundException ex)
         {
+            logger.LogError(ex, "Budget with ID {BudgetId} was not found for update.", budget.Id);
+            return false;
+        }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Database error while updating budget with ID {BudgetId}", budget.Id);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error updating budget with ID {BudgetId}", budget.Id);
             return false;
         }
     }
@@ -84,11 +120,22 @@ public class BudgetService : IBudgetService
     {
         try
         {
-            var budget = _budgetRepository.FindById(id);
-            return _budgetRepository.Delete(budget);
+            var budget = budgetRepository.FindById(id);
+            return budgetRepository.Delete(budget);
         }
-        catch
+        catch (BudgetNotFoundException ex)
         {
+            logger.LogError(ex, "Budget with ID {BudgetId} was not found for deletion.", id);
+            return false;
+        }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Database error while deleting budget with ID {BudgetId}", id);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error deleting budget with ID {BudgetId}", id);
             return false;
         }
     }

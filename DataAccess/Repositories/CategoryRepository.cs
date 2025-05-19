@@ -9,40 +9,6 @@ namespace DataAccess.Repositories;
 public class CategoryRepository(string connectionString, ILogger<CategoryRepository> logger)
     : ICategoryRepository
 {
-    public List<Category> FindAll()
-    {
-        try
-        {
-            List<Category> allCategories = new List<Category>();
-            using MySqlConnection connection = new MySqlConnection(connectionString);
-            connection.Open();
-
-            string sql = "SELECT id, name, user_id FROM category";
-
-            using MySqlCommand command = new MySqlCommand(sql, connection);
-            using MySqlDataReader reader = command.ExecuteReader();
-
-            while (reader.Read())
-            {
-                allCategories.Add(
-                    new Category(
-                        reader.GetInt32(reader.GetOrdinal("id")),
-                        reader.GetString(reader.GetOrdinal("name")),
-                        reader.GetInt32(reader.GetOrdinal("user_id")),
-                        reader.GetString(reader.GetOrdinal("color_hex_code"))
-                    )
-                );
-            }
-
-            return allCategories;
-        }
-        catch (MySqlException ex)
-        {
-            logger.LogError(ex, "Error retrieving all categories from the database.");
-            throw new DatabaseException("Error retrieving all categories from the database.", ex);
-        }
-    }
-
     public Category FindById(int id)
     {
         try
@@ -81,6 +47,100 @@ public class CategoryRepository(string connectionString, ILogger<CategoryReposit
         }
     }
 
+    public List<Category> FindByUserId(int userId)
+    {
+        try
+        {
+            List<Category> categories = new List<Category>();
+
+            using MySqlConnection connection = new MySqlConnection(connectionString);
+            connection.Open();
+
+            string sql =
+                "SELECT id, name, user_id, color_hex_code FROM tag WHERE user_id = @user_id";
+
+            using MySqlCommand command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@user_id", userId);
+
+            using MySqlDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                categories.Add(
+                    new Category(
+                        reader.GetInt32(reader.GetOrdinal("id")),
+                        reader.GetString(reader.GetOrdinal("name")),
+                        reader.GetInt32(reader.GetOrdinal("user_id")),
+                        reader.GetString(reader.GetOrdinal("color_hex_code"))
+                    ));
+            }
+
+            if (categories.Count == 0)
+            {
+                throw new CategoryNotFoundException($"Category with UserID {userId} was not found.");
+            }
+
+            return categories;
+        }
+        catch (CategoryNotFoundException ex)
+        {
+            logger.LogError(ex, $"Category with user ID {userId} was not found.");
+            throw;
+        }
+        catch (MySqlException ex)
+        {
+            logger.LogError(ex, $"Error retrieving category with user ID {userId} from the database.");
+            throw new DatabaseException($"Error retrieving category with user ID {userId} from the database.", ex);
+        }
+    }
+
+    public List<Category> FindByUserIdPaged(int userId, int page, int pageSize)
+    {
+        try
+        {
+            List<Category> categories = new List<Category>();
+
+            using MySqlConnection connection = new MySqlConnection(connectionString);
+            connection.Open();
+
+            int offset = (page - 1) * pageSize;
+            string sql =
+                "SELECT id, name, user_id, color_hex_code FROM tag WHERE user_id = @user_id LIMIT @limit OFFSET @offset";
+
+            using MySqlCommand command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@user_id", userId);
+            command.Parameters.AddWithValue("@offset", offset);
+
+            using MySqlDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                categories.Add(
+                    new Category(
+                        reader.GetInt32(reader.GetOrdinal("id")),
+                        reader.GetString(reader.GetOrdinal("name")),
+                        reader.GetInt32(reader.GetOrdinal("user_id")),
+                        reader.GetString(reader.GetOrdinal("color_hex_code"))
+                    ));
+            }
+
+            if (categories.Count == 0)
+            {
+                throw new CategoryNotFoundException($"Category with UserID {userId} was not found.");
+            }
+
+            return categories;
+        }
+        catch (CategoryNotFoundException ex)
+        {
+            logger.LogError(ex, $"Category with user ID {userId} was not found.");
+            throw;
+        }
+        catch (MySqlException ex)
+        {
+            logger.LogError(ex, $"Error retrieving category with user ID {userId} from the database.");
+            throw new DatabaseException($"Error retrieving category with user ID {userId} from the database.", ex);
+        }
+    }
+
     public int Add(Category category)
     {
         try
@@ -88,7 +148,8 @@ public class CategoryRepository(string connectionString, ILogger<CategoryReposit
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            string sql = "INSERT INTO category (name, user_id, color_hex_code) VALUES (@name, @user_id, @color_hex_code)";
+            string sql =
+                "INSERT INTO category (name, user_id, color_hex_code) VALUES (@name, @user_id, @color_hex_code)";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@name", category.Name);
@@ -127,7 +188,8 @@ public class CategoryRepository(string connectionString, ILogger<CategoryReposit
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            string sql = "UPDATE category SET name = @name, user_id = @user_id, color_hex_code = @color_hex_code WHERE id = @id";
+            string sql =
+                "UPDATE category SET name = @name, user_id = @user_id, color_hex_code = @color_hex_code WHERE id = @id";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@id", category.Id);

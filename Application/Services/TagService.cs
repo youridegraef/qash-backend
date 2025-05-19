@@ -1,36 +1,39 @@
 using Application.Domain;
 using Application.Exceptions;
 using Application.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
 
-public class TagService(ITagRepository tagRepository) : ITagService
+public class TagService(ITagRepository tagRepository, ILogger<TagService> logger) : ITagService
 {
-    public List<Tag> GetAll()
-    {
-        try
-        {
-            return tagRepository.FindAll();
-        }
-        catch (Exception)
-        {
-            throw new Exception($"No tags found");
-        }
-    }
-
     public Tag GetById(int id)
     {
         try
         {
-            return tagRepository.FindById(id);
+            Tag tag = tagRepository.FindById(id);
+
+            if (tag != null!)
+            {
+                return tag;
+            }
+
+            throw new TagNotFoundException($"No tag with id: {id} found.");
         }
-        catch (KeyNotFoundException)
+        catch (TagNotFoundException ex)
         {
-            throw new Exception($"No tags found");
+            logger.LogError(ex, "No tag with id: {TagId} found.", id);
+            throw;
         }
-        catch (Exception)
+        catch (DatabaseException ex)
         {
-            throw new Exception($"No tags found");
+            logger.LogError(ex, "Database error retrieving tag with id: {TagId}", id);
+            throw new Exception($"Database error retrieving tag with id: {id}", ex);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error retrieving tag with id: {TagId}", id);
+            throw new Exception($"Error retrieving tag with id: {id}", ex);
         }
     }
 
@@ -38,59 +41,45 @@ public class TagService(ITagRepository tagRepository) : ITagService
     {
         try
         {
-            List<Tag> allTags = tagRepository.FindAll();
-            var filteredTags = allTags
-                .Where(t => t.UserId == userId).ToList();
-
-            return filteredTags;
+            return tagRepository.FindByUserId(userId);
         }
-        catch (KeyNotFoundException)
+        catch (KeyNotFoundException ex)
         {
-            throw new Exception($"No tags found");
+            logger.LogError(ex, "No tags found for user_id: {UserId}", userId);
+            throw new Exception($"No tags found for user_id: {userId}", ex);
         }
-        catch (Exception)
+        catch (DatabaseException ex)
         {
-            throw new Exception($"No tags found");
+            logger.LogError(ex, "Database error retrieving tags for user_id: {UserId}", userId);
+            throw new Exception($"Database error retrieving tags for user_id: {userId}", ex);
         }
-    }
-
-    public List<Tag> GetByName(string name)
-    {
-        try
+        catch (Exception ex)
         {
-            List<Tag> allTags = tagRepository.FindAll();
-            var filteredTags = allTags
-                .Where(t => t.Name == name).ToList();
-
-            return filteredTags;
-        }
-        catch (KeyNotFoundException)
-        {
-            throw new Exception($"No tags found");
-        }
-        catch (Exception)
-        {
-            throw new Exception($"No tags found");
+            logger.LogError(ex, "Error retrieving tags for user_id: {UserId}", userId);
+            throw new Exception($"Error retrieving tags for user_id: {userId}", ex);
         }
     }
 
-    public List<Tag> GetByNameAndUserId(string name, int userId)
+    public List<Tag> GetByUserIdPaged(int userId, int page, int pageSize)
     {
         try
         {
-            List<Tag> allTags = tagRepository.FindAll();
-            var filteredTags = allTags
-                .Where(t => t.Name == name && t.UserId == userId).ToList();
-
-            return filteredTags;
+            return tagRepository.FindByUserIdPaged(userId, page, pageSize);
         }
-        catch (KeyNotFoundException)
+        catch (KeyNotFoundException ex)
         {
-            throw new Exception($"No tags found");
+            logger.LogError(ex, "No tags found for user_id: {UserId}", userId);
+            throw new Exception($"No tags found for user_id: {userId}", ex);
         }
-        catch (Exception)
+        catch (DatabaseException ex)
         {
-            throw new Exception($"No tags found");
+            logger.LogError(ex, "Database error retrieving paged tags for user_id: {UserId}", userId);
+            throw new Exception($"Database error retrieving paged tags for user_id: {userId}", ex);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error retrieving paged tags for user_id: {UserId}", userId);
+            throw new Exception($"Error retrieving paged tags for user_id: {userId}", ex);
         }
     }
 
@@ -103,9 +92,20 @@ public class TagService(ITagRepository tagRepository) : ITagService
 
             return tag;
         }
-        catch (Exception)
+        catch (ArgumentException ex)
         {
-            throw new Exception($"No tags found");
+            logger.LogError(ex, "Invalid tag data: {Message}", ex.Message);
+            throw new InvalidDataException("Invalid tag data: " + ex.Message, ex);
+        }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Database error while adding a tag.");
+            throw new Exception("Database error while adding a tag.", ex);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "An unexpected error occurred while adding a tag.");
+            throw new Exception("An unexpected error occurred.", ex);
         }
     }
 
@@ -115,8 +115,19 @@ public class TagService(ITagRepository tagRepository) : ITagService
         {
             return tagRepository.Edit(tag);
         }
-        catch (Exception)
+        catch (TagNotFoundException ex)
         {
+            logger.LogError(ex, "Tag with ID {TagId} was not found for update.", tag.Id);
+            return false;
+        }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Database error while updating tag with ID {TagId}", tag.Id);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error updating tag with ID {TagId}", tag.Id);
             return false;
         }
     }
@@ -128,8 +139,19 @@ public class TagService(ITagRepository tagRepository) : ITagService
             Tag tag = tagRepository.FindById(tagId);
             return tagRepository.Delete(tag);
         }
-        catch (Exception)
+        catch (TagNotFoundException ex)
         {
+            logger.LogError(ex, "Tag with ID {TagId} was not found for deletion.", tagId);
+            return false;
+        }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Database error while deleting tag with ID {TagId}", tagId);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error deleting tag with ID {TagId}", tagId);
             return false;
         }
     }
