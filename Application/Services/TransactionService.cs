@@ -1,5 +1,4 @@
 using Application.Domain;
-using Application.Dtos;
 using Application.Exceptions;
 using Application.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -258,45 +257,6 @@ public class TransactionService(
         {
             logger.LogError(ex, "Error calculating balance for user_id: {UserId}", userId);
             throw new Exception($"Error calculating balance for user_id: {userId}", ex);
-        }
-    }
-
-    public List<ChartDataDto> GetChartData(int userId)
-    {
-        try
-        {
-            List<ChartDataDto> chartData = new List<ChartDataDto>();
-            double balance = 0;
-            var transactions = GetByUserId(userId);
-
-            var transactionsByDay = transactions
-                .GroupBy(t => t.Date)
-                .OrderBy(g => g.Key);
-
-            foreach (var dayGroup in transactionsByDay)
-            {
-                double dailyChange = 0;
-                foreach (var transaction in dayGroup)
-                {
-                    dailyChange += transaction.Amount;
-                }
-
-                balance += dailyChange;
-
-                chartData.Add(new ChartDataDto(dayGroup.Key, balance));
-            }
-
-            return chartData;
-        }
-        catch (DatabaseException ex)
-        {
-            logger.LogError(ex, "Database error generating chart data for user_id: {UserId}", userId);
-            throw new Exception($"Database error while generating chart data for user_id: {userId}", ex);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error generating chart data for user_id: {UserId}", userId);
-            throw new Exception($"Error generating chart data for user_id: {userId}", ex);
         }
     }
 }

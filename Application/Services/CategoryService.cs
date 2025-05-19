@@ -7,12 +7,9 @@ namespace Application.Services;
 
 public class CategoryService(
     ICategoryRepository categoryRepository,
-    ITransactionRepository transactionRepository,
     ILogger<CategoryService> logger)
     : ICategoryService
 {
-    private readonly ITransactionRepository _transactionRepository = transactionRepository;
-
     public Category GetById(int id)
     {
         try

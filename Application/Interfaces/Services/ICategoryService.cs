@@ -1,5 +1,4 @@
 using Application.Domain;
-using SQLitePCL;
 
 // ReSharper disable once CheckNamespace
 namespace Application.Interfaces;

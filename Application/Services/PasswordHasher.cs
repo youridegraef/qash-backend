@@ -1,8 +1,6 @@
-using BCrypt.Net;
-
 namespace Application.Services;
 
-public class PasswordHasher
+public static class PasswordHasher
 {
     private static readonly int WorkFactor = 12;
 

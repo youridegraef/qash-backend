@@ -1,11 +1,6 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Application.Dtos;
 using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using RestAPI.Models;
 using RestAPI.Models.RequestModels;
 using RestAPI.Models.ResponseModels;
 
@@ -53,7 +48,7 @@ public class UserController(IUserService userService, IConfiguration configurati
     {
         if (registerRequest == null!)
         {
-            return BadRequest(new { messae = "Name, Email, Passowrd and DateOfBirth are required." });
+            return BadRequest(new { messae = "Name, Email, uPassword and DateOfBirth are required." });
         }
 
         User user = userService.Register(registerRequest.Name, registerRequest.Email, registerRequest.Password,

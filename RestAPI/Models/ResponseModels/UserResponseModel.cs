@@ -1,15 +1,8 @@
 namespace RestAPI.Models.ResponseModels;
 
-public class UserResponseModel
+public class UserResponseModel(int id, string name, string email)
 {
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public string Email { get; set; }
-
-    public UserResponseModel(int id, string name, string email)
-    {
-        Id = id;
-        Name = name;
-        Email = email;
-    }
+    public int Id { get; set; } = id;
+    public string Name { get; set; } = name;
+    public string Email { get; set; } = email;
 }

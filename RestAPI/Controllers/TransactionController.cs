@@ -24,10 +24,4 @@ public class TransactionController(ITransactionService transactionService) : Con
     {
         return Ok(transactionService.GetExpenses(userId));
     }
-
-    [HttpGet("chart-data/{userId}")]
-    public IActionResult GetChartData(int userId)
-    {
-        return Ok(transactionService.GetChartData(userId));
-    }
 }

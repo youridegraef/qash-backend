@@ -1,6 +1,5 @@
-using Application.Domain;
-
 // ReSharper disable once CheckNamespace
+
 namespace Application.Interfaces;
 
 public interface IUserRepository

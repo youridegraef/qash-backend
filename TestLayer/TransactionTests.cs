@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Microsoft.Extensions.Logging;
 using Application.Domain;
@@ -210,20 +207,5 @@ public class TransactionTests
             transactionService.GetBalance(userId)
         );
         Assert.AreEqual($"Database error while calculating balance for user_id: {userId}", ex.Message);
-    }
-
-    [TestMethod]
-    [DataRow(1)]
-    public void GetChartData_DatabaseException_ThrowsExceptionWithMessage(int userId)
-    {
-        var loggerMock = new Mock<ILogger<TransactionService>>();
-        var transactionRepoMock = new Mock<ITransactionRepository>();
-        transactionRepoMock.Setup(r => r.FindByUserId(It.IsAny<int>())).Throws(new DatabaseException("DB error"));
-        var transactionService = new TransactionService(transactionRepoMock.Object, loggerMock.Object);
-
-        var ex = Assert.ThrowsException<Exception>(() =>
-            transactionService.GetChartData(userId)
-        );
-        Assert.AreEqual($"Error generating chart data for user_id: {userId}", ex.Message);
     }
 }
