@@ -1,15 +1,16 @@
 using Application.Domain;
+using Application.Dtos;
 
 // ReSharper disable once CheckNamespace
 namespace Application.Interfaces;
 
 public interface ITransactionRepository
 {
-    public List<Transaction> FindAllPaged(int page, int pageSize);
-    public List<Transaction> FindByUserId(int userId);
-    public List<Transaction> FindByUserIdPaged(int userId, int page, int pageSize);
+    public List<TransactionDto> FindAllPaged(int page, int pageSize);
+    public List<TransactionDto> FindByUserId(int userId);
+    public List<TransactionDto> FindByUserIdPaged(int userId, int page, int pageSize);
 
-    public Transaction FindById(int id);
+    public TransactionDto FindById(int id);
 
     public int Add(Transaction transaction);
 

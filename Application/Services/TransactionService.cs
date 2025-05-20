@@ -1,4 +1,5 @@
 using Application.Domain;
+using Application.Dtos;
 using Application.Exceptions;
 using Application.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -7,14 +8,15 @@ namespace Application.Services;
 
 public class TransactionService(
     ITransactionRepository transactionRepository,
+    ITagService tagService,
     ILogger<TransactionService> logger)
     : ITransactionService
 {
-    public Transaction GetById(int id)
+    public TransactionDto GetById(int id)
     {
         try
         {
-            Transaction transaction = transactionRepository.FindById(id);
+            TransactionDto transaction = transactionRepository.FindById(id);
 
             if (transaction != null!)
             {
@@ -40,11 +42,11 @@ public class TransactionService(
         }
     }
 
-    public List<Transaction> GetByUserIdPaged(int userId, int page, int pageSize)
+    public List<TransactionDto> GetByUserIdPaged(int userId, int page, int pageSize)
     {
         try
         {
-            List<Transaction> transactions = transactionRepository.FindByUserIdPaged(userId, page, pageSize);
+            List<TransactionDto> transactions = transactionRepository.FindByUserIdPaged(userId, page, pageSize);
 
             if (transactions.Count == 0 || transactions == null)
             {
@@ -70,11 +72,11 @@ public class TransactionService(
         }
     }
 
-    public List<Transaction> GetByUserId(int userId)
+    public List<TransactionDto> GetByUserId(int userId)
     {
         try
         {
-            List<Transaction> transactions = transactionRepository.FindByUserId(userId);
+            List<TransactionDto> transactions = transactionRepository.FindByUserId(userId);
 
             if (transactions.Count != 0)
             {
@@ -95,14 +97,14 @@ public class TransactionService(
         }
     }
 
-    public Transaction Add(string description, double amount, DateOnly date, int userId, int categoryId)
+    public TransactionDto Add(string description, double amount, DateOnly date, int userId, int categoryId)
     {
         try
         {
             Transaction transaction = new Transaction(amount, description, date, userId, categoryId);
             transaction.Id = transactionRepository.Add(transaction);
 
-            return transaction;
+            return transactionRepository.FindById(transaction.Id);
         }
         catch (ArgumentException ex)
         {
@@ -152,7 +154,14 @@ public class TransactionService(
         try
         {
             var transaction = transactionRepository.FindById(id);
-            return transactionRepository.Delete(transaction);
+            return transactionRepository.Delete(new Transaction(
+                transaction.Id,
+                transaction.Description,
+                transaction.Amount,
+                transaction.Date,
+                transaction.UserId,
+                transaction.Category.Id
+            ));
         }
         catch (TransactionNotFoundException ex)
         {

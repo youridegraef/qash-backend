@@ -1,4 +1,5 @@
 using Application.Domain;
+using Application.Dtos;
 using Application.Exceptions;
 using Application.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -60,7 +61,7 @@ public class TagService(ITagRepository tagRepository, ILogger<TagService> logger
         }
     }
     
-    public List<Tag> GetByTransactionId(int transactionId)
+    public List<TagDto> GetByTransactionId(int transactionId)
     {
         try
         {

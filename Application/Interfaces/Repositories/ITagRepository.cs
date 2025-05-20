@@ -1,4 +1,5 @@
 using Application.Domain;
+using Application.Dtos;
 
 // ReSharper disable once CheckNamespace
 namespace Application.Interfaces;
@@ -9,7 +10,7 @@ public interface ITagRepository
     public List<Tag> FindByUserId(int userId);
 
     public Tag FindById(int id);
-    public List<Tag> FindByTransactionId(int transactionId);
+    public List<TagDto> FindByTransactionId(int transactionId);
 
     public int Add(Tag tag);
 

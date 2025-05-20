@@ -1,21 +1,21 @@
-using Application.Dtos;
+using Application.Domain;
 
-namespace RestAPI.Models;
+namespace Application.Dtos;
 
-public class TransactionModel(
+public class TransactionDto(
     int id,
     string description,
     double amount,
     DateOnly date,
-    CategoryDto category,
     int userId,
-    ICollection<TagDto> tags)
+    CategoryDto category
+)
 {
     public int Id { get; set; } = id;
     public string Description { get; set; } = description;
     public double Amount { get; set; } = amount;
     public DateOnly Date { get; set; } = date;
-    public CategoryDto Category { get; set; } = category;
     public int UserId { get; set; } = userId;
-    public ICollection<TagDto> Tags { get; set; } = tags;
+    public CategoryDto Category { get; set; } = category;
+    public ICollection<TagDto> Tags { get; set; }
 }

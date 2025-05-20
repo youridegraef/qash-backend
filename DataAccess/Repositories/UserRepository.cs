@@ -2,6 +2,7 @@ using Application.Exceptions;
 using Application.Interfaces;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
+using SQLitePCL;
 
 namespace DataAccess.Repositories;
 
@@ -13,14 +14,14 @@ public class UserRepository(string connectionString, ILogger<UserRepository> log
         {
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
-
+    
             string sql = "SELECT id, name, email, password_hash, date_of_birth FROM user WHERE id = @id";
-
+    
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@id", id);
-
+    
             using MySqlDataReader reader = command.ExecuteReader();
-
+    
             if (reader.Read())
             {
                 return new User(
@@ -31,7 +32,7 @@ public class UserRepository(string connectionString, ILogger<UserRepository> log
                     DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("date_of_birth")))
                 );
             }
-
+    
             throw new UserNotFoundException($"User with ID {id} was not found.");
         }
         catch (UserNotFoundException ex)
@@ -93,7 +94,7 @@ public class UserRepository(string connectionString, ILogger<UserRepository> log
             throw new DatabaseException($"Error retrieving user with email {email} from the database.", ex);
         }
     }
-
+    
     public int Add(User user)
     {
         try

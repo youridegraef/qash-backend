@@ -1,4 +1,5 @@
 using Application.Domain;
+using Application.Dtos;
 using Application.Exceptions;
 using Application.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -101,11 +102,11 @@ public class TagRepository(string connectionString, ILogger<TagRepository> logge
         }
     }
 
-    public List<Tag> FindByTransactionId(int transactionId)
+    public List<TagDto> FindByTransactionId(int transactionId)
     {
         try
         {
-            List<Tag> tags = new List<Tag>();
+            List<TagDto> tags = new List<TagDto>();
 
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
@@ -124,7 +125,7 @@ public class TagRepository(string connectionString, ILogger<TagRepository> logge
             while (reader.Read())
             {
                 tags.Add(
-                    new Tag(
+                    new TagDto(
                         reader.GetInt32(reader.GetOrdinal("id")),
                         reader.GetString(reader.GetOrdinal("name")),
                         reader.GetString(reader.GetOrdinal("color_hex_code")),
