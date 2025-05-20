@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace RestAPI.RequestModels;
 
 public class RegisterRequest(int id, string name, string email, string password)
