@@ -101,6 +101,67 @@ public class TagRepository(string connectionString, ILogger<TagRepository> logge
         }
     }
 
+    public List<Tag> FindByTransactionId(int transactionId)
+    {
+        try
+        {
+            List<Tag> tags = new List<Tag>();
+
+            using MySqlConnection connection = new MySqlConnection(connectionString);
+            connection.Open();
+
+            string sql = @"
+            SELECT t.id, t.name, t.color_hex_code, t.user_id
+            FROM tag t
+            INNER JOIN transaction_tag tt ON t.id = tt.tag_id
+            WHERE tt.transaction_id = @transaction_id
+        ";
+
+            using MySqlCommand command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@transaction_id", transactionId);
+
+            using MySqlDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                tags.Add(
+                    new Tag(
+                        reader.GetInt32(reader.GetOrdinal("id")),
+                        reader.GetString(reader.GetOrdinal("name")),
+                        reader.GetString(reader.GetOrdinal("color_hex_code")),
+                        reader.GetInt32(reader.GetOrdinal("user_id"))
+                    )
+                );
+            }
+
+            if (tags.Count == 0)
+            {
+                logger.LogWarning("No tags found for transaction ID {TransactionId}", transactionId);
+                throw new TagNotFoundException($"No tags found for transaction ID {transactionId}.");
+            }
+
+            return tags;
+        }
+        catch (TagNotFoundException ex)
+        {
+            logger.LogWarning(ex, "No tags found for transaction ID {TransactionId}", transactionId);
+            throw;
+        }
+        catch (MySqlException ex)
+        {
+            logger.LogError(ex, "Database error while retrieving tags for transaction ID {TransactionId}",
+                transactionId);
+            throw new DatabaseException($"Error retrieving tags for transaction ID {transactionId} from the database.",
+                ex);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unexpected error while retrieving tags for transaction ID {TransactionId}",
+                transactionId);
+            throw;
+        }
+    }
+
+
     public Tag FindById(int id)
     {
         try

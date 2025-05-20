@@ -59,6 +59,29 @@ public class TagService(ITagRepository tagRepository, ILogger<TagService> logger
             throw new Exception($"Error retrieving tags for user_id: {userId}", ex);
         }
     }
+    
+    public List<Tag> GetByTransactionId(int transactionId)
+    {
+        try
+        {
+            return tagRepository.FindByTransactionId(transactionId);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            logger.LogError(ex, "No tags found for transaction_id: {TransactionId}", transactionId);
+            throw new Exception($"No tags found for transaction_id: {transactionId}", ex);
+        }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Database error retrieving tags for transaction_id: {TransactionId}", transactionId);
+            throw new Exception($"Database error retrieving tags for transaction_id: {transactionId}", ex);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error retrieving tags for transaction_id: {TransactionId}", transactionId);
+            throw new Exception($"Error retrieving tags for transaction_id: {transactionId}", ex);
+        }
+    }
 
     public List<Tag> GetByUserIdPaged(int userId, int page, int pageSize)
     {

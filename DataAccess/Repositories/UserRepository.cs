@@ -7,41 +7,6 @@ namespace DataAccess.Repositories;
 
 public class UserRepository(string connectionString, ILogger<UserRepository> logger) : IUserRepository
 {
-    public List<User> FindAll()
-    {
-        try
-        {
-            List<User> allUsers = new List<User>();
-            using MySqlConnection connection = new MySqlConnection(connectionString);
-            connection.Open();
-
-            string sql = "SELECT id, name, email, password_hash, date_of_birth FROM user";
-
-            using MySqlCommand command = new MySqlCommand(sql, connection);
-            using MySqlDataReader reader = command.ExecuteReader();
-
-            while (reader.Read())
-            {
-                allUsers.Add(
-                    new User(
-                        reader.GetInt32(reader.GetOrdinal("id")),
-                        reader.GetString(reader.GetOrdinal("name")),
-                        reader.GetString(reader.GetOrdinal("email")),
-                        reader.GetString(reader.GetOrdinal("password_hash")),
-                        DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("date_of_birth")))
-                    )
-                );
-            }
-
-            return allUsers;
-        }
-        catch (MySqlException ex)
-        {
-            logger.LogError(ex, "Error retrieving all users from the database.");
-            throw new DatabaseException("Error retrieving all users from the database.", ex);
-        }
-    }
-
     public User FindById(int id)
     {
         try

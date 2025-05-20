@@ -74,11 +74,14 @@ public class TransactionService(
     {
         try
         {
-            List<Transaction> allTransactions = transactionRepository.FindAll();
-            var filteredTransactions = allTransactions
-                .Where(t => t.UserId == userId).ToList();
+            List<Transaction> transactions = transactionRepository.FindByUserId(userId);
 
-            return filteredTransactions;
+            if (transactions.Count != 0)
+            {
+                return transactions;
+            }
+
+            throw new TransactionNotFoundException($"No transaction with user id: {userId} found.");
         }
         catch (DatabaseException ex)
         {

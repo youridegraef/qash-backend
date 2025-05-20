@@ -129,23 +129,6 @@ public class TransactionTests
         Assert.AreEqual(transactionsList[0].Id, result[0].Id, "Transaction id should match");
     }
 
-
-    [TestMethod]
-    [DataRow(1)]
-    [DataRow(2)]
-    public void GetByUserId_DatabaseException_ThrowsExceptionWithMessage(int userId)
-    {
-        var loggerMock = new Mock<ILogger<TransactionService>>();
-        var transactionRepoMock = new Mock<ITransactionRepository>();
-        transactionRepoMock.Setup(r => r.FindAll()).Throws(new DatabaseException("DB error"));
-        var transactionService = new TransactionService(transactionRepoMock.Object, loggerMock.Object);
-
-        var ex = Assert.ThrowsException<Exception>(() =>
-            transactionService.GetByUserId(userId)
-        );
-        Assert.AreEqual($"Database error while retrieving transactions with user_id: {userId}", ex.Message);
-    }
-
     [TestMethod]
     [DataRow("Test", 100.0, "2025-06-01", 1, 1)]
     public void Add_DatabaseException_ThrowsExceptionWithMessage(string description, double amount, string dateString,

@@ -4,8 +4,6 @@ namespace Application.Interfaces;
 
 public interface IUserRepository
 {
-    public List<User> FindAll();
-
     public User FindById(int id);
 
     public User FindByEmail(string email);

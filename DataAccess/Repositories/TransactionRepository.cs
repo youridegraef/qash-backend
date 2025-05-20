@@ -9,43 +9,6 @@ namespace DataAccess.Repositories;
 public class TransactionRepository(string connectionString, ILogger<TransactionRepository> logger)
     : ITransactionRepository
 {
-    public List<Transaction> FindAll()
-    {
-        try
-        {
-            List<Transaction> transactions = new List<Transaction>();
-            using MySqlConnection connection = new MySqlConnection(connectionString);
-            connection.Open();
-
-            string sql =
-                "SELECT id, description, amount, date, user_id, category_id FROM transactions ORDER BY date DESC";
-
-            using MySqlCommand command = new MySqlCommand(sql, connection);
-
-            using MySqlDataReader reader = command.ExecuteReader();
-            while (reader.Read())
-            {
-                transactions.Add(
-                    new Transaction(
-                        reader.GetInt32(reader.GetOrdinal("id")),
-                        reader.GetString(reader.GetOrdinal("description")),
-                        reader.GetDouble(reader.GetOrdinal("amount")),
-                        DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("date"))),
-                        reader.GetInt32(reader.GetOrdinal("user_id")),
-                        reader.GetInt32(reader.GetOrdinal("category_id"))
-                    )
-                );
-            }
-
-            return transactions;
-        }
-        catch (MySqlException ex)
-        {
-            logger.LogError(ex, "Error retrieving all transactions from the database.");
-            throw new DatabaseException("Error retrieving all transactions from the database.", ex);
-        }
-    }
-
     public List<Transaction> FindAllPaged(int page, int pageSize)
     {
         try
