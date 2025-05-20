@@ -5,9 +5,8 @@ namespace Application.Interfaces;
 
 public interface IBudgetRepository
 {
-    public List<Budget> FindAll();
-
-    public Budget? FindById(int id);
+    public Budget FindById(int id);
+    public Budget FindByCategoryId(int categoryId);
 
     public int Add(Budget budget);
 

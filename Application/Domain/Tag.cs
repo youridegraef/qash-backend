@@ -14,8 +14,8 @@ public class Tag
         ColorHexCode = colorHexCode;
         UserId = userId;
     }
-    
-    public Tag(string name, string colorHexCode, int userId)    
+
+    public Tag(string name, string colorHexCode, int userId)
     {
         Name = name;
         ColorHexCode = colorHexCode;
@@ -25,12 +25,18 @@ public class Tag
     public Tag(string name)
     {
         Name = name;
-        
+
         Random random = new Random();
         int red = random.Next(256);
         int green = random.Next(256);
         int blue = random.Next(256);
 
         ColorHexCode = $"#{red:X2}{green:X2}{blue:X2}";
+    }
+
+    public Tag(int id, string name)
+    {
+        Id = id;    
+        Name = name;
     }
 }

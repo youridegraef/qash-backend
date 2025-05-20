@@ -1,107 +1,240 @@
 using Application.Domain;
+using Application.Dtos;
+using Application.Exceptions;
 using Application.Interfaces;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 
 namespace DataAccess.Repositories;
 
-public class TransactionRepository : ITransactionRepository
+public class TransactionRepository(string connectionString, ILogger<TransactionRepository> logger)
+    : ITransactionRepository
 {
-    private readonly DatabaseConnection _dbConnection = new DatabaseConnection();
-
     public List<Transaction> FindAll()
     {
-        List<Transaction> allTransactions = new List<Transaction>();
-        using MySqlConnection connection = _dbConnection.GetMySqlConnection();
-        connection.Open();
-
-        string sql = "SELECT * FROM transactions";
-
-        using MySqlCommand command = new MySqlCommand(sql, connection);
-        using MySqlDataReader reader = command.ExecuteReader();
-
-        while (reader.Read())
+        try
         {
-            allTransactions.Add(
-                new Transaction(
-                    Convert.ToInt32(reader["id"]),
-                    Convert.ToDouble(reader["amount"]),
-                    DateOnly.FromDateTime(Convert.ToDateTime(reader["date"])),
-                    Convert.ToInt32(reader["user_id"]),
-                    Convert.ToInt32(reader["category_id"])
-                )
-            );
-        }
+            List<Transaction> transactions = new List<Transaction>();
+            using MySqlConnection connection = new MySqlConnection(connectionString);
+            connection.Open();
 
-        return allTransactions;
+            string sql =
+                "SELECT id, description, amount, date, user_id, category_id FROM transactions ORDER BY date DESC";
+
+            using MySqlCommand command = new MySqlCommand(sql, connection);
+
+            using MySqlDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                transactions.Add(
+                    new Transaction(
+                        reader.GetInt32(reader.GetOrdinal("id")),
+                        reader.GetString(reader.GetOrdinal("description")),
+                        reader.GetDouble(reader.GetOrdinal("amount")),
+                        DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("date"))),
+                        reader.GetInt32(reader.GetOrdinal("user_id")),
+                        reader.GetInt32(reader.GetOrdinal("category_id"))
+                    )
+                );
+            }
+
+            return transactions;
+        }
+        catch (MySqlException ex)
+        {
+            logger.LogError(ex, "Error retrieving all transactions from the database.");
+            throw new DatabaseException("Error retrieving all transactions from the database.", ex);
+        }
     }
 
-    public Transaction? FindById(int id)
+    public List<Transaction> FindAllPaged(int page, int pageSize)
     {
-        using MySqlConnection connection = _dbConnection.GetMySqlConnection();
-        connection.Open();
-
-        string sql = "SELECT * FROM transactions WHERE id = @id";
-
-        using MySqlCommand command = new MySqlCommand(sql, connection);
-        command.Parameters.AddWithValue("@id", id);
-
-        using MySqlDataReader reader = command.ExecuteReader();
-
-        if (reader.Read())
+        try
         {
-            return new Transaction(
-                Convert.ToInt32(reader["id"]),
-                Convert.ToDouble(reader["amount"]),
-                DateOnly.FromDateTime(Convert.ToDateTime(reader["date"])),
-                Convert.ToInt32(reader["user_id"]),
-                Convert.ToInt32(reader["category_id"])
-            );
-        }
+            List<Transaction> transactions = new List<Transaction>();
+            using MySqlConnection connection = new MySqlConnection(connectionString);
+            connection.Open();
 
-        return null;
+            int offset = (page - 1) * pageSize;
+            string sql =
+                "SELECT id, description, amount, date, user_id, category_id FROM transactions ORDER BY date DESC LIMIT @limit OFFSET @offset";
+
+            using MySqlCommand command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@limit", pageSize);
+            command.Parameters.AddWithValue("@offset", offset);
+
+            using MySqlDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                transactions.Add(
+                    new Transaction(
+                        reader.GetInt32(reader.GetOrdinal("id")),
+                        reader.GetString(reader.GetOrdinal("description")),
+                        reader.GetDouble(reader.GetOrdinal("amount")),
+                        DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("date"))),
+                        reader.GetInt32(reader.GetOrdinal("user_id")),
+                        reader.GetInt32(reader.GetOrdinal("category_id"))
+                    )
+                );
+            }
+
+            return transactions;
+        }
+        catch (MySqlException ex)
+        {
+            logger.LogError(ex, "Error retrieving all transactions from the database.");
+            throw new DatabaseException("Error retrieving all transactions from the database.", ex);
+        }
+    }
+
+    public List<Transaction> FindByUserIdPaged(int userId, int page, int pageSize)
+    {
+        try
+        {
+            List<Transaction> transactions = new List<Transaction>();
+            using MySqlConnection connection = new MySqlConnection(connectionString);
+            connection.Open();
+
+            int offset = (page - 1) * pageSize;
+            string sql =
+                "SELECT id, description, amount, date, user_id, category_id FROM transactions ORDER BY date DESC LIMIT @limit OFFSET @offset";
+
+            using MySqlCommand command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@limit", pageSize);
+            command.Parameters.AddWithValue("@offset", offset);
+
+            using MySqlDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                transactions.Add(
+                    new Transaction(
+                        reader.GetInt32(reader.GetOrdinal("id")),
+                        reader.GetString(reader.GetOrdinal("description")),
+                        reader.GetDouble(reader.GetOrdinal("amount")),
+                        DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("date"))),
+                        reader.GetInt32(reader.GetOrdinal("user_id")),
+                        reader.GetInt32(reader.GetOrdinal("category_id"))
+                    )
+                );
+            }
+
+            if (transactions.Count == 0)
+            {
+                throw new TransactionNotFoundException($"Transaction with UserID {userId} was not found.");
+            }
+
+            return transactions;
+        }
+        catch (TransactionNotFoundException ex)
+        {
+            logger.LogError(ex, $"Transaction with UserID {userId} was not found.");
+            throw;
+        }
+        catch (MySqlException ex)
+        {
+            logger.LogError(ex, "Error retrieving paged transactions from the database.");
+            throw new DatabaseException("Error retrieving paged transactions from the database.", ex);
+        }
+    }
+
+    public Transaction FindById(int id)
+    {
+        try
+        {
+            using MySqlConnection connection = new MySqlConnection(connectionString);
+            connection.Open();
+
+            string sql = "SELECT id, description, amount, date, user_id, category_id FROM transactions WHERE id = @id";
+
+            using MySqlCommand command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@id", id);
+
+            using MySqlDataReader reader = command.ExecuteReader();
+
+            if (reader.Read())
+            {
+                return new Transaction(
+                    reader.GetInt32(reader.GetOrdinal("id")),
+                    reader.GetString(reader.GetOrdinal("description")),
+                    reader.GetDouble(reader.GetOrdinal("amount")),
+                    DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("date"))),
+                    reader.GetInt32(reader.GetOrdinal("user_id")),
+                    reader.GetInt32(reader.GetOrdinal("category_id"))
+                );
+            }
+
+            throw new TransactionNotFoundException($"Transaction with ID {id} was not found.");
+        }
+        catch (TransactionNotFoundException ex)
+        {
+            logger.LogError(ex, $"Transaction with ID {id} was not found.");
+            throw;
+        }
+        catch (MySqlException ex)
+        {
+            logger.LogError(ex, $"Error retrieving transaction with ID {id} from the database.");
+            throw new DatabaseException($"Error retrieving transaction with ID {id} from the database.", ex);
+        }
+    }
+
+    public List<Transaction> FindByUserId(int userId)
+    {
+        try
+        {
+            List<Transaction> transactions = new List<Transaction>();
+
+            using MySqlConnection connection = new MySqlConnection(connectionString);
+            connection.Open();
+
+            string sql =
+                "SELECT id, description, amount, date, user_id, category_id FROM transactions WHERE user_id = @user_id ORDER BY date DESC";
+
+            using MySqlCommand command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@user_id", userId);
+
+            using MySqlDataReader reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                transactions.Add(
+                    new Transaction(
+                        reader.GetInt32(reader.GetOrdinal("id")),
+                        reader.GetString(reader.GetOrdinal("description")),
+                        reader.GetDouble(reader.GetOrdinal("amount")),
+                        DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("date"))),
+                        reader.GetInt32(reader.GetOrdinal("user_id")),
+                        reader.GetInt32(reader.GetOrdinal("category_id"))
+                    )
+                );
+            }
+
+            return transactions;
+        }
+        catch (TransactionNotFoundException ex)
+        {
+            logger.LogError(ex, $"Transaction with UserID {userId} was not found.");
+            throw new TransactionNotFoundException($"Transaction with UserID {userId} was not found.");
+        }
+        catch (MySqlException ex)
+        {
+            logger.LogError(ex, $"Error retrieving transaction with UserID {userId} from the database.");
+            throw new DatabaseException($"Error retrieving transaction with UserID {userId} from the database.", ex);
+        }
     }
 
     public int Add(Transaction transaction)
     {
-        using MySqlConnection connection = _dbConnection.GetMySqlConnection();
-        connection.Open();
-
-        string sql =
-            "INSERT INTO transactions (amount, date, user_id, category_id) VALUES (@amount, @date, @user_id, @category_id)";
-
-        using MySqlCommand command = new MySqlCommand(sql, connection);
-
-        command.Parameters.AddWithValue("@amount", transaction.Amount);
-        command.Parameters.AddWithValue("@date", transaction.Date.ToDateTime(TimeOnly.MinValue));
-        command.Parameters.AddWithValue("@user_id", transaction.UserId);
-        command.Parameters.AddWithValue("@category_id", transaction.CategoryId);
-
-        int rowsAffected = command.ExecuteNonQuery();
-
-        if (rowsAffected > 0)
-        {
-            string selectIdSql = "SELECT LAST_INSERT_ID()";
-            using MySqlCommand selectIdCommand = new MySqlCommand(selectIdSql, connection);
-            int newId = Convert.ToInt32(selectIdCommand.ExecuteScalar());
-            return newId;
-        }
-
-        return 0; // Of gooi een exception, afhankelijk van je foutafhandeling.
-    }
-
-    public bool Edit(Transaction transaction)
-    {
         try
         {
-            using MySqlConnection connection = _dbConnection.GetMySqlConnection();
+            using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
             string sql =
-                "UPDATE transactions SET amount = @amount, date = @date, user_id = @user_id, category_id = @category_id WHERE id = @id";
+                "INSERT INTO transactions (description, amount, date, user_id, category_id) VALUES (@description, @amount, @date, @user_id, @category_id)";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
 
-            command.Parameters.AddWithValue("@id", transaction.Id);
+            command.Parameters.AddWithValue("@description", transaction.Description);
             command.Parameters.AddWithValue("@amount", transaction.Amount);
             command.Parameters.AddWithValue("@date", transaction.Date.ToDateTime(TimeOnly.MinValue));
             command.Parameters.AddWithValue("@user_id", transaction.UserId);
@@ -109,91 +242,127 @@ public class TransactionRepository : ITransactionRepository
 
             int rowsAffected = command.ExecuteNonQuery();
 
-            return rowsAffected > 0;
+            if (rowsAffected > 0)
+            {
+                string selectIdSql = "SELECT LAST_INSERT_ID()";
+                using MySqlCommand selectIdCommand = new MySqlCommand(selectIdSql, connection);
+                int newId = Convert.ToInt32(selectIdCommand.ExecuteScalar());
+                return newId;
+            }
+
+            throw new DatabaseException("Failed to add the transaction to the database. No rows were affected.");
+        }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Failed to add the transaction to the database. No rows were affected.");
+            throw;
         }
         catch (MySqlException ex)
         {
-            Console.WriteLine($"Error updating user: {ex.Message}");
-            return false;
+            logger.LogError(ex, "Error adding a new transaction to the database.");
+            throw new DatabaseException("Error adding a new transaction to the database.", ex);
         }
-        catch (Exception ex)
+    }
+
+    public bool Edit(Transaction transaction)
+    {
+        try
         {
-            Console.WriteLine($"General Error updating user: {ex.Message}");
-            return false;
+            using MySqlConnection connection = new MySqlConnection(connectionString);
+            connection.Open();
+
+            string sql =
+                "UPDATE transactions SET description = @description, amount = @amount, date = @date, user_id = @user_id, category_id = @category_id WHERE id = @id";
+
+            using MySqlCommand command = new MySqlCommand(sql, connection);
+
+            command.Parameters.AddWithValue("@id", transaction.Id);
+            command.Parameters.AddWithValue("@description", transaction.Description);
+            command.Parameters.AddWithValue("@amount", transaction.Amount);
+            command.Parameters.AddWithValue("@date", transaction.Date.ToDateTime(TimeOnly.MinValue));
+            command.Parameters.AddWithValue("@user_id", transaction.UserId);
+            command.Parameters.AddWithValue("@category_id", transaction.CategoryId);
+
+            int rowsAffected = command.ExecuteNonQuery();
+
+            if (rowsAffected > 0)
+            {
+                return true;
+            }
+
+            throw new TransactionNotFoundException($"Transaction with ID {transaction.Id} was not found for update.");
+        }
+        catch (TransactionNotFoundException ex)
+        {
+            logger.LogError(ex, $"Transaction with ID {transaction.Id} was not found for update.");
+            throw;
+        }
+        catch (MySqlException ex)
+        {
+            logger.LogError(ex, $"Error updating transaction with ID {transaction.Id} in the database.");
+            throw new DatabaseException($"Error updating transaction with ID {transaction.Id} in the database.", ex);
         }
     }
 
     public bool Delete(Transaction transaction)
     {
-        using MySqlConnection connection = _dbConnection.GetMySqlConnection();
-        connection.Open();
+        try
+        {
+            using MySqlConnection connection = new MySqlConnection(connectionString);
+            connection.Open();
 
-        string sql = "DELETE FROM transactions WHERE id = @id";
+            string sql = "DELETE FROM transactions WHERE id = @id";
 
-        using MySqlCommand command = new MySqlCommand(sql, connection);
-        command.Parameters.AddWithValue("@id", transaction.Id);
+            using MySqlCommand command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@id", transaction.Id);
 
-        int rowsAffected = command.ExecuteNonQuery();
+            int rowsAffected = command.ExecuteNonQuery();
 
-        return rowsAffected > 0;
+            if (rowsAffected > 0)
+            {
+                return true;
+            }
+
+            throw new TransactionNotFoundException($"Transaction with ID {transaction.Id} was not found for deletion.");
+        }
+        catch (TransactionNotFoundException ex)
+        {
+            logger.LogError(ex, $"Transaction with ID {transaction.Id} was not found for deletion.");
+            throw;
+        }
+        catch (MySqlException ex)
+        {
+            logger.LogError(ex, $"Error deleting transaction with ID {transaction.Id} from the database.");
+            throw new DatabaseException($"Error deleting transaction with ID {transaction.Id} from the database.", ex);
+        }
     }
 
-    public List<Tag> FindTransactionTags(int id)
+    public void AddTagsToTransaction(int transactionId, List<Tag> tags)
     {
-        List<Tag> transactionTags = new List<Tag>();
-        using MySqlConnection connection = _dbConnection.GetMySqlConnection();
-        connection.Open();
-
-        string sql = "SELECT t.* FROM tag t JOIN transaction_tag tt ON t.id = tt.tag_id WHERE tt.transaction_id = @id";
-
-        using MySqlCommand command = new MySqlCommand(sql, connection);
-        command.Parameters.AddWithValue("@id", id);
-        using MySqlDataReader reader = command.ExecuteReader();
-
-        while (reader.Read())
+        if (tags == null! || tags.Count == 0)
         {
-            transactionTags.Add(
-                new Tag(
-                    Convert.ToInt32(reader["id"]),
-                    reader["name"].ToString(),
-                    reader["color_hex_code"].ToString(),
-                    Convert.ToInt32(reader["user_id"])
-                )
-            );
+            return;
         }
 
-        return transactionTags;
+        try
+        {
+            using MySqlConnection connection = new MySqlConnection(connectionString);
+            connection.Open();
+
+            foreach (var tag in tags)
+            {
+                string sql = "INSERT INTO transaction_tag (transaction_id, tag_id) VALUES (@transaction_id, @tag_id)";
+                using MySqlCommand command = new MySqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@transaction_id", transactionId);
+                command.Parameters.AddWithValue("@tag_id", tag.Id);
+                command.ExecuteNonQuery();
+            }
+        }
+        catch (MySqlException ex)
+        {
+            logger.LogError(ex, "Error adding tags to transaction ID {TransactionId} in the database.", transactionId);
+            throw new DatabaseException($"Error adding tags to transaction ID {transactionId}.", ex);
+        }
     }
 
-    public bool AssignTagToTransaction(int transactionId, int tagId)
-    {
-        using MySqlConnection connection = _dbConnection.GetMySqlConnection();
-        connection.Open();
-
-        string sql = "INSERT INTO transaction_tag (transaction_id, tag_id) VALUES (@transactionId, @tagId)";
-
-        using MySqlCommand command = new MySqlCommand(sql, connection);
-        command.Parameters.AddWithValue("@transactionId", transactionId);
-        command.Parameters.AddWithValue("@tagId", tagId);
-
-        int rowsAffected = command.ExecuteNonQuery();
-
-        return rowsAffected > 0;
-    }
-
-    public bool DeleteTagFromTransaction(int transactionId, int tagId)
-    {
-        using MySqlConnection connection = _dbConnection.GetMySqlConnection();
-        connection.Open();
-
-        string sql = "DELETE FROM transaction_tag WHERE transaction_id = @transactionId AND tag_id = @tagId";
-
-        using MySqlCommand command = new MySqlCommand(sql, connection);
-        command.Parameters.AddWithValue("@transactionId", transactionId);
-        command.Parameters.AddWithValue("@tagId", tagId);
-
-        int rowsAffected = command.ExecuteNonQuery();
-
-        return rowsAffected > 0;
-    }
 }

@@ -37,3 +37,16 @@
 /Volumes/PortableSSD/SchoolProjects/ExpenseTracker/Application/obj/Debug/net8.0/refint/Application.dll
 /Volumes/PortableSSD/SchoolProjects/ExpenseTracker/Application/obj/Debug/net8.0/Application.pdb
 /Volumes/PortableSSD/SchoolProjects/ExpenseTracker/Application/obj/Debug/net8.0/ref/Application.dll
+/Users/macbook/Tech/SchoolProjects/ExpenseTracker/Application/bin/Debug/net8.0/Application.deps.json
+/Users/macbook/Tech/SchoolProjects/ExpenseTracker/Application/bin/Debug/net8.0/Application.dll
+/Users/macbook/Tech/SchoolProjects/ExpenseTracker/Application/bin/Debug/net8.0/Application.pdb
+/Users/macbook/Tech/SchoolProjects/ExpenseTracker/Application/obj/Debug/net8.0/Application.csproj.AssemblyReference.cache
+/Users/macbook/Tech/SchoolProjects/ExpenseTracker/Application/obj/Debug/net8.0/Application.GeneratedMSBuildEditorConfig.editorconfig
+/Users/macbook/Tech/SchoolProjects/ExpenseTracker/Application/obj/Debug/net8.0/Application.AssemblyInfoInputs.cache
+/Users/macbook/Tech/SchoolProjects/ExpenseTracker/Application/obj/Debug/net8.0/Application.AssemblyInfo.cs
+/Users/macbook/Tech/SchoolProjects/ExpenseTracker/Application/obj/Debug/net8.0/Application.csproj.CoreCompileInputs.cache
+/Users/macbook/Tech/SchoolProjects/ExpenseTracker/Application/obj/Debug/net8.0/Application.sourcelink.json
+/Users/macbook/Tech/SchoolProjects/ExpenseTracker/Application/obj/Debug/net8.0/Application.dll
+/Users/macbook/Tech/SchoolProjects/ExpenseTracker/Application/obj/Debug/net8.0/refint/Application.dll
+/Users/macbook/Tech/SchoolProjects/ExpenseTracker/Application/obj/Debug/net8.0/Application.pdb
+/Users/macbook/Tech/SchoolProjects/ExpenseTracker/Application/obj/Debug/net8.0/ref/Application.dll

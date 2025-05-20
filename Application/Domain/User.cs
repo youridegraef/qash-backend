@@ -6,31 +6,23 @@ public class User
     public string Name { get; set; }
     public string Email { get; set; }
     public string PasswordHash { get; private set; }
-    public DateOnly DateOfBirth { get; set; }
-
-    public List<Transaction> Transactions { get; set; } = new List<Transaction>();
-    public List<Tag> Tags { get; set; } = new List<Tag>();
-    public List<SavingGoal> SavingGoals { get; set; } = new List<SavingGoal>();
-    public List<Category> Categories { get; set; } = new List<Category>();
 
     public User()
     {
     }
 
-    public User(string name, string email, string passwordHash, DateOnly dateOfBirth)
+    public User(string name, string email, string passwordHash)
     {
         Name = name;
         Email = email;
         PasswordHash = passwordHash;
-        DateOfBirth = dateOfBirth;
     }
 
-    public User(int id, string name, string email, string passwordHash, DateOnly dateOfBirth)
+    public User(int id, string name, string email, string passwordHash)
     {
         Id = id;
         Name = name;
         Email = email;
         PasswordHash = passwordHash;
-        DateOfBirth = dateOfBirth;
     }
 }

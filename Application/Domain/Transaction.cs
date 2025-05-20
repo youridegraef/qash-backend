@@ -3,52 +3,27 @@ namespace Application.Domain;
 public class Transaction
 {
     public int Id { get; set; }
+    public string Description { get; set; }
     public double Amount { get; set; }
     public DateOnly Date { get; set; }
     public int UserId { get; set; }
     public int CategoryId { get; set; }
 
-    public List<Tag> Tags { get; set; } = new List<Tag>();
-
-    public Transaction(int id, double amount, DateOnly date, int userId, List<Tag> tags, int categoryId)
+    public Transaction(double amount, string description, DateOnly date, int userId, int categoryId)
     {
-        Id = id;
+        Description = description;
         Amount = amount;
         Date = date;
         UserId = userId;
-        Tags = tags;
-        CategoryId = categoryId;
     }
 
-    public Transaction(double amount, DateOnly date, int userId, int categoryId)
+    public Transaction(int id, string description, double amount, DateOnly date, int userId, int categoryId)
     {
+        Id = id;
+        Description = description;
         Amount = amount;
         Date = date;
         UserId = userId;
         CategoryId = categoryId;
-    }    
-    
-    public Transaction(int id, double amount, DateOnly date, int userId, int categoryId)
-    {
-        Id = id;
-        Amount = amount;
-        Date = date;
-        UserId = userId;
-        CategoryId = categoryId;
-    }
-
-    public Transaction(int id, double amount, DateOnly date, List<Tag> tags, int userId)
-    {
-        Id = id;
-        Amount = amount;
-        Date = date;
-        Tags = tags;
-        UserId = userId;
-    }
-
-    public Transaction(double amount, DateOnly date)
-    {
-        Amount = amount;
-        Date = date;
     }
 }

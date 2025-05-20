@@ -2,6 +2,12 @@
   <dictionary name="project">
     <words>
       <w>acces</w>
+      <w>creds</w>
+      <w>datumstring</w>
+      <w>hashedpassword</w>
+      <w>janedoe</w>
+      <w>johndoe</w>
+      <w>passowrd</w>
     </words>
   </dictionary>
 </component>
