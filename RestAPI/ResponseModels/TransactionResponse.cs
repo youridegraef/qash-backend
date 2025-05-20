@@ -8,7 +8,6 @@ public class TransactionResponse(
     double amount,
     DateOnly date,
     Category category,
-    int userId,
     List<Tag> tags)
 {
     public int Id { get; set; } = id;
@@ -16,6 +15,5 @@ public class TransactionResponse(
     public double Amount { get; set; } = amount;
     public DateOnly Date { get; set; } = date;
     public Category Category { get; set; } = category;
-    public int UserId { get; set; } = userId;
     public List<Tag> Tags { get; set; } = tags;
 }

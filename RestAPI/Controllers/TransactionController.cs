@@ -7,7 +7,7 @@ namespace RestAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TransactionController(ITransactionService transactionService, ITagService tagService) : ControllerBase
+public class TransactionController(ITransactionService transactionService) : ControllerBase
 {
     [HttpGet("balance/{userId}")]
     public IActionResult GetBalance([FromRoute] int userId)
@@ -36,30 +36,38 @@ public class TransactionController(ITransactionService transactionService, ITagS
                 transactionService.Add(req.Description, req.Amount, req.Date, userId, req.Category.Id, req.Tags);
 
             var res = new TransactionResponse(transaction.Id, transaction.Description, transaction.Amount,
-                transaction.Date, transaction.Category, userId, transaction.Tags);
+                transaction.Date, transaction.Category, transaction.Tags);
 
             return Ok(res);
         }
         catch (Exception)
         {
-            return BadRequest();
+            return BadRequest(); //TODO: Check welke exception te gooien
         }
     }
 
     [HttpGet("get/{userId}")]
-    public IActionResult GetTrasactionsPaged([FromRoute] int userId,
+    public IActionResult GetTransactionsPaged([FromRoute] int userId,
         [FromQuery] int? page,
         [FromQuery] int? pageSize)
     {
         if (page != null && pageSize != null)
         {
-            var paged = transactionService.GetByUserIdPaged(userId, page.Value, pageSize.Value);
-            return Ok(paged);
+            var transactions = transactionService.GetByUserIdPaged(userId, page.Value, pageSize.Value);
+            var res = transactions.Select(transaction => new TransactionResponse(transaction.Id,
+                transaction.Description, transaction.Amount, transaction.Date, transaction.Category,
+                transaction.Tags)).ToList();
+
+            return Ok(res);
         }
         else
         {
-            var all = transactionService.GetByUserId(userId);
-            return Ok(all);
+            var transactions = transactionService.GetByUserId(userId);
+            var res = transactions.Select(transaction => new TransactionResponse(transaction.Id,
+                transaction.Description, transaction.Amount, transaction.Date, transaction.Category,
+                transaction.Tags)).ToList();
+
+            return Ok(res);
         }
     }
 }

@@ -3,7 +3,6 @@ using Application.Domain;
 namespace RestAPI.RequestModels;
 
 public class TransactionRequest(
-    int id,
     string description,
     double amount,
     DateOnly date,
@@ -11,7 +10,6 @@ public class TransactionRequest(
     int userId,
     List<Tag> tags)
 {
-    public int Id { get; set; } = id;
     public string Description { get; set; } = description;
     public double Amount { get; set; } = amount;
     public DateOnly Date { get; set; } = date;

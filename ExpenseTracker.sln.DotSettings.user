@@ -8,6 +8,7 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=de4ffa8d_002D728d_002D4d38_002D9959_002D370b1a0cdebe/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from Solution" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;Solution /&gt;
 &lt;/SessionState&gt;</s:String>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=dtos/@EntryIndexedValue">True</s:Boolean>
 	
 	
 	
