@@ -9,17 +9,12 @@ public class Transaction
     public int UserId { get; set; }
     public int CategoryId { get; set; }
 
-    public Transaction()
-    {
-    }
-
     public Transaction(double amount, string description, DateOnly date, int userId, int categoryId)
     {
         Description = description;
         Amount = amount;
         Date = date;
         UserId = userId;
-        CategoryId = categoryId;
     }
 
     public Transaction(int id, string description, double amount, DateOnly date, int userId, int categoryId)

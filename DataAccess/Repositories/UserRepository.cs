@@ -14,25 +14,24 @@ public class UserRepository(string connectionString, ILogger<UserRepository> log
         {
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
-    
-            string sql = "SELECT id, name, email, password_hash, date_of_birth FROM user WHERE id = @id";
-    
+
+            string sql = "SELECT id, name, email, password_hash FROM user WHERE id = @id";
+
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@id", id);
-    
+
             using MySqlDataReader reader = command.ExecuteReader();
-    
+
             if (reader.Read())
             {
                 return new User(
                     reader.GetInt32(reader.GetOrdinal("id")),
                     reader.GetString(reader.GetOrdinal("name")),
                     reader.GetString(reader.GetOrdinal("email")),
-                    reader.GetString(reader.GetOrdinal("password_hash")),
-                    DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("date_of_birth")))
+                    reader.GetString(reader.GetOrdinal("password_hash"))
                 );
             }
-    
+
             throw new UserNotFoundException($"User with ID {id} was not found.");
         }
         catch (UserNotFoundException ex)
@@ -69,7 +68,7 @@ public class UserRepository(string connectionString, ILogger<UserRepository> log
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            string sql = "SELECT id, name, email, password_hash, date_of_birth FROM user WHERE email = @email";
+            string sql = "SELECT id, name, email, password_hash FROM user WHERE email = @email";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@email", email);
@@ -82,8 +81,7 @@ public class UserRepository(string connectionString, ILogger<UserRepository> log
                     reader.GetInt32(reader.GetOrdinal("id")),
                     reader.GetString(reader.GetOrdinal("name")),
                     reader.GetString(reader.GetOrdinal("email")),
-                    reader.GetString(reader.GetOrdinal("password_hash")),
-                    DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("date_of_birth")))
+                    reader.GetString(reader.GetOrdinal("password_hash"))
                 );
             }
 
@@ -94,7 +92,7 @@ public class UserRepository(string connectionString, ILogger<UserRepository> log
             throw new DatabaseException($"Error retrieving user with email {email} from the database.", ex);
         }
     }
-    
+
     public int Add(User user)
     {
         try
@@ -103,15 +101,14 @@ public class UserRepository(string connectionString, ILogger<UserRepository> log
             connection.Open();
 
             string sql =
-                "INSERT INTO user (name, email, password_hash, date_of_birth) " +
-                "VALUES (@name, @email, @password_hash, @date_of_birth)";
+                "INSERT INTO user (name, email, password_hash) " +
+                "VALUES (@name, @email, @password_hash)";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
 
             command.Parameters.AddWithValue("@name", user.Name);
             command.Parameters.AddWithValue("@email", user.Email);
             command.Parameters.AddWithValue("@password_hash", user.PasswordHash);
-            command.Parameters.AddWithValue("@date_of_birth", user.DateOfBirth.ToDateTime(TimeOnly.MinValue));
 
             int rowsAffected = command.ExecuteNonQuery();
 
@@ -145,7 +142,7 @@ public class UserRepository(string connectionString, ILogger<UserRepository> log
             connection.Open();
 
             string sql =
-                "UPDATE user SET name = @name, email = @email, password_hash = @password_hash, date_of_birth = @date_of_birth WHERE id = @id";
+                "UPDATE user SET name = @name, email = @email, password_hash = @password_hash WHERE id = @id";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
 
@@ -153,7 +150,6 @@ public class UserRepository(string connectionString, ILogger<UserRepository> log
             command.Parameters.AddWithValue("@name", user.Name);
             command.Parameters.AddWithValue("@email", user.Email);
             command.Parameters.AddWithValue("@password_hash", user.PasswordHash);
-            command.Parameters.AddWithValue("@date_of_birth", user.DateOfBirth);
 
             int rowsAffected = command.ExecuteNonQuery();
 

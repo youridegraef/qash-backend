@@ -1,6 +1,7 @@
 using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using RestAPI.Models;
+using RestAPI.RequestModels;
+using RestAPI.ResponseModels;
 
 namespace RestAPI.Controllers;
 
@@ -27,19 +28,17 @@ public class TransactionController(ITransactionService transactionService, ITagS
     }
 
     [HttpPost("/add/{userId}")]
-    public IActionResult AddTransaction([FromBody] Requests.AddTransaction req, [FromRoute] int userId)
+    public IActionResult AddTransaction([FromBody] TransactionRequest req, [FromRoute] int userId)
     {
         try
         {
-            var transaction = transactionService.Add(req.Description, req.Amount, req.Date, userId, req.Category.Id);
-            transaction.Tags = tagService.GetByTransactionId(transaction.Id);
+            var transaction =
+                transactionService.Add(req.Description, req.Amount, req.Date, userId, req.Category.Id, req.Tags);
 
-            TransactionModel res = new TransactionModel(transaction.Id, transaction.Description, transaction.Amount,
+            var res = new TransactionResponse(transaction.Id, transaction.Description, transaction.Amount,
                 transaction.Date, transaction.Category, userId, transaction.Tags);
-            
-            //TODO: Tags moeten ook in de database worden gezet (koppeltabel)
-            
-            return Ok();
+
+            return Ok(res);
         }
         catch (Exception)
         {

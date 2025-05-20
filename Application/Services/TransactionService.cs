@@ -9,6 +9,7 @@ namespace Application.Services;
 public class TransactionService(
     ITransactionRepository transactionRepository,
     ITagService tagService,
+    ICategoryService categoryService,
     ILogger<TransactionService> logger)
     : ITransactionService
 {
@@ -16,11 +17,16 @@ public class TransactionService(
     {
         try
         {
-            TransactionDto transaction = transactionRepository.FindById(id);
+            var transaction = transactionRepository.FindById(id);
+            var category = categoryService.GetById(transaction.CategoryId);
+            var tags = tagService.GetByTransactionId(id);
+
+            var dto = new TransactionDto(transaction.Id, transaction.Description, transaction.Amount,
+                transaction.Date, transaction.UserId, transaction.CategoryId, category, tags);
 
             if (transaction != null!)
             {
-                return transaction;
+                return dto;
             }
 
             throw new TransactionNotFoundException($"No transaction with id: {id} found.");
@@ -46,19 +52,33 @@ public class TransactionService(
     {
         try
         {
-            List<TransactionDto> transactions = transactionRepository.FindByUserIdPaged(userId, page, pageSize);
+            var transactions = transactionRepository.FindByUserIdPaged(userId, page, pageSize);
+            List<TransactionDto> dtos = new List<TransactionDto>();
 
             if (transactions.Count == 0 || transactions == null)
             {
                 throw new TransactionNotFoundException($"Transaction with UserID {userId} was not found.");
             }
 
-            return transactions;
+            foreach (var transaction in transactions)
+            {
+                var category = categoryService.GetById(transaction.CategoryId);
+                var tags = tagService.GetByTransactionId(transaction.Id);
+
+                dtos.Add(
+                    new TransactionDto(
+                        transaction.Id, transaction.Description, transaction.Amount,
+                        transaction.Date, transaction.UserId, transaction.CategoryId, category, tags
+                    )
+                );
+            }
+
+            return dtos;
         }
         catch (TransactionNotFoundException ex)
         {
             logger.LogError(ex, $"Transaction with UserID {userId} was not found.");
-            throw;
+            throw new TransactionNotFoundException($"No transaction with user id: {userId} found.");
         }
         catch (DatabaseException ex)
         {
@@ -76,13 +96,33 @@ public class TransactionService(
     {
         try
         {
-            List<TransactionDto> transactions = transactionRepository.FindByUserId(userId);
+            List<Transaction> transactions = transactionRepository.FindByUserId(userId);
 
-            if (transactions.Count != 0)
+            List<TransactionDto> dtos = new List<TransactionDto>();
+
+            if (transactions.Count == 0 || transactions == null)
             {
-                return transactions;
+                throw new TransactionNotFoundException($"Transaction with UserID {userId} was not found.");
             }
 
+            foreach (var transaction in transactions)
+            {
+                var category = categoryService.GetById(transaction.CategoryId);
+                var tags = tagService.GetByTransactionId(transaction.Id);
+
+                dtos.Add(
+                    new TransactionDto(
+                        transaction.Id, transaction.Description, transaction.Amount,
+                        transaction.Date, transaction.UserId, transaction.CategoryId, category, tags
+                    )
+                );
+            }
+
+            return dtos;
+        }
+        catch (TransactionNotFoundException ex)
+        {
+            logger.LogError(ex, $"Transaction with UserID {userId} was not found.");
             throw new TransactionNotFoundException($"No transaction with user id: {userId} found.");
         }
         catch (DatabaseException ex)
@@ -97,14 +137,22 @@ public class TransactionService(
         }
     }
 
-    public TransactionDto Add(string description, double amount, DateOnly date, int userId, int categoryId)
+    public TransactionDto Add(string description, double amount, DateOnly date, int userId, int categoryId,
+        List<Tag> tags)
     {
         try
         {
             Transaction transaction = new Transaction(amount, description, date, userId, categoryId);
             transaction.Id = transactionRepository.Add(transaction);
+            AddTagsToTransaction(transaction.Id, tags);
+            var category = categoryService.GetById(transaction.CategoryId);
 
-            return transactionRepository.FindById(transaction.Id);
+            var addedTransaction = transactionRepository.FindById(transaction.Id);
+
+            var dto = new TransactionDto(addedTransaction.Id, addedTransaction.Description, addedTransaction.Amount,
+                addedTransaction.Date, addedTransaction.UserId, addedTransaction.CategoryId, category, tags);
+
+            return dto;
         }
         catch (ArgumentException ex)
         {
@@ -123,12 +171,14 @@ public class TransactionService(
         }
     }
 
-    public bool Edit(int id, double amount, string description, DateOnly date, int userId, int categoryId)
+    public bool Edit(int id, double amount, string description, DateOnly date, int userId, int categoryId,
+        List<Tag> tags)
     {
         try
         {
             Transaction newTransaction = new Transaction(id, description, amount, date,
                 userId, categoryId);
+            AddTagsToTransaction(id, tags);
 
             return transactionRepository.Edit(newTransaction);
         }
@@ -160,7 +210,7 @@ public class TransactionService(
                 transaction.Amount,
                 transaction.Date,
                 transaction.UserId,
-                transaction.Category.Id
+                transaction.CategoryId
             ));
         }
         catch (TransactionNotFoundException ex)
@@ -269,6 +319,24 @@ public class TransactionService(
         {
             logger.LogError(ex, "Error calculating balance for user_id: {UserId}", userId);
             throw new Exception($"Error calculating balance for user_id: {userId}", ex);
+        }
+    }
+
+    private void AddTagsToTransaction(int transactionId, List<Tag> tags)
+    {
+        try
+        {
+            transactionRepository.AddTagsToTransaction(transactionId, tags);
+        }
+        catch (DatabaseException ex)
+        {
+            logger.LogError(ex, "Database error while adding tags to transaction.");
+            throw new Exception("Database error while adding a transaction.", ex);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "An unexpected error occurred while adding tags to transaction.");
+            throw new Exception("An unexpected error occurred.", ex);
         }
     }
 }

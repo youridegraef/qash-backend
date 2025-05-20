@@ -102,11 +102,11 @@ public class TagRepository(string connectionString, ILogger<TagRepository> logge
         }
     }
 
-    public List<TagDto> FindByTransactionId(int transactionId)
+    public List<Tag> FindByTransactionId(int transactionId)
     {
         try
         {
-            List<TagDto> tags = new List<TagDto>();
+            List<Tag> tags = new List<Tag>();
 
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
@@ -125,7 +125,7 @@ public class TagRepository(string connectionString, ILogger<TagRepository> logge
             while (reader.Read())
             {
                 tags.Add(
-                    new TagDto(
+                    new Tag(
                         reader.GetInt32(reader.GetOrdinal("id")),
                         reader.GetString(reader.GetOrdinal("name")),
                         reader.GetString(reader.GetOrdinal("color_hex_code")),

@@ -10,7 +10,7 @@ public interface ITagRepository
     public List<Tag> FindByUserId(int userId);
 
     public Tag FindById(int id);
-    public List<TagDto> FindByTransactionId(int transactionId);
+    public List<Tag> FindByTransactionId(int transactionId);
 
     public int Add(Tag tag);
 

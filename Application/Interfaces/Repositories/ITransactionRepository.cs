@@ -6,15 +6,12 @@ namespace Application.Interfaces;
 
 public interface ITransactionRepository
 {
-    public List<TransactionDto> FindAllPaged(int page, int pageSize);
-    public List<TransactionDto> FindByUserId(int userId);
-    public List<TransactionDto> FindByUserIdPaged(int userId, int page, int pageSize);
-
-    public TransactionDto FindById(int id);
-
+    public List<Transaction> FindAllPaged(int page, int pageSize);
+    public List<Transaction> FindByUserId(int userId);
+    public List<Transaction> FindByUserIdPaged(int userId, int page, int pageSize);
+    public Transaction FindById(int id);
     public int Add(Transaction transaction);
-
+    void AddTagsToTransaction(int transactionId, List<Tag> tags);
     public bool Edit(Transaction transaction);
-
     public bool Delete(Transaction transaction);
 }

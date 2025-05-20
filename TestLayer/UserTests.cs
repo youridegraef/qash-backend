@@ -10,142 +10,89 @@ namespace TestLayer;
 public class UserTests
 {
     [TestMethod]
-    [DataRow("", "johndoe@gmail.com", "password", "2000-01-15")]
-    [DataRow("   ", "jane@example.com", "secure123", "1995-07-20")]
-    public void Register_NameIsEmptyException(string name, string email, string password, string dateOfBirthString)
+    [DataRow("", "johndoe@gmail.com", "password")]
+    [DataRow("   ", "jane@example.com", "secure123")]
+    public void Register_NameIsEmptyException(string name, string email, string password)
     {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
 
-        DateOnly dateOfBirth;
-        try
-        {
-            dateOfBirth = DateOnly.Parse(dateOfBirthString);
-        }
-        catch (FormatException ex)
-        {
-            Assert.Fail($"Kon datumstring '{dateOfBirthString}' niet parsen: {ex.Message}");
-            return;
-        }
-
         var exception = Assert.ThrowsException<ArgumentException>(() =>
-            userService.Register(name, email, password, dateOfBirth)
+            userService.Register(name, email, password)
         );
         Assert.AreEqual($"Name cannot be empty: {name}", exception.Message);
     }
 
     [TestMethod]
-    [DataRow("John Doe", "", "password", "2000-01-15")]
-    [DataRow("Jane Doe", "   ", "secure123", "1995-07-20")]
-    public void Register_EmailIsEmptyException(string name, string email, string password, string dateOfBirthString)
+    [DataRow("John Doe", "", "password")]
+    [DataRow("Jane Doe", "   ", "secure123")]
+    public void Register_EmailIsEmptyException(string name, string email, string password)
     {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
 
-        DateOnly dateOfBirth;
-        try
-        {
-            dateOfBirth = DateOnly.Parse(dateOfBirthString);
-        }
-        catch (FormatException ex)
-        {
-            Assert.Fail($"Kon datumstring '{dateOfBirthString}' niet parsen: {ex.Message}");
-            return;
-        }
 
         var exception = Assert.ThrowsException<ArgumentException>(() =>
-            userService.Register(name, email, password, dateOfBirth)
+            userService.Register(name, email, password)
         );
         Assert.AreEqual($"Email cannot be empty: {email}", exception.Message);
     }
 
     [TestMethod]
-    [DataRow("John Doe", "johndoe@gmail.com", "", "2000-01-15")]
-    [DataRow("Jane Doe", "janedoe@gmail.com", "   ", "1995-07-20")]
-    public void Register_PasswordIsEmptyException(string name, string email, string password, string dateOfBirthString)
+    [DataRow("John Doe", "johndoe@gmail.com", "")]
+    [DataRow("Jane Doe", "janedoe@gmail.com", "   ")]
+    public void Register_PasswordIsEmptyException(string name, string email, string password)
     {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
 
-        DateOnly dateOfBirth;
-        try
-        {
-            dateOfBirth = DateOnly.Parse(dateOfBirthString);
-        }
-        catch (FormatException ex)
-        {
-            Assert.Fail($"Kon datumstring '{dateOfBirthString}' niet parsen: {ex.Message}");
-            return;
-        }
 
         var exception = Assert.ThrowsException<ArgumentException>(() =>
-            userService.Register(name, email, password, dateOfBirth)
+            userService.Register(name, email, password)
         );
         Assert.AreEqual($"Password cannot be empty: {password}", exception.Message);
     }
 
     [TestMethod]
-    [DataRow("John Doe", "johndoe#gmail.com", "password", "2000-01-15")]
-    [DataRow("Jane Doe", "janedoe.gmail.com", "secure123", "1995-07-20")]
-    public void Register_EmailIsInvalidException(string name, string email, string password, string dateOfBirthString)
+    [DataRow("John Doe", "johndoe#gmail.com", "password")]
+    [DataRow("Jane Doe", "janedoe.gmail.com", "secure123")]
+    public void Register_EmailIsInvalidException(string name, string email, string password)
     {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
 
-        DateOnly dateOfBirth;
-        try
-        {
-            dateOfBirth = DateOnly.Parse(dateOfBirthString);
-        }
-        catch (FormatException ex)
-        {
-            Assert.Fail($"Could not parse dateOfBirthString: '{dateOfBirthString}': {ex.Message}");
-            return;
-        }
 
         var exception = Assert.ThrowsException<InvalidEmailFormatException>(() =>
-            userService.Register(name, email, password, dateOfBirth)
+            userService.Register(name, email, password)
         );
         Assert.AreEqual($"Invalid email format {email}", exception.Message);
     }
 
     [TestMethod]
-    [DataRow("John Doe", "johndoe@gmail.com", "password", "2000-01-15")]
-    [DataRow("Jane Doe", "janedoe@gmail.com", "secure123", "1995-07-20")]
-    public void Register_EmailAlreadyExistException(string name, string email, string password,
-        string dateOfBirthString)
+    [DataRow("John Doe", "johndoe@gmail.com", "password")]
+    [DataRow("Jane Doe", "janedoe@gmail.com", "secure123")]
+    public void Register_EmailAlreadyExistException(string name, string email, string password)
     {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         userRepoMock.Setup(r => r.FindByEmail(email))
-            .Returns(new User(1, name, email, "hash", DateOnly.FromDateTime(DateTime.Today)));
+            .Returns(new User(1, name, email, "hash"));
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
 
-        DateOnly dateOfBirth;
-        try
-        {
-            dateOfBirth = DateOnly.Parse(dateOfBirthString);
-        }
-        catch (FormatException ex)
-        {
-            Assert.Fail($"Could not parse dateOfBirthString: '{dateOfBirthString}': {ex.Message}");
-            return;
-        }
 
         var exception = Assert.ThrowsException<UserAlreadyExistsException>(() =>
-            userService.Register(name, email, password, dateOfBirth)
+            userService.Register(name, email, password)
         );
         Assert.AreEqual($"User with email {email} already exists", exception.Message);
     }
 
     [TestMethod]
-    [DataRow("Jane Doe", "janedoe22@gmail.com", "secure123", "1995-07-20")]
-    public void Register_ValidCredentials_ReturnsUser(string name, string email, string password,
-        string dateOfBirthString)
+    [DataRow("Jane Doe", "janedoe22@gmail.com", "secure123")]
+    public void Register_ValidCredentials_ReturnsUser(string name, string email, string password)
     {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
@@ -153,23 +100,12 @@ public class UserTests
         userRepoMock.Setup(r => r.Add(It.IsAny<User>())).Returns(3);
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
 
-        DateOnly dateOfBirth;
-        try
-        {
-            dateOfBirth = DateOnly.Parse(dateOfBirthString);
-        }
-        catch (FormatException ex)
-        {
-            Assert.Fail($"Could not parse dateOfBirthString: '{dateOfBirthString}': {ex.Message}");
-            return;
-        }
 
-        var user = userService.Register(name, email, password, dateOfBirth);
+        var user = userService.Register(name, email, password);
 
         Assert.IsNotNull(user, "User should not be null");
         Assert.AreEqual(name, user.Name, "Name should match");
         Assert.AreEqual(email, user.Email, "Email should match");
-        Assert.AreEqual(dateOfBirth, user.DateOfBirth, "DateOfBirth should match");
     }
 
     [TestMethod]
@@ -184,7 +120,7 @@ public class UserTests
 
         // Act
         var ex = Assert.ThrowsException<DatabaseException>(() =>
-            userService.Register("Test", "test@example.com", "password", new DateOnly(2000, 1, 1))
+            userService.Register("Test", "test@example.com", "password")
         );
         // Assert
         Assert.AreEqual("Database error during registration", ex.Message);
@@ -275,7 +211,7 @@ public class UserTests
         var userRepoMock = new Mock<IUserRepository>();
         string passwordHash = BCrypt.Net.BCrypt.HashPassword("not_the_hash");
         userRepoMock.Setup(r => r.FindByEmail(email))
-            .Returns(new User(1, "Test", email, passwordHash, DateOnly.FromDateTime(DateTime.Today)));
+            .Returns(new User(1, "Test", email, passwordHash));
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
 
         var exception = Assert.ThrowsException<AuthenticationException>(() =>
@@ -291,8 +227,7 @@ public class UserTests
     {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
-        var user = new User(1, "John Doe", email, PasswordHasher.HashPassword(password),
-            DateOnly.FromDateTime(DateTime.Today));
+        var user = new User(1, "John Doe", email, PasswordHasher.HashPassword(password));
         userRepoMock.Setup(r => r.FindByEmail(email)).Returns(user);
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
 
@@ -359,7 +294,7 @@ public class UserTests
     {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
-        var user = new User(userId, "Test", "test@example.com", "hash", DateOnly.FromDateTime(DateTime.Today));
+        var user = new User(userId, "Test", "test@example.com", "hash");
         userRepoMock.Setup(r => r.FindById(userId)).Returns(user);
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
 
@@ -424,7 +359,7 @@ public class UserTests
     {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
-        var user = new User(1, "Test", email, "hash", DateOnly.FromDateTime(DateTime.Today));
+        var user = new User(1, "Test", email, "hash");
         userRepoMock.Setup(r => r.FindByEmail(email)).Returns(user);
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
 
@@ -472,7 +407,7 @@ public class UserTests
     {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
-        var user = new User(userId, "Test User", "test@example.com", "hashedpassword", new DateOnly(1990, 1, 1));
+        var user = new User(userId, "Test User", "test@example.com", "hashedpassword");
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
 
         var exception = Assert.ThrowsException<ArgumentException>(() =>
@@ -489,7 +424,7 @@ public class UserTests
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         userRepoMock.Setup(r => r.FindById(userId)).Returns((User)null!);
-        var user = new User(userId, "Test User", "test@example.com", "hashedpassword", new DateOnly(1990, 1, 1));
+        var user = new User(userId, "Test User", "test@example.com", "hashedpassword");
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
 
         var exception = Assert.ThrowsException<UserNotFoundException>(() =>
@@ -505,7 +440,7 @@ public class UserTests
     {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
-        var user = new User(userId, "Test User", "test@example.com", "hashedpassword", new DateOnly(1990, 1, 1));
+        var user = new User(userId, "Test User", "test@example.com", "hashedpassword");
         userRepoMock.Setup(r => r.FindById(userId)).Returns(user);
         userRepoMock.Setup(r => r.Edit(user)).Returns(true);
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
@@ -521,7 +456,7 @@ public class UserTests
         // Arrange
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
-        var user = new User(1, "Test", "test@example.com", "hash", new DateOnly(2000, 1, 1));
+        var user = new User(1, "Test", "test@example.com", "hash");
         userRepoMock.Setup(r => r.FindById(It.IsAny<int>())).Returns(user);
         userRepoMock.Setup(r => r.Edit(It.IsAny<User>())).Throws(new DatabaseException("DB error"));
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
@@ -570,7 +505,7 @@ public class UserTests
     {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
-        var user = new User(userId, "Test User", "test@example.com", "hashedpassword", new DateOnly(1990, 1, 1));
+        var user = new User(userId, "Test User", "test@example.com", "hashedpassword");
         userRepoMock.Setup(r => r.FindById(userId)).Returns(user);
         userRepoMock.Setup(r => r.Delete(user)).Returns(true);
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
@@ -586,7 +521,7 @@ public class UserTests
         // Arrange
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
-        var user = new User(1, "Test", "test@example.com", "hash", new DateOnly(2000, 1, 1));
+        var user = new User(1, "Test", "test@example.com", "hash");
         userRepoMock.Setup(r => r.FindById(It.IsAny<int>())).Returns(user);
         userRepoMock.Setup(r => r.Delete(It.IsAny<User>())).Throws(new DatabaseException("DB error"));
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);

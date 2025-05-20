@@ -10,56 +10,30 @@ namespace DataAccess.Repositories;
 public class TransactionRepository(string connectionString, ILogger<TransactionRepository> logger)
     : ITransactionRepository
 {
-    public List<TransactionDto> FindAllPaged(int page, int pageSize)
+    public List<Transaction> FindAll()
     {
         try
         {
-            List<TransactionDto> transactions = new List<TransactionDto>();
+            List<Transaction> transactions = new List<Transaction>();
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            int offset = (page - 1) * pageSize;
-            string sql = @"
-                SELECT 
-                    t.id, 
-                    t.description, 
-                    t.amount, 
-                    t.date, 
-                    t.user_id, 
-                    t.category_id,
-                    c.name AS category_name,
-                    c.color_hex_code AS category_color
-                FROM 
-                    transactions t
-                LEFT JOIN 
-                    categories c ON t.category_id = c.id
-                ORDER BY 
-                    t.date DESC
-                LIMIT @limit OFFSET @offset";
+            string sql =
+                "SELECT id, description, amount, date, user_id, category_id FROM transactions ORDER BY date DESC";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@limit", pageSize);
-            command.Parameters.AddWithValue("@offset", offset);
 
             using MySqlDataReader reader = command.ExecuteReader();
             while (reader.Read())
             {
-                int categoryId = reader.GetInt32(reader.GetOrdinal("category_id"));
-                CategoryDto category = new CategoryDto(
-                    categoryId,
-                    reader.GetString(reader.GetOrdinal("category_name")),
-                    reader.GetInt32(reader.GetOrdinal("user_id")),
-                    reader.GetString(reader.GetOrdinal("category_color"))
-                );
-
                 transactions.Add(
-                    new TransactionDto(
+                    new Transaction(
                         reader.GetInt32(reader.GetOrdinal("id")),
                         reader.GetString(reader.GetOrdinal("description")),
                         reader.GetDouble(reader.GetOrdinal("amount")),
                         DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("date"))),
                         reader.GetInt32(reader.GetOrdinal("user_id")),
-                        category
+                        reader.GetInt32(reader.GetOrdinal("category_id"))
                     )
                 );
             }
@@ -73,59 +47,73 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
         }
     }
 
-    public List<TransactionDto> FindByUserIdPaged(int userId, int page, int pageSize)
+    public List<Transaction> FindAllPaged(int page, int pageSize)
     {
         try
         {
-            List<TransactionDto> transactions = new List<TransactionDto>();
+            List<Transaction> transactions = new List<Transaction>();
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
             int offset = (page - 1) * pageSize;
-            string sql = @"
-                SELECT 
-                    t.id, 
-                    t.description, 
-                    t.amount, 
-                    t.date, 
-                    t.user_id, 
-                    t.category_id,
-                    c.name AS category_name,
-                    c.color_hex_code AS category_color
-                FROM 
-                    transactions t
-                LEFT JOIN 
-                    categories c ON t.category_id = c.id
-                WHERE 
-                    t.user_id = @user_id
-                ORDER BY 
-                    t.date DESC
-                LIMIT @limit OFFSET @offset";
+            string sql =
+                "SELECT id, description, amount, date, user_id, category_id FROM transactions ORDER BY date DESC LIMIT @limit OFFSET @offset";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@user_id", userId);
             command.Parameters.AddWithValue("@limit", pageSize);
             command.Parameters.AddWithValue("@offset", offset);
 
             using MySqlDataReader reader = command.ExecuteReader();
             while (reader.Read())
             {
-                int categoryId = reader.GetInt32(reader.GetOrdinal("category_id"));
-                CategoryDto category = new CategoryDto(
-                    categoryId,
-                    reader.GetString(reader.GetOrdinal("category_name")),
-                    reader.GetInt32(reader.GetOrdinal("user_id")),
-                    reader.GetString(reader.GetOrdinal("category_color"))
-                );
-
                 transactions.Add(
-                    new TransactionDto(
+                    new Transaction(
                         reader.GetInt32(reader.GetOrdinal("id")),
                         reader.GetString(reader.GetOrdinal("description")),
                         reader.GetDouble(reader.GetOrdinal("amount")),
                         DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("date"))),
                         reader.GetInt32(reader.GetOrdinal("user_id")),
-                        category
+                        reader.GetInt32(reader.GetOrdinal("category_id"))
+                    )
+                );
+            }
+
+            return transactions;
+        }
+        catch (MySqlException ex)
+        {
+            logger.LogError(ex, "Error retrieving all transactions from the database.");
+            throw new DatabaseException("Error retrieving all transactions from the database.", ex);
+        }
+    }
+
+    public List<Transaction> FindByUserIdPaged(int userId, int page, int pageSize)
+    {
+        try
+        {
+            List<Transaction> transactions = new List<Transaction>();
+            using MySqlConnection connection = new MySqlConnection(connectionString);
+            connection.Open();
+
+            int offset = (page - 1) * pageSize;
+            string sql =
+                "SELECT id, description, amount, date, user_id, category_id FROM transactions ORDER BY date DESC LIMIT @limit OFFSET @offset";
+
+            using MySqlCommand command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@limit", pageSize);
+            command.Parameters.AddWithValue("@offset", offset);
+
+            using MySqlDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                transactions.Add(
+                    new Transaction(
+                        reader.GetInt32(reader.GetOrdinal("id")),
+                        reader.GetString(reader.GetOrdinal("description")),
+                        reader.GetDouble(reader.GetOrdinal("amount")),
+                        DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("date"))),
+                        reader.GetInt32(reader.GetOrdinal("user_id")),
+                        reader.GetInt32(reader.GetOrdinal("category_id"))
                     )
                 );
             }
@@ -149,29 +137,14 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
         }
     }
 
-    public TransactionDto FindById(int id)
+    public Transaction FindById(int id)
     {
         try
         {
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            string sql = @"
-                SELECT 
-                    t.id, 
-                    t.description, 
-                    t.amount, 
-                    t.date, 
-                    t.user_id, 
-                    t.category_id,
-                    c.name AS category_name,
-                    c.color_hex_code AS category_color
-                FROM 
-                    transactions t
-                LEFT JOIN 
-                    categories c ON t.category_id = c.id
-                WHERE 
-                    t.id = @id";
+            string sql = "SELECT id, description, amount, date, user_id, category_id FROM transactions WHERE id = @id";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@id", id);
@@ -180,21 +153,13 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
 
             if (reader.Read())
             {
-                int categoryId = reader.GetInt32(reader.GetOrdinal("category_id"));
-                CategoryDto category = new CategoryDto(
-                    categoryId,
-                    reader.GetString(reader.GetOrdinal("category_name")),
-                    reader.GetInt32(reader.GetOrdinal("user_id")),
-                    reader.GetString(reader.GetOrdinal("category_color"))
-                );
-
-                return new TransactionDto(
+                return new Transaction(
                     reader.GetInt32(reader.GetOrdinal("id")),
                     reader.GetString(reader.GetOrdinal("description")),
                     reader.GetDouble(reader.GetOrdinal("amount")),
                     DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("date"))),
                     reader.GetInt32(reader.GetOrdinal("user_id")),
-                    category
+                    reader.GetInt32(reader.GetOrdinal("category_id"))
                 );
             }
 
@@ -212,33 +177,17 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
         }
     }
 
-    public List<TransactionDto> FindByUserId(int userId)
+    public List<Transaction> FindByUserId(int userId)
     {
         try
         {
-            List<TransactionDto> transactions = new List<TransactionDto>();
+            List<Transaction> transactions = new List<Transaction>();
 
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            string sql = @"
-                SELECT 
-                    t.id, 
-                    t.description, 
-                    t.amount, 
-                    t.date, 
-                    t.user_id, 
-                    t.category_id,
-                    c.name AS category_name,
-                    c.color_hex_code AS category_color
-                FROM 
-                    transactions t
-                LEFT JOIN 
-                    categories c ON t.category_id = c.id
-                WHERE 
-                    t.user_id = @user_id
-                ORDER BY 
-                    t.date DESC";
+            string sql =
+                "SELECT id, description, amount, date, user_id, category_id FROM transactions WHERE user_id = @user_id ORDER BY date DESC";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@user_id", userId);
@@ -247,22 +196,14 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
 
             while (reader.Read())
             {
-                int categoryId = reader.GetInt32(reader.GetOrdinal("category_id"));
-                CategoryDto category = new CategoryDto(
-                    categoryId,
-                    reader.GetString(reader.GetOrdinal("category_name")),
-                    reader.GetInt32(reader.GetOrdinal("user_id")),
-                    reader.GetString(reader.GetOrdinal("category_color"))
-                );
-
                 transactions.Add(
-                    new TransactionDto(
+                    new Transaction(
                         reader.GetInt32(reader.GetOrdinal("id")),
                         reader.GetString(reader.GetOrdinal("description")),
                         reader.GetDouble(reader.GetOrdinal("amount")),
                         DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("date"))),
                         reader.GetInt32(reader.GetOrdinal("user_id")),
-                        category
+                        reader.GetInt32(reader.GetOrdinal("category_id"))
                     )
                 );
             }
@@ -395,4 +336,33 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
             throw new DatabaseException($"Error deleting transaction with ID {transaction.Id} from the database.", ex);
         }
     }
+
+    public void AddTagsToTransaction(int transactionId, List<Tag> tags)
+    {
+        if (tags == null! || tags.Count == 0)
+        {
+            return;
+        }
+
+        try
+        {
+            using MySqlConnection connection = new MySqlConnection(connectionString);
+            connection.Open();
+
+            foreach (var tag in tags)
+            {
+                string sql = "INSERT INTO transaction_tag (transaction_id, tag_id) VALUES (@transaction_id, @tag_id)";
+                using MySqlCommand command = new MySqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@transaction_id", transactionId);
+                command.Parameters.AddWithValue("@tag_id", tag.Id);
+                command.ExecuteNonQuery();
+            }
+        }
+        catch (MySqlException ex)
+        {
+            logger.LogError(ex, "Error adding tags to transaction ID {TransactionId} in the database.", transactionId);
+            throw new DatabaseException($"Error adding tags to transaction ID {transactionId}.", ex);
+        }
+    }
+
 }

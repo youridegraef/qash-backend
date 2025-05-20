@@ -61,7 +61,7 @@ public class TagService(ITagRepository tagRepository, ILogger<TagService> logger
         }
     }
     
-    public List<TagDto> GetByTransactionId(int transactionId)
+    public List<Tag> GetByTransactionId(int transactionId)
     {
         try
         {

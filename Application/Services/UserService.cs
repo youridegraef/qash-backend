@@ -14,7 +14,7 @@ namespace Application.Services;
 public class UserService(IUserRepository userRepository, ILogger<UserService> logger)
     : IUserService
 {
-    public User Register(string name, string email, string password, DateOnly dateOfBirth)
+    public User Register(string name, string email, string password)
     {
         try
         {
@@ -33,7 +33,7 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
                 throw new UserAlreadyExistsException($"User with email {email} already exists");
 
             string hashedPassword = PasswordHasher.HashPassword(password);
-            User newUser = new User(name, email, hashedPassword, dateOfBirth);
+            User newUser = new User(name, email, hashedPassword);
             userRepository.Add(newUser);
             return newUser;
         }
