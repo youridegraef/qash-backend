@@ -1,3 +1,4 @@
+using Application.Exceptions;
 using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using RestAPI.RequestModels;
@@ -40,9 +41,18 @@ public class TransactionController(ITransactionService transactionService) : Con
 
             return Ok(res);
         }
+        catch (ArgumentException)
+        {
+            return BadRequest("Invalid transaction data.");
+        }
+        catch (DatabaseException)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                new { message = "Een databasefout is opgetreden. Probeer het later opnieuw." });
+        }
         catch (Exception)
         {
-            return BadRequest(); //TODO: Check welke exception te gooien
+            return BadRequest("An unexpected error occured.");
         }
     }
 

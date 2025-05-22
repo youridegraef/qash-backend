@@ -3,9 +3,9 @@ namespace Application.Domain;
 public class Category
 {
     public int Id { get; set; }
-    public string Name { get; set; }
-    public int UserId { get; set; }
-    public string ColorHexCode { get; set; }
+    public string Name { get; private set; }
+    public int UserId { get; private set; }
+    public string ColorHexCode { get; private set; }
 
     public Category(string name, int userId, string colorHexCode)
     {
