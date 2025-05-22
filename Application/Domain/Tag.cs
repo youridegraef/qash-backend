@@ -2,7 +2,7 @@ namespace Application.Domain;
 
 public class Tag
 {
-    public int Id { get; set; }
+    public int Id { get; private set; }
     public string Name { get; private set; }
     public string ColorHexCode { get; private set; }
     public int UserId { get; private set; }
@@ -36,7 +36,7 @@ public class Tag
 
     public Tag(int id, string name)
     {
-        Id = id;    
+        Id = id;
         Name = name;
     }
 }

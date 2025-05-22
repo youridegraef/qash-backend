@@ -9,7 +9,7 @@ public interface ICategoryRepository
     public List<Category> FindByUserId(int userId);
     public List<Category> FindByUserIdPaged(int userId, int page, int pageSize);
 
-    public int Add(Category category);
+    public Category Add(Category category);
 
     public bool Edit(Category category);
 

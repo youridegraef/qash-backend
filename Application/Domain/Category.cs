@@ -2,7 +2,7 @@ namespace Application.Domain;
 
 public class Category
 {
-    public int Id { get; set; }
+    public int Id { get; private set; }
     public string Name { get; private set; }
     public int UserId { get; private set; }
     public string ColorHexCode { get; private set; }

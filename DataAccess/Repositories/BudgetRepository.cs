@@ -93,7 +93,7 @@ public class BudgetRepository(string connectionString, ILogger<BudgetRepository>
     }
 
 
-    public int Add(Budget budget)
+    public Budget Add(Budget budget)
     {
         try
         {
@@ -116,7 +116,7 @@ public class BudgetRepository(string connectionString, ILogger<BudgetRepository>
                 string selectIdSql = "SELECT LAST_INSERT_ID()";
                 using MySqlCommand selectIdCommand = new MySqlCommand(selectIdSql, connection);
                 int newId = Convert.ToInt32(selectIdCommand.ExecuteScalar());
-                return newId;
+                return new Budget(newId, budget.StartDate, budget.EndDate, budget.Target, budget.CategoryId);
             }
 
             throw new DatabaseException("Failed to add the budget to the database. No rows were affected.");

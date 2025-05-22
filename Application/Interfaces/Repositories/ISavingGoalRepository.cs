@@ -9,7 +9,7 @@ public interface ISavingGoalRepository
     public List<SavingGoal> FindByUserId(int userId);
     public List<SavingGoal> FindByUserIdPaged(int userId, int page, int pageSize);
 
-    public int Add(SavingGoal savingGoal);
+    public SavingGoal Add(SavingGoal savingGoal);
 
     public bool Edit(SavingGoal savingGoal);
 

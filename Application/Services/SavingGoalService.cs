@@ -119,11 +119,11 @@ public class SavingGoalService(
     {
         try
         {
-            SavingGoal savingGoal = new SavingGoal(name, target, deadline, userId, colorHexCode);
-            savingGoal.Id = savingGoalRepository.Add(savingGoal);
+            var newSavingGoal = new SavingGoal(name, target, deadline, userId, colorHexCode);
+            var addedGoal = savingGoalRepository.Add(newSavingGoal);
 
-            var dto = new SavingGoalDto(savingGoal.Id, savingGoal.Name, CalculateAmountSaved(savingGoal.UserId),
-                savingGoal.Target, savingGoal.Deadline, savingGoal.ColorHexCode);
+            var dto = new SavingGoalDto(addedGoal.Id, addedGoal.Name, CalculateAmountSaved(addedGoal.UserId),
+                addedGoal.Target, addedGoal.Deadline, addedGoal.ColorHexCode);
 
             return dto;
         }

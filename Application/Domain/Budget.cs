@@ -2,7 +2,7 @@ namespace Application.Domain;
 
 public class Budget
 {
-    public int Id { get; set; }
+    public int Id { get; private set; }
     public DateOnly StartDate { get; private set; }
     public DateOnly EndDate { get; private set; }
     public double Target { get; private set; }

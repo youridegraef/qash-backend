@@ -111,10 +111,10 @@ public class TagService(ITagRepository tagRepository, ILogger<TagService> logger
     {
         try
         {
-            Tag tag = new Tag(name, colorHexCode, userId);
-            tag.Id = tagRepository.Add(tag);
+            var newTag = new Tag(name, colorHexCode, userId);
+            var addedTag = tagRepository.Add(newTag);
 
-            return tag;
+            return addedTag;
         }
         catch (ArgumentException ex)
         {
