@@ -67,11 +67,6 @@ public class TagService(ITagRepository tagRepository, ILogger<TagService> logger
         {
             return tagRepository.FindByTransactionId(transactionId);
         }
-        catch (KeyNotFoundException ex)
-        {
-            logger.LogError(ex, "No tags found for transaction_id: {TransactionId}", transactionId);
-            throw new Exception($"No tags found for transaction_id: {transactionId}", ex);
-        }
         catch (DatabaseException ex)
         {
             logger.LogError(ex, "Database error retrieving tags for transaction_id: {TransactionId}", transactionId);

@@ -19,4 +19,10 @@ public class SavingGoalController(ISavingGoalService savingGoalService) : Contro
     {
         throw new NotImplementedException();
     }
+    
+    [HttpPut("/edit/{userId:int}")]
+    public IActionResult Edit([FromRoute] int userId, [FromBody] SavingGoalRequest req)
+    {
+        throw new NotImplementedException();
+    }
 }

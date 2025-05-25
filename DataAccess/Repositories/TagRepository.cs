@@ -134,18 +134,7 @@ public class TagRepository(string connectionString, ILogger<TagRepository> logge
                 );
             }
 
-            if (tags.Count == 0)
-            {
-                logger.LogWarning("No tags found for transaction ID {TransactionId}", transactionId);
-                throw new TagNotFoundException($"No tags found for transaction ID {transactionId}.");
-            }
-
             return tags;
-        }
-        catch (TagNotFoundException ex)
-        {
-            logger.LogWarning(ex, "No tags found for transaction ID {TransactionId}", transactionId);
-            throw;
         }
         catch (MySqlException ex)
         {

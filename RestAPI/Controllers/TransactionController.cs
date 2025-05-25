@@ -80,4 +80,10 @@ public class TransactionController(ITransactionService transactionService) : Con
             return Ok(res);
         }
     }
+    
+    [HttpPut("/edit/{userId:int}")]
+    public IActionResult Edit([FromRoute] int userId, [FromBody] TransactionRequest req)
+    {
+        throw new NotImplementedException();
+    }
 }

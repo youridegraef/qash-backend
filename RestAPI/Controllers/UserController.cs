@@ -21,12 +21,12 @@ public class UserController(IUserService userService, IConfiguration configurati
         var issuer = configuration["Jwt:Issuer"]!;
         var dto = userService.Authenticate(req.Email, req.Password, key, issuer);
 
-        if (dto.User == null!)
+        if (dto.Id == 0)
         {
             return Unauthorized(new { message = "Invalid email or password." });
         }
 
-        return Ok(new LoginResponse(dto.Token, dto.User));
+        return Ok(new LoginResponse(dto.Id, dto.Name, dto.Email, dto.Token));
     }
 
 
@@ -46,5 +46,17 @@ public class UserController(IUserService userService, IConfiguration configurati
         }
 
         return Ok(new RegisterResponse(user.Id, user.Name, user.Email));
+    }
+
+    [HttpPut("/edit/{userId:int}")]
+    public IActionResult Edit([FromRoute] int userId, [FromBody] UserRequest req)
+    {
+        throw new NotImplementedException();
+    }
+
+    [HttpPut("changepassword/{userId:int}")]
+    public IActionResult ChangePassword([FromRoute] int userId, [FromBody] string newPassword)
+    {
+        throw new NotImplementedException();
     }
 }

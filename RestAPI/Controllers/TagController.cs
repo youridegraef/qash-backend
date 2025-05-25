@@ -10,7 +10,7 @@ namespace RestAPI.Controllers;
 [Route("api/[controller]")]
 public class TagController(ITagService tagService) : ControllerBase
 {
-    [HttpGet("get/{userId}")]
+    [HttpGet("get/{userId:int}")]
     public IActionResult Get([FromRoute] int userId, [FromQuery] int? page, [FromQuery] int? pageSize)
     {
         if (page != null && pageSize != null)
@@ -29,7 +29,7 @@ public class TagController(ITagService tagService) : ControllerBase
         }
     }
 
-    [HttpPost("add/{userId}")]
+    [HttpPost("add/{userId:int}")]
     public IActionResult Add([FromRoute] int userId, [FromBody] SavingGoalRequest req)
     {
         try
@@ -40,7 +40,13 @@ public class TagController(ITagService tagService) : ControllerBase
         }
         catch (Exception)
         {
-            return BadRequest(); //TODO: Check welke exception te gooien
+            return BadRequest("");
         }
+    }
+
+    [HttpPut("/edit/{userId:int}")]
+    public IActionResult Edit([FromRoute] int userId, [FromBody] TagRequest req)
+    {
+        throw new NotImplementedException();
     }
 }
