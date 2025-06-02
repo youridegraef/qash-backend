@@ -15,17 +15,18 @@ public class TransactionService(
     public TransactionDto GetById(int id) {
         try {
             var transaction = transactionRepository.FindById(id);
+
+            if (transaction == null) {
+                throw new TransactionNotFoundException($"No transaction with id: {id} found.");
+            }
+
             var category = categoryService.GetById(transaction.CategoryId);
             var tags = tagService.GetByTransactionId(id);
 
             var dto = new TransactionDto(transaction.Id, transaction.Description, transaction.Amount,
                 transaction.Date, transaction.UserId, transaction.CategoryId, category, tags);
 
-            if (transaction != null!) {
-                return dto;
-            }
-
-            throw new TransactionNotFoundException($"No transaction with id: {id} found.");
+            return dto;
         }
         catch (TransactionNotFoundException ex) {
             logger.LogError(ex, "No transaction with id: {TransactionId} found.", id);
@@ -119,10 +120,31 @@ public class TransactionService(
     public TransactionDto Add(string description, double amount, DateOnly date, int userId, int categoryId,
         List<Tag> tags) {
         try {
+            if (string.IsNullOrWhiteSpace(description)) {
+                throw new ArgumentException("Description cannot be empty.");
+            }
+
+            if (userId <= 0) {
+                throw new ArgumentException("User ID must be greater than zero.");
+            }
+
+            if (categoryId <= 0) {
+                throw new ArgumentException("Category ID must be greater than zero.");
+            }
+
             var newTransaction = new Transaction(amount, description, date, userId, categoryId);
             var addedTransaction = transactionRepository.Add(newTransaction);
+
+            if (addedTransaction == null) {
+                throw new InvalidOperationException("Transaction was not added.");
+            }
+
             AddTagsToTransaction(addedTransaction.Id, tags);
+
             var category = categoryService.GetById(addedTransaction.CategoryId);
+            if (category == null) {
+                throw new InvalidOperationException("Category not found.");
+            }
 
             var dto = new TransactionDto(addedTransaction.Id, addedTransaction.Description, addedTransaction.Amount,
                 addedTransaction.Date, addedTransaction.UserId, addedTransaction.CategoryId, category, tags);
