@@ -8,8 +8,7 @@ public class TransactionRequest(
     DateOnly date,
     Category category,
     int userId,
-    List<Tag> tags)
-{
+    List<Tag> tags) {
     public string Description { get; set; } = description;
     public double Amount { get; set; } = amount;
     public DateOnly Date { get; set; } = date;

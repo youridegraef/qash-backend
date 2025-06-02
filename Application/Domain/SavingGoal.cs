@@ -1,7 +1,6 @@
 namespace Application.Domain;
 
-public class SavingGoal
-{
+public class SavingGoal {
     public int Id { get; private set; }
     public string Name { get; private set; }
     public double Target { get; private set; }
@@ -9,8 +8,7 @@ public class SavingGoal
     public int UserId { get; private set; }
     public string ColorHexCode { get; private set; }
 
-    public SavingGoal(int id, string name, double target, DateOnly deadline, int userId, string colorHexCode)
-    {
+    public SavingGoal(int id, string name, double target, DateOnly deadline, int userId, string colorHexCode) {
         Id = id;
         Name = name;
         Target = target;
@@ -19,8 +17,7 @@ public class SavingGoal
         ColorHexCode = colorHexCode;
     }
 
-    public SavingGoal(string name, double target, DateOnly deadline, int userId, string colorHexCode)
-    {
+    public SavingGoal(string name, double target, DateOnly deadline, int userId, string colorHexCode) {
         Name = name;
         Target = target;
         Deadline = deadline;

@@ -1,9 +1,6 @@
-namespace GraphqlAPI.Types
-{
-    public class TagType : ObjectType<Application.Domain.Tag>
-    {
-        protected override void Configure(IObjectTypeDescriptor<Application.Domain.Tag> descriptor)
-        {
+namespace GraphqlAPI.Types {
+    public class TagType : ObjectType<Application.Domain.Tag> {
+        protected override void Configure(IObjectTypeDescriptor<Application.Domain.Tag> descriptor) {
             descriptor.Description("Represents a tag that can be applied to transactions.");
 
             descriptor.Field(t => t.Id).Type<NonNullType<IdType>>();

@@ -7,8 +7,7 @@ public class BudgetRequest(
     decimal budgetAmount,
     string colorHexCode,
     int userId,
-    User user)
-{
+    User user) {
     public int Id { get; set; } = id;
     public string Name { get; set; } = name;
     public decimal AmountSpent { get; set; } = amountSpent;

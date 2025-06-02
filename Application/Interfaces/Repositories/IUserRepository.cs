@@ -2,8 +2,7 @@
 
 namespace Application.Interfaces;
 
-public interface IUserRepository
-{
+public interface IUserRepository {
     public User FindById(int id);
 
     public User FindByEmail(string email);

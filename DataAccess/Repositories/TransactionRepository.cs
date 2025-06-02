@@ -8,12 +8,9 @@ using MySql.Data.MySqlClient;
 namespace DataAccess.Repositories;
 
 public class TransactionRepository(string connectionString, ILogger<TransactionRepository> logger)
-    : ITransactionRepository
-{
-    public List<Transaction> FindAll()
-    {
-        try
-        {
+    : ITransactionRepository {
+    public List<Transaction> FindAll() {
+        try {
             List<Transaction> transactions = new List<Transaction>();
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
@@ -24,8 +21,7 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
             using MySqlCommand command = new MySqlCommand(sql, connection);
 
             using MySqlDataReader reader = command.ExecuteReader();
-            while (reader.Read())
-            {
+            while (reader.Read()) {
                 transactions.Add(
                     new Transaction(
                         reader.GetInt32(reader.GetOrdinal("id")),
@@ -40,17 +36,14 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
 
             return transactions;
         }
-        catch (MySqlException ex)
-        {
+        catch (MySqlException ex) {
             logger.LogError(ex, "Error retrieving all transactions from the database.");
             throw new DatabaseException("Error retrieving all transactions from the database.", ex);
         }
     }
 
-    public List<Transaction> FindAllPaged(int page, int pageSize)
-    {
-        try
-        {
+    public List<Transaction> FindAllPaged(int page, int pageSize) {
+        try {
             List<Transaction> transactions = new List<Transaction>();
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
@@ -64,8 +57,7 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
             command.Parameters.AddWithValue("@offset", offset);
 
             using MySqlDataReader reader = command.ExecuteReader();
-            while (reader.Read())
-            {
+            while (reader.Read()) {
                 transactions.Add(
                     new Transaction(
                         reader.GetInt32(reader.GetOrdinal("id")),
@@ -80,17 +72,14 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
 
             return transactions;
         }
-        catch (MySqlException ex)
-        {
+        catch (MySqlException ex) {
             logger.LogError(ex, "Error retrieving all transactions from the database.");
             throw new DatabaseException("Error retrieving all transactions from the database.", ex);
         }
     }
 
-    public List<Transaction> FindByUserIdPaged(int userId, int page, int pageSize)
-    {
-        try
-        {
+    public List<Transaction> FindByUserIdPaged(int userId, int page, int pageSize) {
+        try {
             List<Transaction> transactions = new List<Transaction>();
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
@@ -104,8 +93,7 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
             command.Parameters.AddWithValue("@offset", offset);
 
             using MySqlDataReader reader = command.ExecuteReader();
-            while (reader.Read())
-            {
+            while (reader.Read()) {
                 transactions.Add(
                     new Transaction(
                         reader.GetInt32(reader.GetOrdinal("id")),
@@ -118,29 +106,24 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
                 );
             }
 
-            if (transactions.Count == 0)
-            {
+            if (transactions.Count == 0) {
                 throw new TransactionNotFoundException($"Transaction with UserID {userId} was not found.");
             }
 
             return transactions;
         }
-        catch (TransactionNotFoundException ex)
-        {
+        catch (TransactionNotFoundException ex) {
             logger.LogError(ex, $"Transaction with UserID {userId} was not found.");
             throw;
         }
-        catch (MySqlException ex)
-        {
+        catch (MySqlException ex) {
             logger.LogError(ex, "Error retrieving paged transactions from the database.");
             throw new DatabaseException("Error retrieving paged transactions from the database.", ex);
         }
     }
 
-    public Transaction FindById(int id)
-    {
-        try
-        {
+    public Transaction FindById(int id) {
+        try {
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
@@ -151,8 +134,7 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
 
             using MySqlDataReader reader = command.ExecuteReader();
 
-            if (reader.Read())
-            {
+            if (reader.Read()) {
                 return new Transaction(
                     reader.GetInt32(reader.GetOrdinal("id")),
                     reader.GetString(reader.GetOrdinal("description")),
@@ -165,22 +147,18 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
 
             throw new TransactionNotFoundException($"Transaction with ID {id} was not found.");
         }
-        catch (TransactionNotFoundException ex)
-        {
+        catch (TransactionNotFoundException ex) {
             logger.LogError(ex, $"Transaction with ID {id} was not found.");
             throw;
         }
-        catch (MySqlException ex)
-        {
+        catch (MySqlException ex) {
             logger.LogError(ex, $"Error retrieving transaction with ID {id} from the database.");
             throw new DatabaseException($"Error retrieving transaction with ID {id} from the database.", ex);
         }
     }
 
-    public List<Transaction> FindByUserId(int userId)
-    {
-        try
-        {
+    public List<Transaction> FindByUserId(int userId) {
+        try {
             List<Transaction> transactions = new List<Transaction>();
 
             using MySqlConnection connection = new MySqlConnection(connectionString);
@@ -194,8 +172,7 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
 
             using MySqlDataReader reader = command.ExecuteReader();
 
-            while (reader.Read())
-            {
+            while (reader.Read()) {
                 transactions.Add(
                     new Transaction(
                         reader.GetInt32(reader.GetOrdinal("id")),
@@ -210,22 +187,18 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
 
             return transactions;
         }
-        catch (TransactionNotFoundException ex)
-        {
+        catch (TransactionNotFoundException ex) {
             logger.LogError(ex, $"Transaction with UserID {userId} was not found.");
             throw new TransactionNotFoundException($"Transaction with UserID {userId} was not found.");
         }
-        catch (MySqlException ex)
-        {
+        catch (MySqlException ex) {
             logger.LogError(ex, $"Error retrieving transaction with UserID {userId} from the database.");
             throw new DatabaseException($"Error retrieving transaction with UserID {userId} from the database.", ex);
         }
     }
 
-    public Transaction Add(Transaction transaction)
-    {
-        try
-        {
+    public Transaction Add(Transaction transaction) {
+        try {
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
@@ -242,8 +215,7 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
 
             int rowsAffected = command.ExecuteNonQuery();
 
-            if (rowsAffected > 0)
-            {
+            if (rowsAffected > 0) {
                 string selectIdSql = "SELECT LAST_INSERT_ID()";
                 using MySqlCommand selectIdCommand = new MySqlCommand(selectIdSql, connection);
                 int newId = Convert.ToInt32(selectIdCommand.ExecuteScalar());
@@ -253,22 +225,18 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
 
             throw new DatabaseException("Failed to add the transaction to the database. No rows were affected.");
         }
-        catch (DatabaseException ex)
-        {
+        catch (DatabaseException ex) {
             logger.LogError(ex, "Failed to add the transaction to the database. No rows were affected.");
             throw;
         }
-        catch (MySqlException ex)
-        {
+        catch (MySqlException ex) {
             logger.LogError(ex, "Error adding a new transaction to the database.");
             throw new DatabaseException("Error adding a new transaction to the database.", ex);
         }
     }
 
-    public bool Edit(Transaction transaction)
-    {
-        try
-        {
+    public bool Edit(Transaction transaction) {
+        try {
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
@@ -286,29 +254,24 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
 
             int rowsAffected = command.ExecuteNonQuery();
 
-            if (rowsAffected > 0)
-            {
+            if (rowsAffected > 0) {
                 return true;
             }
 
             throw new TransactionNotFoundException($"Transaction with ID {transaction.Id} was not found for update.");
         }
-        catch (TransactionNotFoundException ex)
-        {
+        catch (TransactionNotFoundException ex) {
             logger.LogError(ex, $"Transaction with ID {transaction.Id} was not found for update.");
             throw;
         }
-        catch (MySqlException ex)
-        {
+        catch (MySqlException ex) {
             logger.LogError(ex, $"Error updating transaction with ID {transaction.Id} in the database.");
             throw new DatabaseException($"Error updating transaction with ID {transaction.Id} in the database.", ex);
         }
     }
 
-    public bool Delete(Transaction transaction)
-    {
-        try
-        {
+    public bool Delete(Transaction transaction) {
+        try {
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
@@ -319,39 +282,32 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
 
             int rowsAffected = command.ExecuteNonQuery();
 
-            if (rowsAffected > 0)
-            {
+            if (rowsAffected > 0) {
                 return true;
             }
 
             throw new TransactionNotFoundException($"Transaction with ID {transaction.Id} was not found for deletion.");
         }
-        catch (TransactionNotFoundException ex)
-        {
+        catch (TransactionNotFoundException ex) {
             logger.LogError(ex, $"Transaction with ID {transaction.Id} was not found for deletion.");
             throw;
         }
-        catch (MySqlException ex)
-        {
+        catch (MySqlException ex) {
             logger.LogError(ex, $"Error deleting transaction with ID {transaction.Id} from the database.");
             throw new DatabaseException($"Error deleting transaction with ID {transaction.Id} from the database.", ex);
         }
     }
 
-    public void AddTagsToTransaction(int transactionId, List<Tag> tags)
-    {
-        if (tags == null! || tags.Count == 0)
-        {
+    public void AddTagsToTransaction(int transactionId, List<Tag> tags) {
+        if (tags == null! || tags.Count == 0) {
             return;
         }
 
-        try
-        {
+        try {
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            foreach (var tag in tags)
-            {
+            foreach (var tag in tags) {
                 string sql = "INSERT INTO transaction_tag (transaction_id, tag_id) VALUES (@transaction_id, @tag_id)";
                 using MySqlCommand command = new MySqlCommand(sql, connection);
                 command.Parameters.AddWithValue("@transaction_id", transactionId);
@@ -359,8 +315,7 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
                 command.ExecuteNonQuery();
             }
         }
-        catch (MySqlException ex)
-        {
+        catch (MySqlException ex) {
             logger.LogError(ex, "Error adding tags to transaction ID {TransactionId} in the database.", transactionId);
             throw new DatabaseException($"Error adding tags to transaction ID {transactionId}.", ex);
         }

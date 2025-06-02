@@ -1,6 +1,3 @@
 namespace GraphqlAPI;
 
-public class Mutation
-{
-    
-}
+public class Mutation { }

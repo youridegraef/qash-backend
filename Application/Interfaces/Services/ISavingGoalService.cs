@@ -4,8 +4,7 @@ using Application.Dtos;
 // ReSharper disable once CheckNamespace
 namespace Application.Interfaces;
 
-public interface ISavingGoalService
-{
+public interface ISavingGoalService {
     public SavingGoalDto GetById(int id);
     public List<SavingGoalDto> GetByUserId(int userId);
     public List<SavingGoalDto> GetByUserIdPaged(int userId, int page, int pageSize);

@@ -6,12 +6,10 @@ using Application.Interfaces;
 
 namespace GraphqlAPI.Types;
 
-public class TransactionType : ObjectType<TransactionDto>
-{
+public class TransactionType : ObjectType<TransactionDto> {
     protected override void Configure(
         IObjectTypeDescriptor<TransactionDto> descriptor
-    )
-    {
+    ) {
         descriptor.Description("Represents a financial transaction.");
 
         descriptor.Field(t => t.Id).Type<NonNullType<IdType>>();

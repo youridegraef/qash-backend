@@ -1,11 +1,8 @@
 using Application.Domain;
 
-namespace GraphqlAPI.Types
-{
-    public class CategoryType : ObjectType<Category>
-    {
-        protected override void Configure(IObjectTypeDescriptor<Category> descriptor)
-        {
+namespace GraphqlAPI.Types {
+    public class CategoryType : ObjectType<Category> {
+        protected override void Configure(IObjectTypeDescriptor<Category> descriptor) {
             descriptor.Description("Represents a category for transactions.");
 
             descriptor.Field(c => c.Id).Type<NonNullType<IdType>>();

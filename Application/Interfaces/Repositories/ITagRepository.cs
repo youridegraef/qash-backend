@@ -4,8 +4,7 @@ using Application.Dtos;
 // ReSharper disable once CheckNamespace
 namespace Application.Interfaces;
 
-public interface ITagRepository
-{
+public interface ITagRepository {
     public List<Tag> FindByUserIdPaged(int userId, int page, int pageSize);
     public List<Tag> FindByUserId(int userId);
 

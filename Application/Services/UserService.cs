@@ -12,12 +12,9 @@ using Microsoft.Extensions.Logging;
 namespace Application.Services;
 
 public class UserService(IUserRepository userRepository, ILogger<UserService> logger)
-    : IUserService
-{
-    public User Register(string name, string email, string password)
-    {
-        try
-        {
+    : IUserService {
+    public User Register(string name, string email, string password) {
+        try {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException($"Name cannot be empty: {name}");
 
@@ -37,37 +34,30 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
             userRepository.Add(newUser);
             return newUser;
         }
-        catch (ArgumentException ex)
-        {
+        catch (ArgumentException ex) {
             logger.LogError(ex, $"Argument error during registration: {ex.Message}");
             throw;
         }
-        catch (UserAlreadyExistsException ex)
-        {
+        catch (UserAlreadyExistsException ex) {
             logger.LogError(ex, $"User already exists: {email}");
             throw;
         }
-        catch (FormatException ex)
-        {
+        catch (FormatException ex) {
             logger.LogError(ex, $"Invalid email format: {email}");
             throw new InvalidEmailFormatException($"Invalid email format {email}");
         }
-        catch (DatabaseException ex)
-        {
+        catch (DatabaseException ex) {
             logger.LogError(ex, $"Database error during registration for {email}");
             throw new DatabaseException("Database error during registration", ex);
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex) {
             logger.LogError(ex, $"Error registering user: {email}");
             throw new RegistrationFailedException("Error registering user", ex);
         }
     }
 
-    public AuthenticationDto Authenticate(string email, string password, string jwtKey, string jwtIssuer)
-    {
-        try
-        {
+    public AuthenticationDto Authenticate(string email, string password, string jwtKey, string jwtIssuer) {
+        try {
             if (string.IsNullOrWhiteSpace(email))
                 throw new ArgumentException($"Email cannot be empty: {email}");
 
@@ -88,8 +78,7 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
             if (!PasswordHasher.VerifyPassword(password, user.PasswordHash))
                 throw new AuthenticationException("Invalid email or password");
 
-            var claims = new[]
-            {
+            var claims = new[] {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim("userId", user.Id.ToString()),
@@ -111,37 +100,30 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
             AuthenticationDto dto = new AuthenticationDto(user.Id, user.Name, user.Email, tokenString);
             return dto;
         }
-        catch (UserNotFoundException ex)
-        {
+        catch (UserNotFoundException ex) {
             logger.LogError(ex, $"User not found during authentication: {email}");
             throw;
         }
-        catch (AuthenticationException ex)
-        {
+        catch (AuthenticationException ex) {
             logger.LogError(ex, $"Authentication failed for user: {email}");
             throw;
         }
-        catch (ArgumentException ex)
-        {
+        catch (ArgumentException ex) {
             logger.LogError(ex, $"Argument error during authentication: {ex.Message}");
             throw;
         }
-        catch (DatabaseException ex)
-        {
+        catch (DatabaseException ex) {
             logger.LogError(ex, $"Database error during registration for {email}");
             throw new DatabaseException("Database error during registration", ex);
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex) {
             logger.LogError(ex, $"Authentication failed for user: {email}");
             throw new AuthenticationFailedException("Authentication failed", ex);
         }
     }
 
-    public User GetById(int userId)
-    {
-        try
-        {
+    public User GetById(int userId) {
+        try {
             if (userId <= 0)
                 throw new ArgumentException($"User ID must be greater than zero: {userId}");
 
@@ -152,32 +134,26 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
 
             return user;
         }
-        catch (UserNotFoundException ex)
-        {
+        catch (UserNotFoundException ex) {
             logger.LogError(ex, $"User with ID {userId} not found.");
             throw;
         }
-        catch (ArgumentException ex)
-        {
+        catch (ArgumentException ex) {
             logger.LogError(ex, $"Argument error in GetById: {ex.Message}");
             throw;
         }
-        catch (DatabaseException ex)
-        {
+        catch (DatabaseException ex) {
             logger.LogError(ex, $"Database error during registration for {userId}");
             throw new DatabaseException("Database error during registration", ex);
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex) {
             logger.LogError(ex, $"Error retrieving user with ID {userId}");
             throw new UserRetrievalException($"Error retrieving user with ID {userId}", ex);
         }
     }
 
-    public User GetByEmail(string email)
-    {
-        try
-        {
+    public User GetByEmail(string email) {
+        try {
             if (string.IsNullOrWhiteSpace(email))
                 throw new ArgumentException($"Email cannot be empty: {email}");
 
@@ -188,32 +164,26 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
 
             return user;
         }
-        catch (UserNotFoundException ex)
-        {
+        catch (UserNotFoundException ex) {
             logger.LogError(ex, $"User with email {email} not found.");
             throw;
         }
-        catch (ArgumentException ex)
-        {
+        catch (ArgumentException ex) {
             logger.LogError(ex, $"Argument error in GetByEmail: {ex.Message}");
             throw;
         }
-        catch (DatabaseException ex)
-        {
+        catch (DatabaseException ex) {
             logger.LogError(ex, $"Database error during registration for {email}");
             throw new DatabaseException("Database error during registration", ex);
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex) {
             logger.LogError(ex, $"Error retrieving user with email {email}");
             throw new UserRetrievalException($"Error retrieving user with email {email}", ex);
         }
     }
 
-    public bool Update(User user)
-    {
-        try
-        {
+    public bool Update(User user) {
+        try {
             if (user == null)
                 throw new ArgumentException($"User cannot be null: {user}");
 
@@ -226,32 +196,26 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
             userRepository.Edit(user);
             return true;
         }
-        catch (UserNotFoundException ex)
-        {
+        catch (UserNotFoundException ex) {
             logger.LogError(ex, $"User with ID {user.Id} not found for update.");
             throw;
         }
-        catch (ArgumentException ex)
-        {
+        catch (ArgumentException ex) {
             logger.LogError(ex, $"Argument error in Update: {ex.Message}");
             throw;
         }
-        catch (DatabaseException ex)
-        {
+        catch (DatabaseException ex) {
             logger.LogError(ex, $"Database error during registration");
             throw new DatabaseException("Database error during registration", ex);
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex) {
             logger.LogError(ex, $"Error updating user with ID {user.Id}");
             throw;
         }
     }
 
-    public bool Delete(int id)
-    {
-        try
-        {
+    public bool Delete(int id) {
+        try {
             if (id <= 0)
                 throw new ArgumentException($"User ID must be greater than zero: {id}");
 
@@ -263,23 +227,19 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
             userRepository.Delete(user);
             return true;
         }
-        catch (UserNotFoundException ex)
-        {
+        catch (UserNotFoundException ex) {
             logger.LogError(ex, $"User with ID {id} not found for deletion.");
             return false;
         }
-        catch (ArgumentException ex)
-        {
+        catch (ArgumentException ex) {
             logger.LogError(ex, $"Argument error in Delete: {ex.Message}");
             return false;
         }
-        catch (DatabaseException ex)
-        {
+        catch (DatabaseException ex) {
             logger.LogError(ex, $"Database error during registration for {id}");
             throw new DatabaseException("Database error during registration", ex);
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex) {
             logger.LogError(ex, $"Error deleting user with ID {id}");
             return false;
         }

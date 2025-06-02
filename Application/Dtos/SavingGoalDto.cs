@@ -6,8 +6,7 @@ public class SavingGoalDto(
     double amountSaved,
     double target,
     DateOnly deadline,
-    string colorHexCode)
-{
+    string colorHexCode) {
     public int Id { get; set; } = id;
     public string Name { get; set; } = name;
     public double AmountSaved { get; set; } = amountSaved;

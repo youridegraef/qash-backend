@@ -5,23 +5,19 @@ namespace GraphqlAPI.Middlewares;
 public class ApiKeyMiddleware(
     RequestDelegate next,
     IConfiguration configuration,
-    ILogger<ApiKeyMiddleware> logger)
-{
+    ILogger<ApiKeyMiddleware> logger) {
     private const string ApikeyHeader = "X-API-KEY";
 
-    public async Task InvokeAsync(HttpContext context)
-    {
+    public async Task InvokeAsync(HttpContext context) {
         // Probeer eerst of er al een gebruiker geauthenticeerd is (bijv. via JWT)
         // Als je wilt dat API key authenticatie JWT overschrijft of als fallback dient,
         // kun je de logica hier aanpassen.
         // Voor nu gaan we ervan uit dat als er een API key is, we die proberen te valideren.
 
-        if (context.Request.Headers.TryGetValue(ApikeyHeader, out var extractedApiKey))
-        {
+        if (context.Request.Headers.TryGetValue(ApikeyHeader, out var extractedApiKey)) {
             var serverApiKey = configuration["ApiKey"];
 
-            if (string.IsNullOrEmpty(serverApiKey))
-            {
+            if (string.IsNullOrEmpty(serverApiKey)) {
                 logger.LogError("Server API Key is not configured.");
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                 await context.Response.WriteAsync("API Key configuration error.");
@@ -33,8 +29,7 @@ public class ApiKeyMiddleware(
                 logger.LogInformation(
                     "Valid API Key received. Authenticating request via API Key."
                 );
-                var claims = new List<Claim>
-                {
+                var claims = new List<Claim> {
                     new Claim(ClaimTypes.NameIdentifier, "ApiKeyUser"),
                     new Claim("AuthMethod", "ApiKey")
                     // Je hoeft hier geen specifieke rollen toe te voegen als de key alles mag
@@ -43,8 +38,7 @@ public class ApiKeyMiddleware(
                 var identity = new ClaimsIdentity(claims, "ApiKeyAuthentication");
                 context.User = new ClaimsPrincipal(identity); // << DIT IS DE CRUCIALE TOEVOEGING
             }
-            else
-            {
+            else {
                 logger.LogWarning(
                     "Invalid API Key received: {ProvidedKey}",
                     extractedApiKey

@@ -9,10 +9,8 @@ using RestAPI.Middlewares;
 // Services
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend", policy =>
-    {
+builder.Services.AddCors(options => {
+    options.AddPolicy("AllowFrontend", policy => {
         policy.WithOrigins("http://localhost:5173")
             .AllowAnyHeader()
             .AllowAnyMethod();
@@ -23,15 +21,12 @@ var jwtKey = builder.Configuration["Jwt:Key"]!;
 var jwtIssuer = builder.Configuration["Jwt:Issuer"]!;
 var connectionString = builder.Configuration["ConnectionStrings:DefaultConnection"]!;
 
-builder.Services.AddAuthentication(options =>
-    {
+builder.Services.AddAuthentication(options => {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     })
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
+    .AddJwtBearer(options => {
+        options.TokenValidationParameters = new TokenValidationParameters {
             ValidateIssuer = true,
             ValidateAudience = false,
             ValidateLifetime = true,
@@ -48,38 +43,32 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Data Repositories
-builder.Services.AddScoped<IUserRepository>(provider =>
-{
+builder.Services.AddScoped<IUserRepository>(provider => {
     var logger = provider.GetRequiredService<ILogger<UserRepository>>();
     return new UserRepository(connectionString, logger);
 });
 
-builder.Services.AddScoped<ITransactionRepository>(provider =>
-{
+builder.Services.AddScoped<ITransactionRepository>(provider => {
     var logger = provider.GetRequiredService<ILogger<TransactionRepository>>();
     return new TransactionRepository(connectionString, logger);
 });
 
-builder.Services.AddScoped<ICategoryRepository>(provider =>
-{
+builder.Services.AddScoped<ICategoryRepository>(provider => {
     var logger = provider.GetRequiredService<ILogger<CategoryRepository>>();
     return new CategoryRepository(connectionString, logger);
 });
 
-builder.Services.AddScoped<ISavingGoalRepository>(provider =>
-{
+builder.Services.AddScoped<ISavingGoalRepository>(provider => {
     var logger = provider.GetRequiredService<ILogger<SavingGoalRepository>>();
     return new SavingGoalRepository(connectionString, logger);
 });
 
-builder.Services.AddScoped<IBudgetRepository>(provider =>
-{
+builder.Services.AddScoped<IBudgetRepository>(provider => {
     var logger = provider.GetRequiredService<ILogger<BudgetRepository>>();
     return new BudgetRepository(connectionString, logger);
 });
 
-builder.Services.AddScoped<ITagRepository>(provider =>
-{
+builder.Services.AddScoped<ITagRepository>(provider => {
     var logger = provider.GetRequiredService<ILogger<TagRepository>>();
     return new TagRepository(connectionString, logger);
 });
@@ -95,8 +84,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 var app = builder.Build();
 
 // ...
-if (app.Environment.IsDevelopment())
-{
+if (app.Environment.IsDevelopment()) {
     app.UseSwagger();
     app.UseSwaggerUI();
 }

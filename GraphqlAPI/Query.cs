@@ -7,11 +7,9 @@ using System.Threading.Tasks;
 
 namespace GraphqlAPI;
 
-public class Query
-{
+public class Query {
     [GraphQLDescription("Gets a specific user by their ID.")]
-    public TransactionDto GetTransactionById(int id, [Service] ITransactionService transactionService)
-    {
+    public TransactionDto GetTransactionById(int id, [Service] ITransactionService transactionService) {
         return transactionService.GetById(id);
     }
 }

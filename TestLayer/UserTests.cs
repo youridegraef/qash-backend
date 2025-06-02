@@ -7,13 +7,11 @@ using Moq;
 namespace TestLayer;
 
 [TestClass]
-public class UserTests
-{
+public class UserTests {
     [TestMethod]
     [DataRow("", "johndoe@gmail.com", "password")]
     [DataRow("   ", "jane@example.com", "secure123")]
-    public void Register_NameIsEmptyException(string name, string email, string password)
-    {
+    public void Register_NameIsEmptyException(string name, string email, string password) {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
@@ -27,8 +25,7 @@ public class UserTests
     [TestMethod]
     [DataRow("John Doe", "", "password")]
     [DataRow("Jane Doe", "   ", "secure123")]
-    public void Register_EmailIsEmptyException(string name, string email, string password)
-    {
+    public void Register_EmailIsEmptyException(string name, string email, string password) {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
@@ -43,8 +40,7 @@ public class UserTests
     [TestMethod]
     [DataRow("John Doe", "johndoe@gmail.com", "")]
     [DataRow("Jane Doe", "janedoe@gmail.com", "   ")]
-    public void Register_PasswordIsEmptyException(string name, string email, string password)
-    {
+    public void Register_PasswordIsEmptyException(string name, string email, string password) {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
@@ -59,8 +55,7 @@ public class UserTests
     [TestMethod]
     [DataRow("John Doe", "johndoe#gmail.com", "password")]
     [DataRow("Jane Doe", "janedoe.gmail.com", "secure123")]
-    public void Register_EmailIsInvalidException(string name, string email, string password)
-    {
+    public void Register_EmailIsInvalidException(string name, string email, string password) {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
@@ -75,8 +70,7 @@ public class UserTests
     [TestMethod]
     [DataRow("John Doe", "johndoe@gmail.com", "password")]
     [DataRow("Jane Doe", "janedoe@gmail.com", "secure123")]
-    public void Register_EmailAlreadyExistException(string name, string email, string password)
-    {
+    public void Register_EmailAlreadyExistException(string name, string email, string password) {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         userRepoMock.Setup(r => r.FindByEmail(email))
@@ -92,8 +86,7 @@ public class UserTests
 
     [TestMethod]
     [DataRow("Jane Doe", "janedoe22@gmail.com", "secure123")]
-    public void Register_ValidCredentials_ReturnsUser(string name, string email, string password)
-    {
+    public void Register_ValidCredentials_ReturnsUser(string name, string email, string password) {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         userRepoMock.Setup(r => r.IsEmailAvailable(email)).Returns(true);
@@ -109,8 +102,7 @@ public class UserTests
     }
 
     [TestMethod]
-    public void Register_DatabaseException_IsWrapped()
-    {
+    public void Register_DatabaseException_IsWrapped() {
         // Arrange
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
@@ -129,8 +121,7 @@ public class UserTests
     [TestMethod]
     [DataRow("", "password", "supersecret_key_12345_12345_12345", "issuer")]
     [DataRow("   ", "password", "supersecret_key_12345_12345_12345", "issuer")]
-    public void Authenticate_EmailIsEmptyException(string email, string password, string jwtKey, string jwtIssuer)
-    {
+    public void Authenticate_EmailIsEmptyException(string email, string password, string jwtKey, string jwtIssuer) {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
@@ -144,8 +135,7 @@ public class UserTests
     [TestMethod]
     [DataRow("johndoe@gmail.com", "", "supersecret_key_12345_12345_12345", "issuer")]
     [DataRow("johndoe@gmail.com", "   ", "supersecret_key_12345_12345_12345", "issuer")]
-    public void Authenticate_PasswordIsEmptyException(string email, string password, string jwtKey, string jwtIssuer)
-    {
+    public void Authenticate_PasswordIsEmptyException(string email, string password, string jwtKey, string jwtIssuer) {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
@@ -159,8 +149,7 @@ public class UserTests
     [TestMethod]
     [DataRow("johndoe@gmail.com", "password", "", "issuer")]
     [DataRow("johndoe@gmail.com", "password", "   ", "issuer")]
-    public void Authenticate_JwtKeyIsEmptyException(string email, string password, string jwtKey, string jwtIssuer)
-    {
+    public void Authenticate_JwtKeyIsEmptyException(string email, string password, string jwtKey, string jwtIssuer) {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
@@ -174,8 +163,7 @@ public class UserTests
     [TestMethod]
     [DataRow("johndoe@gmail.com", "password", "supersecret_key_12345_12345_12345", "")]
     [DataRow("johndoe@gmail.com", "password", "supersecret_key_12345_12345_12345", "   ")]
-    public void Authenticate_JwtIssuerIsEmptyException(string email, string password, string jwtKey, string jwtIssuer)
-    {
+    public void Authenticate_JwtIssuerIsEmptyException(string email, string password, string jwtKey, string jwtIssuer) {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
@@ -189,8 +177,7 @@ public class UserTests
     [TestMethod]
     [DataRow("johndoe22@gmail.com", "password", "supersecret_key_12345_12345_12345", "issuer")]
     [DataRow("janedoe18@gmail.com", "password", "supersecret_key_12345_12345_12345", "issuer")]
-    public void Authenticate_UserNotFoundException(string email, string password, string jwtKey, string jwtIssuer)
-    {
+    public void Authenticate_UserNotFoundException(string email, string password, string jwtKey, string jwtIssuer) {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         userRepoMock.Setup(r => r.FindByEmail(email)).Returns((User)null!);
@@ -205,8 +192,7 @@ public class UserTests
     [TestMethod]
     [DataRow("johndoe@gmail.com", "secret", "supersecret_key_12345_12345_12345", "issuer")]
     [DataRow("janedoe@gmail.com", "password", "supersecret_key_12345_12345_12345", "issuer")]
-    public void Authenticate_InvalidPasswordException(string email, string password, string jwtKey, string jwtIssuer)
-    {
+    public void Authenticate_InvalidPasswordException(string email, string password, string jwtKey, string jwtIssuer) {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         string passwordHash = BCrypt.Net.BCrypt.HashPassword("not_the_hash");
@@ -223,8 +209,7 @@ public class UserTests
     [TestMethod]
     [DataRow("johndoe@gmail.com", "password", "supersecret_key_12345_12345_12345", "myIssuer")]
     public void Authenticate_ValidCredentials_ReturnsAuthenticationDto(
-        string email, string password, string jwtKey, string jwtIssuer)
-    {
+        string email, string password, string jwtKey, string jwtIssuer) {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         var user = new User(1, "John Doe", email, PasswordHasher.HashPassword(password));
@@ -240,8 +225,7 @@ public class UserTests
     }
 
     [TestMethod]
-    public void Authenticate_DatabaseException_IsWrapped()
-    {
+    public void Authenticate_DatabaseException_IsWrapped() {
         // Arrange
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
@@ -259,8 +243,7 @@ public class UserTests
     [TestMethod]
     [DataRow(-1)]
     [DataRow(0)]
-    public void GetById_IdZeroOrNegativeException(int userId)
-    {
+    public void GetById_IdZeroOrNegativeException(int userId) {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
@@ -274,8 +257,7 @@ public class UserTests
     [TestMethod]
     [DataRow(4)]
     [DataRow(12)]
-    public void GetById_UserNotFoundException(int userId)
-    {
+    public void GetById_UserNotFoundException(int userId) {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         userRepoMock.Setup(r => r.FindById(userId)).Returns((User)null!);
@@ -290,8 +272,7 @@ public class UserTests
     [TestMethod]
     [DataRow(1)]
     [DataRow(2)]
-    public void GetById_ReturnsUser(int userId)
-    {
+    public void GetById_ReturnsUser(int userId) {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         var user = new User(userId, "Test", "test@example.com", "hash");
@@ -305,8 +286,7 @@ public class UserTests
     }
 
     [TestMethod]
-    public void GetById_DatabaseException_IsWrapped()
-    {
+    public void GetById_DatabaseException_IsWrapped() {
         // Arrange
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
@@ -324,8 +304,7 @@ public class UserTests
     [TestMethod]
     [DataRow("")]
     [DataRow("   ")]
-    public void GetByEmail_EmailIsEmptyException(string email)
-    {
+    public void GetByEmail_EmailIsEmptyException(string email) {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
@@ -339,8 +318,7 @@ public class UserTests
     [TestMethod]
     [DataRow("frankdoe@gmail.com")]
     [DataRow("hansdoe@gmail.com")]
-    public void GetByEmail_UserNotFoundException(string email)
-    {
+    public void GetByEmail_UserNotFoundException(string email) {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         userRepoMock.Setup(r => r.FindByEmail(email)).Returns((User)null!);
@@ -355,8 +333,7 @@ public class UserTests
     [TestMethod]
     [DataRow("johndoe@gmail.com")]
     [DataRow("janedoe@gmail.com")]
-    public void GetByEmail_ReturnsUser(string email)
-    {
+    public void GetByEmail_ReturnsUser(string email) {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         var user = new User(1, "Test", email, "hash");
@@ -370,8 +347,7 @@ public class UserTests
     }
 
     [TestMethod]
-    public void GetByEmail_DatabaseException_IsWrapped()
-    {
+    public void GetByEmail_DatabaseException_IsWrapped() {
         // Arrange
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
@@ -387,8 +363,7 @@ public class UserTests
     }
 
     [TestMethod]
-    public void Update_UserIsNullException()
-    {
+    public void Update_UserIsNullException() {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
@@ -403,8 +378,7 @@ public class UserTests
     [TestMethod]
     [DataRow(-1)]
     [DataRow(0)]
-    public void Update_IdZeroOrNegativeException(int userId)
-    {
+    public void Update_IdZeroOrNegativeException(int userId) {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         var user = new User(userId, "Test User", "test@example.com", "hashedpassword");
@@ -419,8 +393,7 @@ public class UserTests
     [TestMethod]
     [DataRow(4)]
     [DataRow(12)]
-    public void Update_UserNotFoundException(int userId)
-    {
+    public void Update_UserNotFoundException(int userId) {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         userRepoMock.Setup(r => r.FindById(userId)).Returns((User)null!);
@@ -436,8 +409,7 @@ public class UserTests
     [TestMethod]
     [DataRow(1)]
     [DataRow(2)]
-    public void Update_ValidUser_ReturnsTrue(int userId)
-    {
+    public void Update_ValidUser_ReturnsTrue(int userId) {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         var user = new User(userId, "Test User", "test@example.com", "hashedpassword");
@@ -451,8 +423,7 @@ public class UserTests
     }
 
     [TestMethod]
-    public void Update_DatabaseException_IsWrapped()
-    {
+    public void Update_DatabaseException_IsWrapped() {
         // Arrange
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
@@ -472,8 +443,7 @@ public class UserTests
     [TestMethod]
     [DataRow(-1)]
     [DataRow(0)]
-    public void Delete_IdZeroOrNegative_ReturnsFalse(int userId)
-    {
+    public void Delete_IdZeroOrNegative_ReturnsFalse(int userId) {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         var userService = new UserService(userRepoMock.Object, loggerMock.Object);
@@ -486,8 +456,7 @@ public class UserTests
     [TestMethod]
     [DataRow(4)]
     [DataRow(12)]
-    public void Delete_UserNotFound_ReturnsFalse(int userId)
-    {
+    public void Delete_UserNotFound_ReturnsFalse(int userId) {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         userRepoMock.Setup(r => r.FindById(userId)).Returns((User)null!);
@@ -501,8 +470,7 @@ public class UserTests
     [TestMethod]
     [DataRow(1)]
     [DataRow(2)]
-    public void Delete_ValidUser_ReturnsTrue(int userId)
-    {
+    public void Delete_ValidUser_ReturnsTrue(int userId) {
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
         var user = new User(userId, "Test User", "test@example.com", "hashedpassword");
@@ -516,8 +484,7 @@ public class UserTests
     }
 
     [TestMethod]
-    public void Delete_DatabaseException_IsWrapped()
-    {
+    public void Delete_DatabaseException_IsWrapped() {
         // Arrange
         var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<UserService>>();
         var userRepoMock = new Mock<IUserRepository>();
