@@ -72,9 +72,9 @@ public class BudgetService(IBudgetRepository budgetRepository, ILogger<BudgetSer
     {
         try
         {
-            Budget budget = new Budget(startDate, endDate, target, categoryId);
-            budget.Id = budgetRepository.Add(budget);
-            return budget;
+            var newBudget = new Budget(startDate, endDate, target, categoryId);
+            var addedBudget = budgetRepository.Add(newBudget);
+            return addedBudget;
         }
         catch (ArgumentException ex)
         {

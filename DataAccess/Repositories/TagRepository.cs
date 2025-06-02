@@ -134,18 +134,7 @@ public class TagRepository(string connectionString, ILogger<TagRepository> logge
                 );
             }
 
-            if (tags.Count == 0)
-            {
-                logger.LogWarning("No tags found for transaction ID {TransactionId}", transactionId);
-                throw new TagNotFoundException($"No tags found for transaction ID {transactionId}.");
-            }
-
             return tags;
-        }
-        catch (TagNotFoundException ex)
-        {
-            logger.LogWarning(ex, "No tags found for transaction ID {TransactionId}", transactionId);
-            throw;
         }
         catch (MySqlException ex)
         {
@@ -201,7 +190,7 @@ public class TagRepository(string connectionString, ILogger<TagRepository> logge
         }
     }
 
-    public int Add(Tag tag)
+    public Tag Add(Tag tag)
     {
         try
         {
@@ -223,7 +212,7 @@ public class TagRepository(string connectionString, ILogger<TagRepository> logge
                 string selectIdSql = "SELECT LAST_INSERT_ID()";
                 using MySqlCommand selectIdCommand = new MySqlCommand(selectIdSql, connection);
                 int newId = Convert.ToInt32(selectIdCommand.ExecuteScalar());
-                return newId;
+                return new Tag(newId, tag.Name, tag.ColorHexCode, tag.UserId);
             }
 
             throw new DatabaseException("Failed to add the tag to the database. No rows were affected.");

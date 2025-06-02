@@ -146,7 +146,7 @@ public class SavingGoalRepository(string connectionString, ILogger<SavingGoalRep
         }
     }
 
-    public int Add(SavingGoal savingGoal)
+    public SavingGoal Add(SavingGoal savingGoal)
     {
         try
         {
@@ -171,7 +171,8 @@ public class SavingGoalRepository(string connectionString, ILogger<SavingGoalRep
                 string selectIdSql = "SELECT LAST_INSERT_ID()";
                 using MySqlCommand selectIdCommand = new MySqlCommand(selectIdSql, connection);
                 int newId = Convert.ToInt32(selectIdCommand.ExecuteScalar());
-                return newId;
+                return new SavingGoal(newId, savingGoal.Name, savingGoal.Target, savingGoal.Deadline, savingGoal.UserId,
+                    savingGoal.ColorHexCode);
             }
 
             throw new DatabaseException("Failed to add the saving goal to the database. No rows were affected.");

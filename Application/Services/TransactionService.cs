@@ -142,12 +142,10 @@ public class TransactionService(
     {
         try
         {
-            Transaction transaction = new Transaction(amount, description, date, userId, categoryId);
-            transaction.Id = transactionRepository.Add(transaction);
-            AddTagsToTransaction(transaction.Id, tags);
-            var category = categoryService.GetById(transaction.CategoryId);
-
-            var addedTransaction = transactionRepository.FindById(transaction.Id);
+            var newTransaction = new Transaction(amount, description, date, userId, categoryId);
+            var addedTransaction = transactionRepository.Add(newTransaction);
+            AddTagsToTransaction(addedTransaction.Id, tags);
+            var category = categoryService.GetById(addedTransaction.CategoryId);
 
             var dto = new TransactionDto(addedTransaction.Id, addedTransaction.Description, addedTransaction.Amount,
                 addedTransaction.Date, addedTransaction.UserId, addedTransaction.CategoryId, category, tags);

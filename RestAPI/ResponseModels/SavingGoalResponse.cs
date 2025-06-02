@@ -6,9 +6,8 @@ public class SavingGoalResponse(
     decimal amountSaved,
     decimal target,
     DateTime deadline,
-    string colorHexCode,
-    int userId,
-    User user)
+    string colorHexCode
+)
 {
     public int Id { get; set; } = id;
     public string Name { get; set; } = name;
@@ -16,7 +15,4 @@ public class SavingGoalResponse(
     public decimal Target { get; set; } = target;
     public DateTime Deadline { get; set; } = deadline;
     public string ColorHexCode { get; set; } = colorHexCode;
-
-    public int UserId { get; set; } = userId;
-    public User User { get; set; } = user;
 }

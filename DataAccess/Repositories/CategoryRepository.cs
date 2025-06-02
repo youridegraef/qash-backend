@@ -16,7 +16,7 @@ public class CategoryRepository(string connectionString, ILogger<CategoryReposit
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            string sql = "SELECT id, name, user_id FROM category WHERE id = @id";
+            string sql = "SELECT id, name, user_id, color_hex_code FROM category WHERE id = @id";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@id", id);
@@ -141,7 +141,7 @@ public class CategoryRepository(string connectionString, ILogger<CategoryReposit
         }
     }
 
-    public int Add(Category category)
+    public Category Add(Category category)
     {
         try
         {
@@ -164,7 +164,7 @@ public class CategoryRepository(string connectionString, ILogger<CategoryReposit
                 string selectIdSql = "SELECT LAST_INSERT_ID()";
                 using MySqlCommand selectIdCommand = new MySqlCommand(selectIdSql, connection);
                 int newId = Convert.ToInt32(selectIdCommand.ExecuteScalar());
-                return newId;
+                return new Category(newId, category.Name, category.UserId, category.ColorHexCode);
             }
 
             throw new DatabaseException("Failed to add the category to the database. No rows were affected.");

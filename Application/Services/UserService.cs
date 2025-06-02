@@ -108,7 +108,7 @@ public class UserService(IUserRepository userRepository, ILogger<UserService> lo
             );
 
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-            AuthenticationDto dto = new AuthenticationDto(tokenString, user);
+            AuthenticationDto dto = new AuthenticationDto(user.Id, user.Name, user.Email, tokenString);
             return dto;
         }
         catch (UserNotFoundException ex)

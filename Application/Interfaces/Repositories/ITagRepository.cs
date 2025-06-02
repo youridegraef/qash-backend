@@ -12,7 +12,7 @@ public interface ITagRepository
     public Tag FindById(int id);
     public List<Tag> FindByTransactionId(int transactionId);
 
-    public int Add(Tag tag);
+    public Tag Add(Tag tag);
 
     public bool Edit(Tag tag);
 

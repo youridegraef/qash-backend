@@ -2,12 +2,12 @@ namespace Application.Domain;
 
 public class Transaction
 {
-    public int Id { get; set; }
-    public string Description { get; set; }
-    public double Amount { get; set; }
-    public DateOnly Date { get; set; }
-    public int UserId { get; set; }
-    public int CategoryId { get; set; }
+    public int Id { get; private set; }
+    public string Description { get; private set; }
+    public double Amount { get; private set; }
+    public DateOnly Date { get; private set; }
+    public int UserId { get; private set; }
+    public int CategoryId { get; private set; }
 
     public Transaction(double amount, string description, DateOnly date, int userId, int categoryId)
     {

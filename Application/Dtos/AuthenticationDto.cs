@@ -1,7 +1,9 @@
 namespace Application.Dtos;
 
-public class AuthenticationDto(string token, User user)
+public class AuthenticationDto(int id, string name, string email, string token)
 {
-    public string Token { get; set; } = token;
-    public User User { get; set; } = user;
+    public int Id { get; private set; }
+    public string Token { get; private set; } = token;
+    public string Name { get; private set; } = name;
+    public string Email { get; private set; } = email;
 }

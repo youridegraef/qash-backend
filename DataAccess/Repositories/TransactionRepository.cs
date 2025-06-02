@@ -222,7 +222,7 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
         }
     }
 
-    public int Add(Transaction transaction)
+    public Transaction Add(Transaction transaction)
     {
         try
         {
@@ -247,7 +247,8 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
                 string selectIdSql = "SELECT LAST_INSERT_ID()";
                 using MySqlCommand selectIdCommand = new MySqlCommand(selectIdSql, connection);
                 int newId = Convert.ToInt32(selectIdCommand.ExecuteScalar());
-                return newId;
+                return new Transaction(newId, transaction.Description, transaction.Amount, transaction.Date,
+                    transaction.UserId, transaction.CategoryId);
             }
 
             throw new DatabaseException("Failed to add the transaction to the database. No rows were affected.");
@@ -364,5 +365,4 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
             throw new DatabaseException($"Error adding tags to transaction ID {transactionId}.", ex);
         }
     }
-
 }

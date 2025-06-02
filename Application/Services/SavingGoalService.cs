@@ -1,14 +1,18 @@
 using Application.Domain;
+using Application.Dtos;
 using Application.Exceptions;
 using Application.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
 
-public class SavingGoalService(ISavingGoalRepository savingGoalRepository, ILogger<SavingGoalService> logger)
+public class SavingGoalService(
+    ISavingGoalRepository savingGoalRepository,
+    ITransactionService transactionService,
+    ILogger<SavingGoalService> logger)
     : ISavingGoalService
 {
-    public SavingGoal GetById(int id)
+    public SavingGoalDto GetById(int id)
     {
         try
         {
@@ -16,7 +20,9 @@ public class SavingGoalService(ISavingGoalRepository savingGoalRepository, ILogg
 
             if (savingGoal != null!)
             {
-                return savingGoal;
+                var dto = new SavingGoalDto(savingGoal.Id, savingGoal.Name, CalculateAmountSaved(savingGoal.UserId),
+                    savingGoal.Target, savingGoal.Deadline, savingGoal.ColorHexCode);
+                return dto;
             }
 
             throw new SavingGoalNotFoundException($"Saving goal with id {id} not found.");
@@ -38,11 +44,26 @@ public class SavingGoalService(ISavingGoalRepository savingGoalRepository, ILogg
         }
     }
 
-    public List<SavingGoal> GetByUserId(int userId)
+    public List<SavingGoalDto> GetByUserId(int userId)
     {
         try
         {
-            return savingGoalRepository.FindByUserId(userId);
+            var goals = savingGoalRepository.FindByUserId(userId);
+            var dtos = new List<SavingGoalDto>();
+
+            if (goals.Count != 0)
+            {
+                dtos.AddRange(goals.Select(goal => new SavingGoalDto(goal.Id, goal.Name,
+                    CalculateAmountSaved(goal.UserId), goal.Target, goal.Deadline, goal.ColorHexCode)));
+                return dtos;
+            }
+
+            throw new SavingGoalNotFoundException($"Saving goal with user id {userId} not found.");
+        }
+        catch (SavingGoalNotFoundException ex)
+        {
+            logger.LogError(ex, "Saving goal with id {SavingGoalId} not found.", userId);
+            throw;
         }
         catch (KeyNotFoundException ex)
         {
@@ -61,11 +82,21 @@ public class SavingGoalService(ISavingGoalRepository savingGoalRepository, ILogg
         }
     }
 
-    public List<SavingGoal> GetByUserIdPaged(int userId, int page, int pageSize)
+    public List<SavingGoalDto> GetByUserIdPaged(int userId, int page, int pageSize)
     {
         try
         {
-            return savingGoalRepository.FindByUserIdPaged(userId, page, pageSize);
+            var goals = savingGoalRepository.FindByUserIdPaged(userId, page, pageSize);
+            var dtos = new List<SavingGoalDto>();
+
+            if (goals.Count != 0)
+            {
+                dtos.AddRange(goals.Select(goal => new SavingGoalDto(goal.Id, goal.Name,
+                    CalculateAmountSaved(goal.UserId), goal.Target, goal.Deadline, goal.ColorHexCode)));
+                return dtos;
+            }
+
+            throw new SavingGoalNotFoundException($"Saving goal with user id {userId} not found.");
         }
         catch (KeyNotFoundException ex)
         {
@@ -84,13 +115,17 @@ public class SavingGoalService(ISavingGoalRepository savingGoalRepository, ILogg
         }
     }
 
-    public SavingGoal Add(string name, double target, DateOnly deadline, int userId, string colorHexCode)
+    public SavingGoalDto Add(string name, double target, DateOnly deadline, int userId, string colorHexCode)
     {
         try
         {
-            SavingGoal savingGoal = new SavingGoal(name, target, deadline, userId, colorHexCode);
-            savingGoal.Id = savingGoalRepository.Add(savingGoal);
-            return savingGoal;
+            var newSavingGoal = new SavingGoal(name, target, deadline, userId, colorHexCode);
+            var addedGoal = savingGoalRepository.Add(newSavingGoal);
+
+            var dto = new SavingGoalDto(addedGoal.Id, addedGoal.Name, CalculateAmountSaved(addedGoal.UserId),
+                addedGoal.Target, addedGoal.Deadline, addedGoal.ColorHexCode);
+
+            return dto;
         }
         catch (ArgumentException ex)
         {
@@ -153,6 +188,27 @@ public class SavingGoalService(ISavingGoalRepository savingGoalRepository, ILogg
         {
             logger.LogError(ex, "Error deleting saving goal with ID {SavingGoalId}", id);
             return false;
+        }
+    }
+
+    private double CalculateAmountSaved(int userId)
+    {
+        try
+        {
+            var balance = transactionService.GetBalance(userId);
+            var goals = GetByUserId(userId);
+
+            if (goals == null!)
+            {
+                throw new SavingGoalNotFoundException($"No saving goals with user id: {userId} found.");
+            }
+
+            return balance / goals.Count;
+        }
+        catch (SavingGoalNotFoundException ex)
+        {
+            logger.LogError(ex, "No saving goals with user id: {userId} found.", userId);
+            throw;
         }
     }
 }

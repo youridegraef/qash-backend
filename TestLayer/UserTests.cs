@@ -235,8 +235,8 @@ public class UserTests
 
         Assert.IsNotNull(dto, "AuthenticationDto should not be null");
         Assert.IsFalse(string.IsNullOrWhiteSpace(dto.Token), "Token should not be empty");
-        Assert.IsNotNull(dto.User, "User should not be null");
-        Assert.AreEqual(email, dto.User.Email, "Email should match");
+        Assert.IsNotNull(dto.Id, "User id should not be null");
+        Assert.AreEqual(email, dto.Email, "Email should match");
     }
 
     [TestMethod]

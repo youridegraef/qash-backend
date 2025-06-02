@@ -10,8 +10,8 @@ public interface ITransactionRepository
     public List<Transaction> FindByUserId(int userId);
     public List<Transaction> FindByUserIdPaged(int userId, int page, int pageSize);
     public Transaction FindById(int id);
-    public int Add(Transaction transaction);
-    void AddTagsToTransaction(int transactionId, List<Tag> tags);
+    public Transaction Add(Transaction transaction);
     public bool Edit(Transaction transaction);
     public bool Delete(Transaction transaction);
+    void AddTagsToTransaction(int transactionId, List<Tag> tags);
 }

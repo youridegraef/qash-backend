@@ -90,9 +90,9 @@ public class CategoryService(
     {
         try
         {
-            Category category = new Category(name, userId, colorHexCode);
-            category.Id = categoryRepository.Add(category);
-            return category;
+            var newCategory = new Category(name, userId, colorHexCode);
+            var addedCategory = categoryRepository.Add(newCategory);
+            return addedCategory;
         }
         catch (ArgumentException ex)
         {
