@@ -20,7 +20,6 @@ public class TransactionTests {
         var tagServiceMock = new Mock<ITagService>();
         var categoryServiceMock = new Mock<ICategoryService>();
 
-        // Simulate underlying repository throwing ArgumentException for invalid ID
         var originalExceptionMessage = $"Transaction ID must be greater than zero: {transactionId}";
         transactionRepoMock.Setup(r => r.FindById(transactionId))
             .Throws(new ArgumentException(originalExceptionMessage));
@@ -33,13 +32,13 @@ public class TransactionTests {
         );
 
         // Act
-        var exception = Assert.ThrowsException<Exception>(() => // Service wraps it
+        var exception = Assert.ThrowsException<Exception>(() =>
             transactionService.GetById(transactionId)
         );
 
         // Assert
         Assert.AreEqual(
-            $"Error retrieving transaction with id: {transactionId}", // Service's wrapper message
+            $"Error retrieving transaction with id: {transactionId}",
             exception.Message
         );
         Assert.IsInstanceOfType(exception.InnerException, typeof(ArgumentException));
@@ -57,7 +56,7 @@ public class TransactionTests {
         var categoryServiceMock = new Mock<ICategoryService>();
         transactionRepoMock
             .Setup(r => r.FindById(transactionId))
-            .Returns((Transaction)null!); // This will lead to TransactionNotFoundException in service
+            .Returns((Transaction)null!);
         var transactionService = new TransactionService(
             transactionRepoMock.Object,
             tagServiceMock.Object,
@@ -163,12 +162,11 @@ public class TransactionTests {
         );
 
         // Act
-        var exception = Assert.ThrowsException<Exception>(() => // Service wraps it
+        var exception = Assert.ThrowsException<Exception>(() =>
             transactionService.GetByUserId(userId)
         );
 
         // Assert
-        // This service method's generic catch is: throw new Exception($"No transactions found with user_id: {userId}", ex);
         Assert.AreEqual(
             $"No transactions found with user_id: {userId}",
             exception.Message
@@ -188,7 +186,7 @@ public class TransactionTests {
         var categoryServiceMock = new Mock<ICategoryService>();
         transactionRepoMock
             .Setup(r => r.FindByUserId(userId))
-            .Returns(new List<Transaction>()); // Service throws TransactionNotFoundException for empty list
+            .Returns(new List<Transaction>());
         var transactionService = new TransactionService(
             transactionRepoMock.Object,
             tagServiceMock.Object,
@@ -293,12 +291,11 @@ public class TransactionTests {
         );
 
         // Act
-        var exception = Assert.ThrowsException<Exception>(() => // Service wraps it
+        var exception = Assert.ThrowsException<Exception>(() =>
             transactionService.GetByUserIdPaged(userId, page, pageSize)
         );
 
         // Assert
-        // Service's generic catch: throw new Exception($"No transactions found. {ex.Message}", ex);
         Assert.AreEqual(
             $"No transactions found. {originalExceptionMessage}",
             exception.Message
@@ -329,7 +326,7 @@ public class TransactionTests {
         );
 
         // Act
-        var exception = Assert.ThrowsException<Exception>(() => // Service wraps it
+        var exception = Assert.ThrowsException<Exception>(() =>
             transactionService.GetByUserIdPaged(userId, page, pageSize)
         );
 
@@ -368,7 +365,7 @@ public class TransactionTests {
         );
 
         // Act
-        var exception = Assert.ThrowsException<Exception>(() => // Service wraps it
+        var exception = Assert.ThrowsException<Exception>(() =>
             transactionService.GetByUserIdPaged(userId, page, pageSize)
         );
 
@@ -396,7 +393,7 @@ public class TransactionTests {
         var categoryServiceMock = new Mock<ICategoryService>();
         transactionRepoMock
             .Setup(r => r.FindByUserIdPaged(userId, page, pageSize))
-            .Returns(new List<Transaction>()); // Service throws TransactionNotFoundException
+            .Returns(new List<Transaction>());
         var transactionService = new TransactionService(
             transactionRepoMock.Object,
             tagServiceMock.Object,
@@ -501,14 +498,7 @@ public class TransactionTests {
         var tagServiceMock = new Mock<ITagService>();
         var categoryServiceMock = new Mock<ICategoryService>();
 
-        // Mock the Transaction constructor to throw ArgumentException for this case
-        // This setup assumes the service calls the constructor which might throw
-        // For simplicity, we'll assume the service's catch block for ArgumentException is hit
-        // by a direct or indirect call that throws it.
-        // The actual Transaction object would throw this.
-        var originalArgExMessage = description == ""
-            ? "Description cannot be empty."
-            : "Description cannot be empty or whitespace.";
+        var originalArgExMessage = "Description cannot be empty.";
         transactionRepoMock.Setup(r => r.Add(It.IsAny<Transaction>()))
             .Throws(new ArgumentException(originalArgExMessage));
 
@@ -528,7 +518,6 @@ public class TransactionTests {
         );
 
         // Assert
-        // Service: throw new InvalidDataException("Invalid transaction data: " + ex.Message, ex);
         Assert.AreEqual(
             $"Invalid transaction data: {originalArgExMessage}",
             exception.Message
@@ -536,7 +525,7 @@ public class TransactionTests {
     }
 
     [TestMethod]
-    [DataRow("Test Transaction", 100.0, -1, 1)] // Amount is not used for this specific test's logic
+    [DataRow("Test Transaction", 100.0, -1, 1)]
     [DataRow("Test Transaction", 100.0, 0, 1)]
     public void Add_UserIdZeroOrNegativeException(
         string description,
@@ -630,7 +619,7 @@ public class TransactionTests {
         var categoryServiceMock = new Mock<ICategoryService>();
         var date = DateOnly.FromDateTime(DateTime.Now);
         var tags = new List<Tag>();
-        
+
         var addedTransaction = new Transaction(
             1,
             description,
@@ -641,18 +630,14 @@ public class TransactionTests {
         );
         var category = new Category(categoryId, "Test Category", userId, "#112233");
 
-        // Setup repository methods - gebruik Any() voor eenvoudigere matching
         transactionRepoMock
             .Setup(r => r.Add(It.IsAny<Transaction>()))
             .Returns(addedTransaction);
 
-        // Setup category service
         categoryServiceMock.Setup(c => c.GetById(categoryId)).Returns(category);
 
-        // Setup tag service
         tagServiceMock.Setup(t => t.GetByTransactionId(addedTransaction.Id)).Returns(tags);
 
-        // Setup AddTagsToTransaction
         transactionRepoMock
             .Setup(r => r.AddTagsToTransaction(addedTransaction.Id, tags))
             .Verifiable();
@@ -681,7 +666,6 @@ public class TransactionTests {
         Assert.AreEqual(userId, result.UserId, "User id should match");
         Assert.AreEqual(addedTransaction.Id, result.Id, "Returned DTO ID should match added transaction ID");
 
-        // Verify dat AddTagsToTransaction werd aangeroepen
         transactionRepoMock.Verify(r => r.AddTagsToTransaction(addedTransaction.Id, tags), Times.Once);
     }
 
@@ -767,7 +751,6 @@ public class TransactionTests {
             .Throws(new DatabaseException("DB error"));
         transactionRepoMock.Setup(r => r.AddTagsToTransaction(It.IsAny<int>(), It.IsAny<List<Tag>>()));
 
-
         var transactionService = new TransactionService(
             transactionRepoMock.Object,
             tagServiceMock.Object,
@@ -794,7 +777,6 @@ public class TransactionTests {
         var tagServiceMock = new Mock<ITagService>();
         var categoryServiceMock = new Mock<ICategoryService>();
 
-        // If FindById throws for invalid ID, service's generic catch will return false
         transactionRepoMock.Setup(r => r.FindById(transactionId))
             .Throws(new ArgumentException("Invalid ID"));
 
@@ -826,7 +808,7 @@ public class TransactionTests {
         var categoryServiceMock = new Mock<ICategoryService>();
         transactionRepoMock
             .Setup(r => r.FindById(transactionId))
-            .Throws(new TransactionNotFoundException("Not found")); // Service catches this and returns false
+            .Throws(new TransactionNotFoundException("Not found"));
         var transactionService = new TransactionService(
             transactionRepoMock.Object,
             tagServiceMock.Object,
@@ -892,7 +874,7 @@ public class TransactionTests {
         transactionRepoMock.Setup(r => r.FindById(1)).Returns(transaction);
         transactionRepoMock
             .Setup(r => r.Delete(It.IsAny<Transaction>()))
-            .Throws(new DatabaseException("DB error")); // Service catches this and returns false
+            .Throws(new DatabaseException("DB error"));
         var transactionService = new TransactionService(
             transactionRepoMock.Object,
             tagServiceMock.Object,
@@ -929,12 +911,11 @@ public class TransactionTests {
         );
 
         // Act
-        var exception = Assert.ThrowsException<Exception>(() => // Service wraps it
+        var exception = Assert.ThrowsException<Exception>(() =>
             transactionService.GetBalance(userId)
         );
 
         // Assert
-        // Service's generic catch: throw new Exception($"Error calculating balance for user_id: {userId}", ex);
         Assert.AreEqual(
             $"Error calculating balance for user_id: {userId}",
             exception.Message
