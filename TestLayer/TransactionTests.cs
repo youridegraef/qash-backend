@@ -4,12 +4,14 @@ using Application.Services;
 using Application.Interfaces;
 using Application.Domain;
 using Application.Dtos;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace TestLayer;
 
 [TestClass]
-public class TransactionTests {
+public class TransactionTests
+{
     [TestMethod]
     [DataRow(-1)]
     [DataRow(0)]
@@ -1035,5 +1037,90 @@ public class TransactionTests {
 
         // Assert
         Assert.AreEqual(300.0, result, "Income should be 300.0");
+    }
+
+    [TestMethod]
+    [DataRow(0)]
+    [DataRow(99)]
+    public void GetByCategoryId_ThrowsTransactionNotFoundException_WhenNoTransactions(int categoryId) {
+        var loggerMock = new Mock<ILogger<TransactionService>>();
+        var transactionRepoMock = new Mock<ITransactionRepository>();
+        var tagServiceMock = new Mock<ITagService>();
+        var categoryServiceMock = new Mock<ICategoryService>();
+
+        transactionRepoMock.Setup(r => r.FindByCategoryId(categoryId)).Returns(new List<Transaction>());
+
+        var service = new TransactionService(
+            transactionRepoMock.Object,
+            tagServiceMock.Object,
+            categoryServiceMock.Object,
+            loggerMock.Object
+        );
+
+        var ex = Assert.ThrowsException<TransactionNotFoundException>(() =>
+            service.GetByCategoryId(categoryId)
+        );
+
+        Assert.AreEqual($"No transaction with user id: {categoryId} found.", ex.Message);
+    }
+
+    [TestMethod]
+    public void GetByCategoryId_ThrowsException_OnDatabaseException() {
+        var loggerMock = new Mock<ILogger<TransactionService>>();
+        var transactionRepoMock = new Mock<ITransactionRepository>();
+        var tagServiceMock = new Mock<ITagService>();
+        var categoryServiceMock = new Mock<ICategoryService>();
+
+        transactionRepoMock
+            .Setup(r => r.FindByCategoryId(It.IsAny<int>()))
+            .Throws(new DatabaseException("DB error"));
+
+        var service = new TransactionService(
+            transactionRepoMock.Object,
+            tagServiceMock.Object,
+            categoryServiceMock.Object,
+            loggerMock.Object
+        );
+
+        var ex = Assert.ThrowsException<Exception>(() =>
+            service.GetByCategoryId(1)
+        );
+
+        Assert.AreEqual("Database error while retrieving transactions with CategoryID: 1", ex.Message);
+        Assert.IsInstanceOfType(ex.InnerException, typeof(DatabaseException));
+    }
+
+    [TestMethod]
+    public void GetByCategoryId_ReturnsTransactionDtoList() {
+        var loggerMock = new Mock<ILogger<TransactionService>>();
+        var transactionRepoMock = new Mock<ITransactionRepository>();
+        var tagServiceMock = new Mock<ITagService>();
+        var categoryServiceMock = new Mock<ICategoryService>();
+
+        var categoryId = 5;
+        var transaction = new Transaction(1, "Test", 100.0, DateOnly.FromDateTime(DateTime.Now), 2, categoryId);
+        var category = new Category(categoryId, "TestCat", 2);
+        var tags = new List<Tag> { new Tag(1, "TestTag") };
+
+        transactionRepoMock.Setup(r => r.FindByCategoryId(categoryId)).Returns(new List<Transaction> { transaction });
+        categoryServiceMock.Setup(c => c.GetById(categoryId)).Returns(category);
+        tagServiceMock.Setup(t => t.GetByTransactionId(transaction.Id)).Returns(tags);
+
+        var service = new TransactionService(
+            transactionRepoMock.Object,
+            tagServiceMock.Object,
+            categoryServiceMock.Object,
+            loggerMock.Object
+        );
+
+        var result = service.GetByCategoryId(categoryId);
+
+        Assert.IsNotNull(result);
+        Assert.AreEqual(1, result.Count);
+        Assert.AreEqual(transaction.Id, result[0].Id);
+        Assert.AreEqual(transaction.Description, result[0].Description);
+        Assert.AreEqual(categoryId, result[0].CategoryId);
+        Assert.AreEqual(category, result[0].Category);
+        Assert.AreEqual(tags, result[0].Tags);
     }
 }
