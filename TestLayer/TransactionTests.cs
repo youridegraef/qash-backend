@@ -93,7 +93,7 @@ public class TransactionTests {
             1,
             1
         );
-        var category = new Category(1, "Test Category", 1, "#FF0000");
+        var category = new Category(1, "Test Category", 1);
         var tags = new List<Tag> { new Tag(1, "Test Tag") };
 
         transactionRepoMock.Setup(r => r.FindById(transactionId)).Returns(transaction);
@@ -219,7 +219,7 @@ public class TransactionTests {
             new Transaction(1, "Test Transaction 1", 100.0, DateOnly.FromDateTime(DateTime.Now), userId, 1),
             new Transaction(2, "Test Transaction 2", 200.0, DateOnly.FromDateTime(DateTime.Now), userId, 1)
         };
-        var category = new Category(1, "Test Category", userId, "#ABCDEF");
+        var category = new Category(1, "Test Category", userId);
         var tags = new List<Tag> { new Tag(1, "Test Tag") };
 
         transactionRepoMock.Setup(r => r.FindByUserId(userId)).Returns(transactions);
@@ -429,7 +429,7 @@ public class TransactionTests {
         var transactions = new List<Transaction> {
             new Transaction(1, "Test Transaction 1", 100.0, DateOnly.FromDateTime(DateTime.Now), userId, 1)
         };
-        var category = new Category(1, "Test Category", userId, "#FEDCBA");
+        var category = new Category(1, "Test Category", userId);
         var tags = new List<Tag> { new Tag(1, "Test Tag") };
 
         transactionRepoMock
@@ -628,7 +628,7 @@ public class TransactionTests {
             userId,
             categoryId
         );
-        var category = new Category(categoryId, "Test Category", userId, "#112233");
+        var category = new Category(categoryId, "Test Category", userId);
 
         transactionRepoMock
             .Setup(r => r.Add(It.IsAny<Transaction>()))

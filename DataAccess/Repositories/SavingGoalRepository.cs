@@ -25,8 +25,7 @@ public class SavingGoalRepository(string connectionString, ILogger<SavingGoalRep
                     reader.GetString(reader.GetOrdinal("name")),
                     reader.GetDouble(reader.GetOrdinal("target")),
                     DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("deadline"))),
-                    reader.GetInt32(reader.GetOrdinal("user_id")),
-                    reader.GetString(reader.GetOrdinal("color_hex_code"))
+                    reader.GetInt32(reader.GetOrdinal("user_id"))
                 );
             }
 
@@ -50,7 +49,7 @@ public class SavingGoalRepository(string connectionString, ILogger<SavingGoalRep
             connection.Open();
 
             string sql =
-                "SELECT id, name, target, deadline, user_id, color_hex_code FROM tag WHERE user_id = @user_id";
+                "SELECT id, name, target, deadline, user_id FROM tag WHERE user_id = @user_id";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@user_id", userId);
@@ -63,8 +62,7 @@ public class SavingGoalRepository(string connectionString, ILogger<SavingGoalRep
                         reader.GetString(reader.GetOrdinal("name")),
                         reader.GetInt32(reader.GetOrdinal("target")),
                         DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("deadline"))),
-                        reader.GetInt32(reader.GetOrdinal("user_id")),
-                        reader.GetString(reader.GetOrdinal("color_hex_code"))
+                        reader.GetInt32(reader.GetOrdinal("user_id"))
                     ));
             }
 
@@ -93,7 +91,7 @@ public class SavingGoalRepository(string connectionString, ILogger<SavingGoalRep
 
             int offset = (page - 1) * pageSize;
             string sql =
-                "SELECT id, name, target, deadline, user_id, color_hex_code FROM tag WHERE user_id = @user_id LIMIT @limit OFFSET @offset";
+                "SELECT id, name, target, deadline, user_id FROM tag WHERE user_id = @user_id LIMIT @limit OFFSET @offset";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@user_id", userId);
@@ -107,8 +105,7 @@ public class SavingGoalRepository(string connectionString, ILogger<SavingGoalRep
                         reader.GetString(reader.GetOrdinal("name")),
                         reader.GetInt32(reader.GetOrdinal("target")),
                         DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("deadline"))),
-                        reader.GetInt32(reader.GetOrdinal("user_id")),
-                        reader.GetString(reader.GetOrdinal("color_hex_code"))
+                        reader.GetInt32(reader.GetOrdinal("user_id"))
                     ));
             }
 
@@ -134,7 +131,7 @@ public class SavingGoalRepository(string connectionString, ILogger<SavingGoalRep
             connection.Open();
 
             string sql =
-                "INSERT INTO saving_goal (name, target, deadline, user_id, color_hex_code) VALUES (@name, @target, @deadline, @user_id, @color_hex_code)";
+                "INSERT INTO saving_goal (name, target, deadline, user_id) VALUES (@name, @target, @deadline, @user_id)";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
 
@@ -142,7 +139,6 @@ public class SavingGoalRepository(string connectionString, ILogger<SavingGoalRep
             command.Parameters.AddWithValue("@target", savingGoal.Target);
             command.Parameters.AddWithValue("@deadline", savingGoal.Deadline.ToDateTime(TimeOnly.MinValue));
             command.Parameters.AddWithValue("@user_id", savingGoal.UserId);
-            command.Parameters.AddWithValue("@color_hex_code", savingGoal.ColorHexCode);
 
             int rowsAffected = command.ExecuteNonQuery();
 
@@ -150,8 +146,8 @@ public class SavingGoalRepository(string connectionString, ILogger<SavingGoalRep
                 string selectIdSql = "SELECT LAST_INSERT_ID()";
                 using MySqlCommand selectIdCommand = new MySqlCommand(selectIdSql, connection);
                 int newId = Convert.ToInt32(selectIdCommand.ExecuteScalar());
-                return new SavingGoal(newId, savingGoal.Name, savingGoal.Target, savingGoal.Deadline, savingGoal.UserId,
-                    savingGoal.ColorHexCode);
+                return new SavingGoal(newId, savingGoal.Name, savingGoal.Target, savingGoal.Deadline,
+                    savingGoal.UserId);
             }
 
             throw new DatabaseException("Failed to add the saving goal to the database. No rows were affected.");
@@ -172,7 +168,7 @@ public class SavingGoalRepository(string connectionString, ILogger<SavingGoalRep
             connection.Open();
 
             string sql =
-                "UPDATE saving_goal SET name = @name, target = @target, deadline = @deadline, user_id = @user_id, color_hex_code = @color_hex_code WHERE id = @id";
+                "UPDATE saving_goal SET name = @name, target = @target, deadline = @deadline, user_id = @user_id WHERE id = @id";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
 
@@ -181,7 +177,6 @@ public class SavingGoalRepository(string connectionString, ILogger<SavingGoalRep
             command.Parameters.AddWithValue("@target", savingGoal.Target);
             command.Parameters.AddWithValue("@deadline", savingGoal.Deadline.ToDateTime(TimeOnly.MinValue));
             command.Parameters.AddWithValue("@user_id", savingGoal.UserId);
-            command.Parameters.AddWithValue("@color_hex_code", savingGoal.ColorHexCode);
 
             int rowsAffected = command.ExecuteNonQuery();
 

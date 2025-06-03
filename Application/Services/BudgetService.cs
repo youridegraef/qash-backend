@@ -1,21 +1,40 @@
 using Application.Domain;
+using Application.Dtos;
 using Application.Exceptions;
 using Application.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
 
-public class BudgetService(IBudgetRepository budgetRepository, ILogger<BudgetService> logger)
+public class BudgetService(
+    IBudgetRepository budgetRepository,
+    ICategoryService categoryService,
+    ITransactionService transactionService,
+    ILogger<BudgetService> logger)
     : IBudgetService {
-    public Budget GetById(int id) {
+    public BudgetDto GetById(int id) {
         try {
-            Budget budget = budgetRepository.FindById(id);
+            var budget = budgetRepository.FindById(id);
+            if (budget == null)
+                throw new BudgetNotFoundException($"No budget with id: {id} found.");
 
-            if (budget != null!) {
-                return budget;
-            }
+            var category = categoryService.GetById(budget.CategoryId);
+            var spent = transactionService
+                .GetByUserId(category.UserId)
+                .Where(t => t.CategoryId == category.Id
+                            && t.Date >= budget.StartDate
+                            && t.Date <= budget.EndDate)
+                .Sum(t => t.Amount);
 
-            throw new BudgetNotFoundException($"No budget with id: {id} found.");
+            return new BudgetDto(
+                budget.Id,
+                category.Name,
+                budget.StartDate,
+                budget.EndDate,
+                spent,
+                budget.Target,
+                category.Id
+            );
         }
         catch (BudgetNotFoundException ex) {
             logger.LogError(ex, "No budget with id: {BudgetId} found.", id);
@@ -31,15 +50,76 @@ public class BudgetService(IBudgetRepository budgetRepository, ILogger<BudgetSer
         }
     }
 
-    public Budget GetByCategoryId(int categoryId) {
+    public List<BudgetDto> GetByUserId(int userId) {
         try {
-            Budget budget = budgetRepository.FindByCategoryId(categoryId);
-
-            if (budget != null!) {
-                return budget;
+            var categories = categoryService.GetByUserId(userId);
+            if (categories == null || categories.Count == 0) {
+                logger.LogInformation("No categories found for user with id: {UserId}", userId);
+                return new List<BudgetDto>();
             }
 
-            throw new BudgetNotFoundException($"No budget with category id: {categoryId} found.");
+            var transactions = transactionService.GetByUserId(userId);
+            var budgetDtos = new List<BudgetDto>();
+
+            foreach (var category in categories) {
+                try {
+                    var budget = budgetRepository.FindByCategoryId(category.Id);
+                    if (budget != null) {
+                        var spent = transactions
+                            .Where(t => t.CategoryId == category.Id
+                                        && t.Date >= budget.StartDate
+                                        && t.Date <= budget.EndDate)
+                            .Sum(t => t.Amount);
+
+                        budgetDtos.Add(new BudgetDto(
+                            budget.Id,
+                            category.Name,
+                            budget.StartDate,
+                            budget.EndDate,
+                            spent,
+                            budget.Target,
+                            category.Id
+                        ));
+                    }
+                }
+                catch (BudgetNotFoundException) { }
+            }
+
+            return budgetDtos;
+        }
+        catch (DatabaseException ex) {
+            logger.LogError(ex, "Database error retrieving budgets for user with id: {UserId}", userId);
+            throw new Exception($"Database error retrieving budgets for user with id: {userId}", ex);
+        }
+        catch (Exception ex) {
+            logger.LogError(ex, "Error retrieving budgets for user with id: {UserId}", userId);
+            throw new Exception($"Error retrieving budgets for user with id: {userId}", ex);
+        }
+    }
+
+    public BudgetDto GetByCategoryId(int categoryId) {
+        try {
+            var budget = budgetRepository.FindByCategoryId(categoryId);
+            if (budget == null)
+                throw new BudgetNotFoundException($"No budget with category id: {categoryId} found.");
+
+            var category = categoryService.GetById(categoryId);
+            var spent = transactionService
+                .GetByUserId(category.UserId)
+                .Where(t => t.CategoryId == category.Id
+                            && t.Date >= budget.StartDate
+                            && t.Date <= budget.EndDate)
+                .Sum(t => t.Amount);
+
+            return new BudgetDto(
+                budget.Id,
+                category.Name,
+                budget.StartDate,
+                budget.EndDate,
+                spent,
+                budget.Target,
+                category.Id
+            );
         }
         catch (BudgetNotFoundException ex) {
             logger.LogError(ex, "No budget with category id: {CategoryId} found.", categoryId);
@@ -55,11 +135,21 @@ public class BudgetService(IBudgetRepository budgetRepository, ILogger<BudgetSer
         }
     }
 
-    public Budget Add(DateOnly startDate, DateOnly endDate, double target, int categoryId) {
+    public BudgetDto Add(DateOnly startDate, DateOnly endDate, double target, int categoryId) {
         try {
             var newBudget = new Budget(startDate, endDate, target, categoryId);
             var addedBudget = budgetRepository.Add(newBudget);
-            return addedBudget;
+            var category = categoryService.GetById(categoryId);
+
+            return new BudgetDto(
+                addedBudget.Id,
+                category.Name,
+                addedBudget.StartDate,
+                addedBudget.EndDate,
+                0,
+                addedBudget.Target,
+                category.Id
+            );
         }
         catch (ArgumentException ex) {
             logger.LogError(ex, "Invalid budget data: {Message}", ex.Message);

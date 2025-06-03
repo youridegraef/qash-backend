@@ -80,7 +80,6 @@ public class BudgetRepository(string connectionString, ILogger<BudgetRepository>
         }
     }
 
-
     public Budget Add(Budget budget) {
         try {
             using MySqlConnection connection = new MySqlConnection(connectionString);

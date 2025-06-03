@@ -3,18 +3,12 @@ namespace RestAPI.ResponseModels;
 public class BudgetResponse(
     int id,
     string name,
-    decimal amountSpent,
-    decimal budgetAmount,
-    string colorHexCode,
-    int userId,
-    User user)
-{
+    double amountSpent,
+    double budgetAmount,
+    int userId) {
     public int Id { get; set; } = id;
     public string Name { get; set; } = name;
-    public decimal AmountSpent { get; set; } = amountSpent;
-    public decimal BudgetAmount { get; set; } = budgetAmount;
-    public string ColorHexCode { get; set; } = colorHexCode;
-
+    public double AmountSpent { get; set; } = amountSpent;
+    public double BudgetAmount { get; set; } = budgetAmount;
     public int UserId { get; set; } = userId;
-    public User User { get; set; } = user;
 }

@@ -117,6 +117,44 @@ public class TransactionService(
         }
     }
 
+    public List<TransactionDto> GetByCategoryId(int categoryId) {
+        try {
+            List<Transaction> transactions = transactionRepository.FindByCategoryId(categoryId);
+
+            List<TransactionDto> dtos = new List<TransactionDto>();
+
+            if (transactions.Count == 0 || transactions == null) {
+                throw new TransactionNotFoundException($"Transaction with CategoryID {categoryId} was not found.");
+            }
+
+            foreach (var transaction in transactions) {
+                var category = categoryService.GetById(transaction.CategoryId);
+                var tags = tagService.GetByTransactionId(transaction.Id);
+
+                dtos.Add(
+                    new TransactionDto(
+                        transaction.Id, transaction.Description, transaction.Amount,
+                        transaction.Date, transaction.UserId, transaction.CategoryId, category, tags
+                    )
+                );
+            }
+
+            return dtos;
+        }
+        catch (TransactionNotFoundException ex) {
+            logger.LogError(ex, $"Transaction with CategoryID {categoryId} was not found.");
+            throw new TransactionNotFoundException($"No transaction with user id: {categoryId} found.");
+        }
+        catch (DatabaseException ex) {
+            logger.LogError(ex, "Database error retrieving transactions with CategoryID: {CategoryId}", categoryId);
+            throw new Exception($"Database error while retrieving transactions with CategoryID: {categoryId}", ex);
+        }
+        catch (Exception ex) {
+            logger.LogError(ex, "No transactions found with CategoryID: {CategoryId}", categoryId);
+            throw new Exception($"No transactions found with CategoryID: {categoryId}", ex);
+        }
+    }
+
     public TransactionDto Add(string description, double amount, DateOnly date, int userId, int categoryId,
         List<Tag> tags) {
         try {

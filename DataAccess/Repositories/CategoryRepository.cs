@@ -7,13 +7,14 @@ using MySql.Data.MySqlClient;
 namespace DataAccess.Repositories;
 
 public class CategoryRepository(string connectionString, ILogger<CategoryRepository> logger)
-    : ICategoryRepository {
+    : ICategoryRepository
+{
     public Category FindById(int id) {
         try {
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            string sql = "SELECT id, name, user_id, color_hex_code FROM category WHERE id = @id";
+            string sql = "SELECT id, name, user_id FROM category WHERE id = @id";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@id", id);
@@ -24,8 +25,7 @@ public class CategoryRepository(string connectionString, ILogger<CategoryReposit
                 return new Category(
                     reader.GetInt32(reader.GetOrdinal("id")),
                     reader.GetString(reader.GetOrdinal("name")),
-                    reader.GetInt32(reader.GetOrdinal("user_id")),
-                    reader.GetString(reader.GetOrdinal("color_hex_code"))
+                    reader.GetInt32(reader.GetOrdinal("user_id"))
                 );
             }
 
@@ -49,7 +49,7 @@ public class CategoryRepository(string connectionString, ILogger<CategoryReposit
             connection.Open();
 
             string sql =
-                "SELECT id, name, user_id, color_hex_code FROM tag WHERE user_id = @user_id";
+                "SELECT id, name, user_id FROM category WHERE user_id = @user_id";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@user_id", userId);
@@ -60,8 +60,7 @@ public class CategoryRepository(string connectionString, ILogger<CategoryReposit
                     new Category(
                         reader.GetInt32(reader.GetOrdinal("id")),
                         reader.GetString(reader.GetOrdinal("name")),
-                        reader.GetInt32(reader.GetOrdinal("user_id")),
-                        reader.GetString(reader.GetOrdinal("color_hex_code"))
+                        reader.GetInt32(reader.GetOrdinal("user_id"))
                     ));
             }
 
@@ -90,7 +89,7 @@ public class CategoryRepository(string connectionString, ILogger<CategoryReposit
 
             int offset = (page - 1) * pageSize;
             string sql =
-                "SELECT id, name, user_id, color_hex_code FROM tag WHERE user_id = @user_id LIMIT @limit OFFSET @offset";
+                "SELECT id, name, user_id FROM category WHERE user_id = @user_id LIMIT @limit OFFSET @offset";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@user_id", userId);
@@ -102,8 +101,7 @@ public class CategoryRepository(string connectionString, ILogger<CategoryReposit
                     new Category(
                         reader.GetInt32(reader.GetOrdinal("id")),
                         reader.GetString(reader.GetOrdinal("name")),
-                        reader.GetInt32(reader.GetOrdinal("user_id")),
-                        reader.GetString(reader.GetOrdinal("color_hex_code"))
+                        reader.GetInt32(reader.GetOrdinal("user_id"))
                     ));
             }
 
@@ -129,12 +127,11 @@ public class CategoryRepository(string connectionString, ILogger<CategoryReposit
             connection.Open();
 
             string sql =
-                "INSERT INTO category (name, user_id, color_hex_code) VALUES (@name, @user_id, @color_hex_code)";
+                "INSERT INTO category (name, user_id) VALUES (@name, @user_id)";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@name", category.Name);
             command.Parameters.AddWithValue("@user_id", category.UserId);
-            command.Parameters.AddWithValue("@color_hex_code", category.ColorHexCode);
 
 
             int rowsAffected = command.ExecuteNonQuery();
@@ -143,7 +140,7 @@ public class CategoryRepository(string connectionString, ILogger<CategoryReposit
                 string selectIdSql = "SELECT LAST_INSERT_ID()";
                 using MySqlCommand selectIdCommand = new MySqlCommand(selectIdSql, connection);
                 int newId = Convert.ToInt32(selectIdCommand.ExecuteScalar());
-                return new Category(newId, category.Name, category.UserId, category.ColorHexCode);
+                return new Category(newId, category.Name, category.UserId);
             }
 
             throw new DatabaseException("Failed to add the category to the database. No rows were affected.");
@@ -164,13 +161,12 @@ public class CategoryRepository(string connectionString, ILogger<CategoryReposit
             connection.Open();
 
             string sql =
-                "UPDATE category SET name = @name, user_id = @user_id, color_hex_code = @color_hex_code WHERE id = @id";
+                "UPDATE category SET name = @name, user_id = @user_id WHERE id = @id";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@id", category.Id);
             command.Parameters.AddWithValue("@name", category.Name);
             command.Parameters.AddWithValue("@user_id", category.UserId);
-            command.Parameters.AddWithValue("@color_hex_code", category.ColorHexCode);
 
             int rowsAffected = command.ExecuteNonQuery();
 

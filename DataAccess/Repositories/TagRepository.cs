@@ -17,7 +17,7 @@ public class TagRepository(string connectionString, ILogger<TagRepository> logge
 
             int offset = (page - 1) * pageSize;
             string sql =
-                "SELECT id, name, color_hex_code, user_id FROM tag WHERE user_id = @user_id LIMIT @limit OFFSET @offset";
+                "SELECT id, name, user_id FROM tag WHERE user_id = @user_id LIMIT @limit OFFSET @offset";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@user_id", userId);
@@ -29,7 +29,6 @@ public class TagRepository(string connectionString, ILogger<TagRepository> logge
                     new Tag(
                         reader.GetInt32(reader.GetOrdinal("id")),
                         reader.GetString(reader.GetOrdinal("name")),
-                        reader.GetString(reader.GetOrdinal("color_hex_code")),
                         reader.GetInt32(reader.GetOrdinal("user_id"))
                     ));
             }
@@ -57,7 +56,7 @@ public class TagRepository(string connectionString, ILogger<TagRepository> logge
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            string sql = "SELECT id, name, color_hex_code, user_id FROM tag WHERE user_id = @user_id";
+            string sql = "SELECT id, name, user_id FROM tag WHERE user_id = @user_id";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@user_id", userId);
@@ -68,7 +67,6 @@ public class TagRepository(string connectionString, ILogger<TagRepository> logge
                     new Tag(
                         reader.GetInt32(reader.GetOrdinal("id")),
                         reader.GetString(reader.GetOrdinal("name")),
-                        reader.GetString(reader.GetOrdinal("color_hex_code")),
                         reader.GetInt32(reader.GetOrdinal("user_id"))
                     ));
             }
@@ -97,7 +95,7 @@ public class TagRepository(string connectionString, ILogger<TagRepository> logge
             connection.Open();
 
             string sql = @"
-            SELECT t.id, t.name, t.color_hex_code, t.user_id
+            SELECT t.id, t.name, t.user_id
             FROM tag t
             INNER JOIN transaction_tag tt ON t.id = tt.tag_id
             WHERE tt.transaction_id = @transaction_id
@@ -112,7 +110,6 @@ public class TagRepository(string connectionString, ILogger<TagRepository> logge
                     new Tag(
                         reader.GetInt32(reader.GetOrdinal("id")),
                         reader.GetString(reader.GetOrdinal("name")),
-                        reader.GetString(reader.GetOrdinal("color_hex_code")),
                         reader.GetInt32(reader.GetOrdinal("user_id"))
                     )
                 );
@@ -139,7 +136,7 @@ public class TagRepository(string connectionString, ILogger<TagRepository> logge
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            string sql = "SELECT id, name, color_hex_code, user_id FROM tag WHERE id = @id";
+            string sql = "SELECT id, name, user_id FROM tag WHERE id = @id";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@id", id);
@@ -150,7 +147,6 @@ public class TagRepository(string connectionString, ILogger<TagRepository> logge
                 return new Tag(
                     reader.GetInt32(reader.GetOrdinal("id")),
                     reader.GetString(reader.GetOrdinal("name")),
-                    reader.GetString(reader.GetOrdinal("color_hex_code")),
                     reader.GetInt32(reader.GetOrdinal("user_id"))
                 );
             }
@@ -172,12 +168,11 @@ public class TagRepository(string connectionString, ILogger<TagRepository> logge
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            string sql = "INSERT INTO tag (name, color_hex_code, user_id) VALUES (@name, @color_hex_code, @user_id)";
+            string sql = "INSERT INTO tag (name, user_id) VALUES (@name, @user_id)";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
 
             command.Parameters.AddWithValue("@name", tag.Name);
-            command.Parameters.AddWithValue("@color_hex_code", tag.ColorHexCode);
             command.Parameters.AddWithValue("@user_id", tag.UserId);
 
             int rowsAffected = command.ExecuteNonQuery();
@@ -186,7 +181,7 @@ public class TagRepository(string connectionString, ILogger<TagRepository> logge
                 string selectIdSql = "SELECT LAST_INSERT_ID()";
                 using MySqlCommand selectIdCommand = new MySqlCommand(selectIdSql, connection);
                 int newId = Convert.ToInt32(selectIdCommand.ExecuteScalar());
-                return new Tag(newId, tag.Name, tag.ColorHexCode, tag.UserId);
+                return new Tag(newId, tag.Name, tag.UserId);
             }
 
             throw new DatabaseException("Failed to add the tag to the database. No rows were affected.");
@@ -207,13 +202,12 @@ public class TagRepository(string connectionString, ILogger<TagRepository> logge
             connection.Open();
 
             string sql =
-                "UPDATE tag SET name = @name, color_hex_code = @color_hex_code, user_id = @user_id WHERE id = @id";
+                "UPDATE tag SET name = @name, = user_id = @user_id WHERE id = @id";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
 
             command.Parameters.AddWithValue("@id", tag.Id);
             command.Parameters.AddWithValue("@name", tag.Name);
-            command.Parameters.AddWithValue("@color_hex_code", tag.ColorHexCode);
             command.Parameters.AddWithValue("@user_id", tag.UserId);
 
             int rowsAffected = command.ExecuteNonQuery();

@@ -81,9 +81,9 @@ public class TagService(ITagRepository tagRepository, ILogger<TagService> logger
         }
     }
 
-    public Tag Add(string name, string colorHexCode, int userId) {
+    public Tag Add(string name, int userId) {
         try {
-            var newTag = new Tag(name, colorHexCode, userId);
+            var newTag = new Tag(name, userId);
             var addedTag = tagRepository.Add(newTag);
 
             return addedTag;

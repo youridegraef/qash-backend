@@ -69,9 +69,9 @@ public class CategoryService(
         }
     }
 
-    public Category Add(string name, int userId, string colorHexCode) {
+    public Category Add(string name, int userId) {
         try {
-            var newCategory = new Category(name, userId, colorHexCode);
+            var newCategory = new Category(name, userId);
             var addedCategory = categoryRepository.Add(newCategory);
             return addedCategory;
         }

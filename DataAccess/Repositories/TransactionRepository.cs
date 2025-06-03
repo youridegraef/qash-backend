@@ -122,6 +122,48 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
         }
     }
 
+    public List<Transaction> FindByCategoryId(int categoryId) {
+        try {
+            List<Transaction> transactions = new List<Transaction>();
+            using MySqlConnection connection = new MySqlConnection(connectionString);
+            connection.Open();
+
+            string sql =
+                "SELECT id, description, amount, date, user_id, category_id FROM transactions WHERE category_id = @category_id";
+
+            using MySqlCommand command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@category_id", categoryId);
+
+            using MySqlDataReader reader = command.ExecuteReader();
+            while (reader.Read()) {
+                transactions.Add(
+                    new Transaction(
+                        reader.GetInt32(reader.GetOrdinal("id")),
+                        reader.GetString(reader.GetOrdinal("description")),
+                        reader.GetDouble(reader.GetOrdinal("amount")),
+                        DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("date"))),
+                        reader.GetInt32(reader.GetOrdinal("user_id")),
+                        reader.GetInt32(reader.GetOrdinal("category_id"))
+                    )
+                );
+            }
+
+            if (transactions.Count == 0) {
+                throw new TransactionNotFoundException($"Transaction with CategoryID {categoryId} was not found.");
+            }
+
+            return transactions;
+        }
+        catch (TransactionNotFoundException ex) {
+            logger.LogError(ex, $"Transaction with CategoryID {categoryId} was not found.");
+            throw;
+        }
+        catch (MySqlException ex) {
+            logger.LogError(ex, "Error retrieving paged transactions from the database.");
+            throw new DatabaseException("Error retrieving paged transactions from the database.", ex);
+        }
+    }
+
     public Transaction FindById(int id) {
         try {
             using MySqlConnection connection = new MySqlConnection(connectionString);
