@@ -66,13 +66,16 @@ public class UserRepository(string connectionString, ILogger<UserRepository> log
 
             using MySqlDataReader reader = command.ExecuteReader();
 
+            User newUser;
+
             if (reader.Read()) {
-                return new User(
+                newUser = new User(
                     reader.GetInt32(reader.GetOrdinal("id")),
                     reader.GetString(reader.GetOrdinal("name")),
                     reader.GetString(reader.GetOrdinal("email")),
                     reader.GetString(reader.GetOrdinal("password_hash"))
                 );
+                return newUser;
             }
 
             throw new UserNotFoundException($"User with email {email} was not found.");
