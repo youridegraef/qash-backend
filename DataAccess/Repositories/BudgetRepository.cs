@@ -107,15 +107,7 @@ public class BudgetRepository(string connectionString, ILogger<BudgetRepository>
                 ));
             }
 
-            if (budgets.Count == 0) {
-                throw new BudgetNotFoundException($"No budgets found for user ID {userId}.");
-            }
-
             return budgets;
-        }
-        catch (BudgetNotFoundException ex) {
-            logger.LogError(ex, "No budgets found for user ID {UserId}.", userId);
-            throw;
         }
         catch (MySqlException ex) {
             logger.LogError(ex, "Database error retrieving budgets for user ID {UserId}", userId);
