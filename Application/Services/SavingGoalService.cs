@@ -10,13 +10,15 @@ public class SavingGoalService(
     ISavingGoalRepository savingGoalRepository,
     ITransactionService transactionService,
     ILogger<SavingGoalService> logger)
-    : ISavingGoalService {
+    : ISavingGoalService
+{
     public SavingGoalDto GetById(int id) {
         try {
             SavingGoal? savingGoal = savingGoalRepository.FindById(id);
 
             if (savingGoal != null!) {
-                var dto = new SavingGoalDto(savingGoal.Id, savingGoal.Name, CalculateAmountSaved(savingGoal.UserId),
+                var amountSaved = CalculateAmountSavedForGoal(savingGoal.UserId);
+                var dto = new SavingGoalDto(savingGoal.Id, savingGoal.Name, amountSaved,
                     savingGoal.Target, savingGoal.Deadline);
                 return dto;
             }
@@ -40,15 +42,20 @@ public class SavingGoalService(
     public List<SavingGoalDto> GetByUserId(int userId) {
         try {
             var goals = savingGoalRepository.FindByUserId(userId);
-            var dtos = new List<SavingGoalDto>();
-
-            if (goals.Count != 0) {
-                dtos.AddRange(goals.Select(goal => new SavingGoalDto(goal.Id, goal.Name,
-                    CalculateAmountSaved(goal.UserId), goal.Target, goal.Deadline)));
-                return dtos;
+            if (goals.Count == 0) {
+                throw new SavingGoalNotFoundException($"Saving goal with user id {userId} not found.");
             }
 
-            throw new SavingGoalNotFoundException($"Saving goal with user id {userId} not found.");
+            var dtos = goals.Select(goal =>
+                new SavingGoalDto(
+                    goal.Id,
+                    goal.Name,
+                    CalculateAmountSavedForGoal(userId),
+                    goal.Target,
+                    goal.Deadline
+                )).ToList();
+
+            return dtos;
         }
         catch (SavingGoalNotFoundException ex) {
             logger.LogError(ex, "Saving goal with id {SavingGoalId} not found.", userId);
@@ -71,15 +78,20 @@ public class SavingGoalService(
     public List<SavingGoalDto> GetByUserIdPaged(int userId, int page, int pageSize) {
         try {
             var goals = savingGoalRepository.FindByUserIdPaged(userId, page, pageSize);
-            var dtos = new List<SavingGoalDto>();
-
-            if (goals.Count != 0) {
-                dtos.AddRange(goals.Select(goal => new SavingGoalDto(goal.Id, goal.Name,
-                    CalculateAmountSaved(goal.UserId), goal.Target, goal.Deadline)));
-                return dtos;
+            if (goals.Count == 0) {
+                throw new SavingGoalNotFoundException($"Saving goal with user id {userId} not found.");
             }
 
-            throw new SavingGoalNotFoundException($"Saving goal with user id {userId} not found.");
+            var dtos = goals.Select(goal =>
+                new SavingGoalDto(
+                    goal.Id,
+                    goal.Name,
+                    CalculateAmountSavedForGoal(userId),
+                    goal.Target,
+                    goal.Deadline
+                )).ToList();
+
+            return dtos;
         }
         catch (KeyNotFoundException ex) {
             logger.LogError(ex, "No saving goals found for user_id: {UserId}", userId);
@@ -100,7 +112,9 @@ public class SavingGoalService(
             var newSavingGoal = new SavingGoal(name, target, deadline, userId);
             var addedGoal = savingGoalRepository.Add(newSavingGoal);
 
-            var dto = new SavingGoalDto(addedGoal.Id, addedGoal.Name, CalculateAmountSaved(addedGoal.UserId),
+            var amountSaved = CalculateAmountSavedForGoal(userId);
+
+            var dto = new SavingGoalDto(addedGoal.Id, addedGoal.Name, amountSaved,
                 addedGoal.Target, addedGoal.Deadline);
 
             return dto;
@@ -156,20 +170,8 @@ public class SavingGoalService(
         }
     }
 
-    private double CalculateAmountSaved(int userId) {
-        try {
-            var balance = transactionService.GetBalance(userId);
-            var goals = GetByUserId(userId);
-
-            if (goals == null!) {
-                throw new SavingGoalNotFoundException($"No saving goals with user id: {userId} found.");
-            }
-
-            return balance / goals.Count;
-        }
-        catch (SavingGoalNotFoundException ex) {
-            logger.LogError(ex, "No saving goals with user id: {userId} found.", userId);
-            throw;
-        }
+    private double CalculateAmountSavedForGoal(int userId) {
+        var goals = savingGoalRepository.FindByUserId(userId);
+        return transactionService.GetBalance(userId) / goals.Count;
     }
 }

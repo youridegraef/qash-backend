@@ -1,6 +1,5 @@
 using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Org.BouncyCastle.Bcpg;
 using RestAPI.RequestModels;
 using RestAPI.ResponseModels;
 
@@ -8,7 +7,8 @@ namespace RestAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TagController(ITagService tagService) : ControllerBase {
+public class TagController(ITagService tagService) : ControllerBase
+{
     [HttpGet("get/{userId:int}")]
     public IActionResult Get([FromRoute] int userId, [FromQuery] int? page, [FromQuery] int? pageSize) {
         if (page != null && pageSize != null) {

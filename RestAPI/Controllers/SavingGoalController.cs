@@ -9,12 +9,12 @@ namespace RestAPI.Controllers;
 [Route("api/[controller]")]
 public class SavingGoalController(ISavingGoalService savingGoalService) : ControllerBase
 {
-    [HttpPost("/add/{userId:int}")]
+    [HttpPost("add/{userId:int}")]
     public IActionResult Add([FromRoute] int userId, [FromBody] SavingGoalRequest req) {
         throw new NotImplementedException();
     }
 
-    [HttpPost("/get/{userId:int}")]
+    [HttpGet("get/{userId:int}")]
     public IActionResult Get([FromRoute] int userId) {
         var savingGoals = savingGoalService.GetByUserId(userId);
         var res = savingGoals.Select(g =>
@@ -22,7 +22,7 @@ public class SavingGoalController(ISavingGoalService savingGoalService) : Contro
         return Ok(res);
     }
 
-    [HttpPut("/edit/{userId:int}")]
+    [HttpPut("edit/{userId:int}")]
     public IActionResult Edit([FromRoute] int userId, [FromBody] SavingGoalRequest req) {
         throw new NotImplementedException();
     }

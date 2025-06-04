@@ -1,3 +1,4 @@
+using Application.Domain;
 using Application.Dtos;
 
 // ReSharper disable once CheckNamespace

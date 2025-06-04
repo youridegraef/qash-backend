@@ -1,3 +1,4 @@
+using Application.Domain;
 using Application.Exceptions;
 using Application.Interfaces;
 using Microsoft.Extensions.Logging;

@@ -1,3 +1,5 @@
+using Application.Domain;
+
 namespace RestAPI.RequestModels;
 
 public class BudgetRequest(
