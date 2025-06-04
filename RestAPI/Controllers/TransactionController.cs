@@ -80,4 +80,27 @@ public class TransactionController(ITransactionService transactionService, ITagS
     public IActionResult Edit([FromRoute] int userId, [FromBody] TransactionRequest req) {
         throw new NotImplementedException();
     }
+
+    [HttpDelete("{id:int}")]
+    public IActionResult DeleteTransaction([FromRoute] int id) {
+        try {
+            var isDeleted = transactionService.Delete(id);
+
+            if (!isDeleted) {
+                throw new Exception();
+            }
+
+            return Ok("Successfully deleted!");
+        }
+        catch (ArgumentException) {
+            return BadRequest("Invalid transaction data.");
+        }
+        catch (DatabaseException) {
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                new { message = "Een databasefout is opgetreden. Probeer het later opnieuw." });
+        }
+        catch (Exception) {
+            return BadRequest("An unexpected error occured.");
+        }
+    }
 }

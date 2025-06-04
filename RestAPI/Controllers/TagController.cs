@@ -1,3 +1,4 @@
+using Application.Exceptions;
 using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using RestAPI.RequestModels;
@@ -25,20 +26,43 @@ public class TagController(ITagService tagService) : ControllerBase
         }
     }
 
-    [HttpPost("add/{userId:int}")]
-    public IActionResult Add([FromRoute] int userId, [FromBody] SavingGoalRequest req) {
+    [HttpPost("add")]
+    public IActionResult Add([FromBody] TagRequest req) {
         try {
-            var tag = tagService.Add(req.Name, userId);
+            var tag = tagService.Add(req.Name, req.UserId);
             var res = new TagResponse(tag.Id, tag.Name);
             return Ok(res);
         }
         catch (Exception) {
-            return BadRequest("");
+            return BadRequest(""); //TODO
         }
     }
 
-    [HttpPut("/edit/{userId:int}")]
-    public IActionResult Edit([FromRoute] int userId, [FromBody] TagRequest req) {
+    [HttpPut("/edit")]
+    public IActionResult Edit([FromBody] TagRequest req) {
         throw new NotImplementedException();
+    }
+
+    [HttpDelete("{id:int}")]
+    public IActionResult DeleteBudget([FromRoute] int id) {
+        try {
+            var isDeleted = tagService.Delete(id);
+
+            if (!isDeleted) {
+                throw new Exception();
+            }
+
+            return Ok("Successfully deleted!");
+        }
+        catch (ArgumentException) {
+            return BadRequest("Invalid budget data.");
+        }
+        catch (DatabaseException) {
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                new { message = "Een databasefout is opgetreden. Probeer het later opnieuw." });
+        }
+        catch (Exception) {
+            return BadRequest("An unexpected error occured.");
+        }
     }
 }

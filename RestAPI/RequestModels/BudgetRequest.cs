@@ -2,20 +2,11 @@ using Application.Domain;
 
 namespace RestAPI.RequestModels;
 
-public class BudgetRequest(
-    int id,
-    string name,
-    decimal amountSpent,
-    decimal budgetAmount,
-    string colorHexCode,
-    int userId,
-    User user) {
-    public int Id { get; set; } = id;
-    public string Name { get; set; } = name;
-    public decimal AmountSpent { get; set; } = amountSpent;
-    public decimal BudgetAmount { get; set; } = budgetAmount;
-    public string ColorHexCode { get; set; } = colorHexCode;
-
+public class BudgetRequest(DateOnly startDate, DateOnly endDate, double target, int categoryId, int userId)
+{
+    public DateOnly StartDate { get; set; } = startDate;
+    public DateOnly EndDate { get; set; } = endDate;
+    public double Target { get; set; } = target;
+    public int CategoryId { get; set; } = categoryId;
     public int UserId { get; set; } = userId;
-    public User User { get; set; } = user;
 }

@@ -1,5 +1,7 @@
+using Application.Exceptions;
 using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using RestAPI.RequestModels;
 using RestAPI.ResponseModels;
 
 namespace RestAPI.Controllers;
@@ -23,5 +25,40 @@ public class CategoryController(ICategoryService categoryService, ITransactionSe
         var res = transactions.Select(t =>
             new TransactionResponse(t.Id, t.Description, t.Amount, t.Date, t.Category, t.Tags));
         return Ok(res);
+    }
+
+    [HttpPost("add")]
+    public IActionResult AddCategory([FromBody] CategoryRequest req) {
+        try {
+            var category = categoryService.Add(req.Name, req.UserId);
+            var res = new CategoryResponse(category.Id, category.Name);
+            return Ok(res);
+        }
+        catch (Exception) {
+            return BadRequest(""); //TODO
+        }
+    }
+
+    [HttpDelete("{id:int}")]
+    public IActionResult DeleteBudget([FromRoute] int id) {
+        try {
+            var isDeleted = categoryService.Delete(id);
+
+            if (!isDeleted) {
+                throw new Exception();
+            }
+
+            return Ok("Successfully deleted!");
+        }
+        catch (ArgumentException) {
+            return BadRequest("Invalid budget data.");
+        }
+        catch (DatabaseException) {
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                new { message = "Een databasefout is opgetreden. Probeer het later opnieuw." });
+        }
+        catch (Exception) {
+            return BadRequest("An unexpected error occured.");
+        }
     }
 }

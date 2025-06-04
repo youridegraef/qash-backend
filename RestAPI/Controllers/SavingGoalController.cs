@@ -1,3 +1,4 @@
+using Application.Exceptions;
 using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using RestAPI.RequestModels;
@@ -9,9 +10,23 @@ namespace RestAPI.Controllers;
 [Route("api/[controller]")]
 public class SavingGoalController(ISavingGoalService savingGoalService) : ControllerBase
 {
-    [HttpPost("add/{userId:int}")]
-    public IActionResult Add([FromRoute] int userId, [FromBody] SavingGoalRequest req) {
-        throw new NotImplementedException();
+    [HttpPost("add")]
+    public IActionResult Add([FromBody] SavingGoalRequest req) {
+        try {
+            var goal = savingGoalService.Add(req.Name, req.Target, req.Deadline, req.UserId);
+            var res = new SavingGoalResponse(goal.Id, goal.Name, goal.AmountSaved, goal.Target, goal.Deadline);
+            return Ok(res);
+        }
+        catch (ArgumentException) {
+            return BadRequest("Invalid saving goal data.");
+        }
+        catch (DatabaseException) {
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                new { message = "Een databasefout is opgetreden. Probeer het later opnieuw." });
+        }
+        catch (Exception) {
+            return BadRequest("An unexpected error occured.");
+        }
     }
 
     [HttpGet("get/{userId:int}")]
@@ -25,5 +40,28 @@ public class SavingGoalController(ISavingGoalService savingGoalService) : Contro
     [HttpPut("edit/{userId:int}")]
     public IActionResult Edit([FromRoute] int userId, [FromBody] SavingGoalRequest req) {
         throw new NotImplementedException();
+    }
+
+    [HttpDelete("{id:int}")]
+    public IActionResult DeleteBudget([FromRoute] int id) {
+        try {
+            var isDeleted = savingGoalService.Delete(id);
+
+            if (!isDeleted) {
+                throw new Exception();
+            }
+
+            return Ok("Successfully deleted!");
+        }
+        catch (ArgumentException) {
+            return BadRequest("Invalid saving goal data.");
+        }
+        catch (DatabaseException) {
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                new { message = "Een databasefout is opgetreden. Probeer het later opnieuw." });
+        }
+        catch (Exception) {
+            return BadRequest("An unexpected error occured.");
+        }
     }
 }

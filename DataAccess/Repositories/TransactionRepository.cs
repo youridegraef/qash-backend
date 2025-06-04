@@ -8,7 +8,8 @@ using MySql.Data.MySqlClient;
 namespace DataAccess.Repositories;
 
 public class TransactionRepository(string connectionString, ILogger<TransactionRepository> logger)
-    : ITransactionRepository {
+    : ITransactionRepository
+{
     public List<Transaction> FindAll() {
         try {
             List<Transaction> transactions = new List<Transaction>();
@@ -317,18 +318,27 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            string sql = "DELETE FROM transactions WHERE id = @id";
-
-            using MySqlCommand command = new MySqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@id", transaction.Id);
-
-            int rowsAffected = command.ExecuteNonQuery();
-
-            if (rowsAffected > 0) {
-                return true;
+            // Eerst alle tags verwijderen uit de koppeltabel
+            string deleteTagsSql = "DELETE FROM transaction_tag WHERE transaction_id = @transaction_id";
+            using (MySqlCommand deleteTagsCommand = new MySqlCommand(deleteTagsSql, connection)) {
+                deleteTagsCommand.Parameters.AddWithValue("@transaction_id", transaction.Id);
+                deleteTagsCommand.ExecuteNonQuery();
             }
 
-            throw new TransactionNotFoundException($"Transaction with ID {transaction.Id} was not found for deletion.");
+            // Daarna de transactie zelf verwijderen
+            string deleteTransactionSql = "DELETE FROM transactions WHERE id = @id";
+            using (MySqlCommand deleteTransactionCommand = new MySqlCommand(deleteTransactionSql, connection)) {
+                deleteTransactionCommand.Parameters.AddWithValue("@id", transaction.Id);
+
+                int rowsAffected = deleteTransactionCommand.ExecuteNonQuery();
+
+                if (rowsAffected > 0) {
+                    return true;
+                }
+
+                throw new TransactionNotFoundException(
+                    $"Transaction with ID {transaction.Id} was not found for deletion.");
+            }
         }
         catch (TransactionNotFoundException ex) {
             logger.LogError(ex, $"Transaction with ID {transaction.Id} was not found for deletion.");
