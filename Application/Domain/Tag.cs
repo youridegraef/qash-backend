@@ -1,41 +1,26 @@
 namespace Application.Domain;
 
-public class Tag
-{
+public class Tag {
     public int Id { get; private set; }
     public string Name { get; private set; }
-    public string ColorHexCode { get; private set; }
     public int UserId { get; private set; }
 
-    public Tag(int id, string name, string colorHexCode, int userId)
-    {
+    public Tag(int id, string name, int userId) {
         Id = id;
         Name = name;
-        ColorHexCode = colorHexCode;
         UserId = userId;
     }
 
-    public Tag(string name, string colorHexCode, int userId)
-    {
+    public Tag(string name, int userId) {
         Name = name;
-        ColorHexCode = colorHexCode;
         UserId = userId;
     }
 
-    public Tag(string name)
-    {
+    public Tag(string name) {
         Name = name;
-
-        Random random = new Random();
-        int red = random.Next(256);
-        int green = random.Next(256);
-        int blue = random.Next(256);
-
-        ColorHexCode = $"#{red:X2}{green:X2}{blue:X2}";
     }
 
-    public Tag(int id, string name)
-    {
+    public Tag(int id, string name) {
         Id = id;
         Name = name;
     }

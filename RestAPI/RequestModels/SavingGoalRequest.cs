@@ -8,8 +8,7 @@ public class SavingGoalRequest(
     DateTime deadline,
     string colorHexCode,
     int userId,
-    User user)
-{
+    User user) {
     public string Name { get; set; } = name;
     public decimal Target { get; set; } = target;
     public DateTime Deadline { get; set; } = deadline;

@@ -10,8 +10,7 @@ public class TransactionDto(
     int userId,
     int categoryId,
     Category category,
-    List<Tag> tags)
-{
+    List<Tag> tags) {
     public int Id { get; set; } = id;
     public string Description { get; set; } = description;
     public double Amount { get; set; } = amount;

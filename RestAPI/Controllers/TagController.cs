@@ -8,45 +8,37 @@ namespace RestAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TagController(ITagService tagService) : ControllerBase
-{
+public class TagController(ITagService tagService) : ControllerBase {
     [HttpGet("get/{userId:int}")]
-    public IActionResult Get([FromRoute] int userId, [FromQuery] int? page, [FromQuery] int? pageSize)
-    {
-        if (page != null && pageSize != null)
-        {
+    public IActionResult Get([FromRoute] int userId, [FromQuery] int? page, [FromQuery] int? pageSize) {
+        if (page != null && pageSize != null) {
             var tags = tagService.GetByUserIdPaged(userId, page.Value, pageSize.Value);
-            var res = tags.Select(tag => new TagResponse(tag.Id, tag.Name, tag.ColorHexCode)).ToList();
+            var res = tags.Select(tag => new TagResponse(tag.Id, tag.Name)).ToList();
 
             return Ok(res);
         }
-        else
-        {
+        else {
             var tags = tagService.GetByUserId(userId);
-            var res = tags.Select(tag => new TagResponse(tag.Id, tag.Name, tag.ColorHexCode)).ToList();
+            var res = tags.Select(tag => new TagResponse(tag.Id, tag.Name)).ToList();
 
             return Ok(res);
         }
     }
 
     [HttpPost("add/{userId:int}")]
-    public IActionResult Add([FromRoute] int userId, [FromBody] SavingGoalRequest req)
-    {
-        try
-        {
-            var tag = tagService.Add(req.Name, req.ColorHexCode, userId);
-            var res = new TagResponse(tag.Id, tag.Name, tag.ColorHexCode);
+    public IActionResult Add([FromRoute] int userId, [FromBody] SavingGoalRequest req) {
+        try {
+            var tag = tagService.Add(req.Name, userId);
+            var res = new TagResponse(tag.Id, tag.Name);
             return Ok(res);
         }
-        catch (Exception)
-        {
+        catch (Exception) {
             return BadRequest("");
         }
     }
 
     [HttpPut("/edit/{userId:int}")]
-    public IActionResult Edit([FromRoute] int userId, [FromBody] TagRequest req)
-    {
+    public IActionResult Edit([FromRoute] int userId, [FromBody] TagRequest req) {
         throw new NotImplementedException();
     }
 }
