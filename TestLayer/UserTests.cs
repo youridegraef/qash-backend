@@ -1,4 +1,5 @@
 using System.Security.Authentication;
+using Application.Domain;
 using Application.Exceptions;
 using Application.Services;
 using Application.Interfaces;

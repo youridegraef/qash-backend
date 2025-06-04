@@ -1,7 +1,7 @@
 namespace RestAPI.RequestModels;
 
-public class CategoryRequest(int id, string name, string colorHexCode) {
-    public int Id { get; set; } = id;
+public class CategoryRequest(int userId, string name)
+{
     public string Name { get; set; } = name;
-    public string ColorHexCode { get; set; } = colorHexCode;
+    public int UserId { get; set; } = userId;
 }

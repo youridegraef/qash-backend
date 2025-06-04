@@ -4,10 +4,12 @@ using Application.Dtos;
 // ReSharper disable once CheckNamespace
 namespace Application.Interfaces;
 
-public interface ITransactionService {
+public interface ITransactionService
+{
     public TransactionDto GetById(int id);
     public List<TransactionDto> GetByUserId(int userId);
     public List<TransactionDto> GetByUserIdPaged(int userId, int page, int pageSize);
+    public List<TransactionDto> GetByCategoryId(int categoryId);
 
     public TransactionDto Add(string description, double amount, DateOnly date, int userId, int categoryId,
         List<Tag> tags);

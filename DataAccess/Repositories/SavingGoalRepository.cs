@@ -7,7 +7,8 @@ using MySql.Data.MySqlClient;
 namespace DataAccess.Repositories;
 
 public class SavingGoalRepository(string connectionString, ILogger<SavingGoalRepository> logger)
-    : ISavingGoalRepository {
+    : ISavingGoalRepository
+{
     public SavingGoal FindById(int id) {
         try {
             using MySqlConnection connection = new MySqlConnection(connectionString);
@@ -49,7 +50,7 @@ public class SavingGoalRepository(string connectionString, ILogger<SavingGoalRep
             connection.Open();
 
             string sql =
-                "SELECT id, name, target, deadline, user_id FROM tag WHERE user_id = @user_id";
+                "SELECT id, name, target, deadline, user_id FROM saving_goal WHERE user_id = @user_id";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@user_id", userId);
@@ -91,7 +92,7 @@ public class SavingGoalRepository(string connectionString, ILogger<SavingGoalRep
 
             int offset = (page - 1) * pageSize;
             string sql =
-                "SELECT id, name, target, deadline, user_id FROM tag WHERE user_id = @user_id LIMIT @limit OFFSET @offset";
+                "SELECT id, name, target, deadline, user_id FROM saving_goal WHERE user_id = @user_id LIMIT @limit OFFSET @offset";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@user_id", userId);

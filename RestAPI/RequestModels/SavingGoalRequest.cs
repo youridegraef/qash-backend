@@ -1,18 +1,13 @@
 namespace RestAPI.RequestModels;
 
 public class SavingGoalRequest(
-    int id,
     string name,
-    decimal amountSaved,
-    decimal target,
-    DateTime deadline,
-    string colorHexCode,
-    int userId,
-    User user) {
+    double target,
+    DateOnly deadline,
+    int userId)
+{
     public string Name { get; set; } = name;
-    public decimal Target { get; set; } = target;
-    public DateTime Deadline { get; set; } = deadline;
-    public string ColorHexCode { get; set; } = colorHexCode;
-
+    public double Target { get; set; } = target;
+    public DateOnly Deadline { get; set; } = deadline;
     public int UserId { get; set; } = userId;
 }

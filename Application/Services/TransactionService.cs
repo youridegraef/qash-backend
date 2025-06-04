@@ -11,7 +11,8 @@ public class TransactionService(
     ITagService tagService,
     ICategoryService categoryService,
     ILogger<TransactionService> logger)
-    : ITransactionService {
+    : ITransactionService
+{
     public TransactionDto GetById(int id) {
         try {
             var transaction = transactionRepository.FindById(id);

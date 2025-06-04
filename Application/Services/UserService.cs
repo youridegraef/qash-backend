@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Net.Mail;
 using System.Security.Authentication;
+using Application.Domain;
 using Application.Dtos;
 using Application.Exceptions;
 using Application.Interfaces;

@@ -8,29 +8,30 @@ namespace RestAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TagController(ITagService tagService) : ControllerBase
+public class CategoryController(ICategoryService categoryService, ITransactionService transactionService)
+    : ControllerBase
 {
     [HttpGet("get/{userId:int}")]
-    public IActionResult Get([FromRoute] int userId, [FromQuery] int? page, [FromQuery] int? pageSize) {
-        if (page != null && pageSize != null) {
-            var tags = tagService.GetByUserIdPaged(userId, page.Value, pageSize.Value);
-            var res = tags.Select(tag => new TagResponse(tag.Id, tag.Name)).ToList();
+    public IActionResult GetByUserId([FromRoute] int userId) {
+        var budgets = categoryService.GetByUserId(userId);
+        var res = budgets.Select(category =>
+            new CategoryResponse(category.Id, category.Name));
+        return Ok(res);
+    }
 
-            return Ok(res);
-        }
-        else {
-            var tags = tagService.GetByUserId(userId);
-            var res = tags.Select(tag => new TagResponse(tag.Id, tag.Name)).ToList();
-
-            return Ok(res);
-        }
+    [HttpGet("get-transactions/{categoryId:int}")]
+    public IActionResult GetTransactionsByCategory(int categoryId) {
+        var transactions = transactionService.GetByCategoryId(categoryId);
+        var res = transactions.Select(t =>
+            new TransactionResponse(t.Id, t.Description, t.Amount, t.Date, t.Category, t.Tags));
+        return Ok(res);
     }
 
     [HttpPost("add")]
-    public IActionResult Add([FromBody] TagRequest req) {
+    public IActionResult AddCategory([FromBody] CategoryRequest req) {
         try {
-            var tag = tagService.Add(req.Name, req.UserId);
-            var res = new TagResponse(tag.Id, tag.Name);
+            var category = categoryService.Add(req.Name, req.UserId);
+            var res = new CategoryResponse(category.Id, category.Name);
             return Ok(res);
         }
         catch (Exception) {
@@ -38,15 +39,10 @@ public class TagController(ITagService tagService) : ControllerBase
         }
     }
 
-    [HttpPut("/edit")]
-    public IActionResult Edit([FromBody] TagRequest req) {
-        throw new NotImplementedException();
-    }
-
     [HttpDelete("{id:int}")]
     public IActionResult DeleteBudget([FromRoute] int id) {
         try {
-            var isDeleted = tagService.Delete(id);
+            var isDeleted = categoryService.Delete(id);
 
             if (!isDeleted) {
                 throw new Exception();

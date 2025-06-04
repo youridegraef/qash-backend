@@ -7,7 +7,8 @@ namespace RestAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UserController(IUserService userService, IConfiguration configuration) : ControllerBase {
+public class UserController(IUserService userService, IConfiguration configuration) : ControllerBase
+{
     [HttpPost("Login")]
     public IActionResult Login([FromBody] LoginRequest req) {
         if (req == null!) {
@@ -46,7 +47,7 @@ public class UserController(IUserService userService, IConfiguration configurati
         throw new NotImplementedException();
     }
 
-    [HttpPut("changepassword/{userId:int}")]
+    [HttpPut("change-password/{userId:int}")]
     public IActionResult ChangePassword([FromRoute] int userId, [FromBody] string newPassword) {
         throw new NotImplementedException();
     }

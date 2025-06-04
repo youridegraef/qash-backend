@@ -3,16 +3,14 @@ namespace RestAPI.ResponseModels;
 public class SavingGoalResponse(
     int id,
     string name,
-    decimal amountSaved,
-    decimal target,
-    DateTime deadline,
-    string colorHexCode
+    double saved,
+    double target,
+    DateOnly deadline
 )
 {
     public int Id { get; set; } = id;
     public string Name { get; set; } = name;
-    public decimal AmountSaved { get; set; } = amountSaved;
-    public decimal Target { get; set; } = target;
-    public DateTime Deadline { get; set; } = deadline;
-    public string ColorHexCode { get; set; } = colorHexCode;
+    public double Saved { get; set; } = saved;
+    public double Target { get; set; } = target;
+    public DateOnly Deadline { get; set; } = deadline;
 }
