@@ -7,7 +7,7 @@ namespace RestAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class BudgetController(IBudgetService budgetService, ICategoryService categoryService) : ControllerBase
+public class BudgetController(IBudgetService budgetService) : ControllerBase
 {
     [HttpGet("get/{userId:int}")]
     public IActionResult GetByUserId([FromRoute] int userId) {

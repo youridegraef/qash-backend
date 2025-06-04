@@ -99,7 +99,6 @@
 /Users/macbook/Tech/SchoolProjects/ExpenseTracker/RestAPI/obj/Debug/net8.0/RestAPI.MvcApplicationPartsAssemblyInfo.cs
 /Users/macbook/Tech/SchoolProjects/ExpenseTracker/RestAPI/obj/Debug/net8.0/RestAPI.MvcApplicationPartsAssemblyInfo.cache
 /Users/macbook/Tech/SchoolProjects/ExpenseTracker/RestAPI/obj/Debug/net8.0/RestAPI.sourcelink.json
-/Users/macbook/Tech/SchoolProjects/ExpenseTracker/RestAPI/bin/Debug/net8.0/appsettings.Development.json
 /Users/macbook/Tech/SchoolProjects/ExpenseTracker/RestAPI/bin/Debug/net8.0/appsettings.json
 /Users/macbook/Tech/SchoolProjects/ExpenseTracker/RestAPI/bin/Debug/net8.0/RestAPI
 /Users/macbook/Tech/SchoolProjects/ExpenseTracker/RestAPI/bin/Debug/net8.0/RestAPI.deps.json

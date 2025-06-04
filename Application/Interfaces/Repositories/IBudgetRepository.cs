@@ -3,9 +3,11 @@ using Application.Domain;
 // ReSharper disable once CheckNamespace
 namespace Application.Interfaces;
 
-public interface IBudgetRepository {
+public interface IBudgetRepository
+{
     public Budget FindById(int id);
     public Budget FindByCategoryId(int categoryId);
+    public List<Budget> FindByUserId(int userId);
 
     public Budget Add(Budget budget);
 

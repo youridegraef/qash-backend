@@ -6,7 +6,8 @@ using MySql.Data.MySqlClient;
 
 namespace DataAccess.Repositories;
 
-public class BudgetRepository(string connectionString, ILogger<BudgetRepository> logger) : IBudgetRepository {
+public class BudgetRepository(string connectionString, ILogger<BudgetRepository> logger) : IBudgetRepository
+{
     public Budget FindById(int id) {
         try {
             using MySqlConnection connection = new MySqlConnection(connectionString);
@@ -77,6 +78,52 @@ public class BudgetRepository(string connectionString, ILogger<BudgetRepository>
         catch (Exception ex) {
             logger.LogError(ex, "Error retrieving budget with category ID {CategoryId}", categoryId);
             throw new Exception($"Error retrieving budget with category ID {categoryId}", ex);
+        }
+    }
+
+    public List<Budget> FindByUserId(int userId) {
+        try {
+            var budgets = new List<Budget>();
+            using MySqlConnection connection = new MySqlConnection(connectionString);
+            connection.Open();
+
+            string sql = @"
+            SELECT b.id, b.start_date, b.end_date, b.budget, b.category_id
+            FROM budget b
+            JOIN category c ON b.category_id = c.id
+            WHERE c.user_id = @user_id";
+
+            using MySqlCommand command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@user_id", userId);
+
+            using MySqlDataReader reader = command.ExecuteReader();
+            while (reader.Read()) {
+                budgets.Add(new Budget(
+                    reader.GetInt32(reader.GetOrdinal("id")),
+                    DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("start_date"))),
+                    DateOnly.FromDateTime(reader.GetDateTime(reader.GetOrdinal("end_date"))),
+                    reader.GetDouble(reader.GetOrdinal("budget")),
+                    reader.GetInt32(reader.GetOrdinal("category_id"))
+                ));
+            }
+
+            if (budgets.Count == 0) {
+                throw new BudgetNotFoundException($"No budgets found for user ID {userId}.");
+            }
+
+            return budgets;
+        }
+        catch (BudgetNotFoundException ex) {
+            logger.LogError(ex, "No budgets found for user ID {UserId}.", userId);
+            throw;
+        }
+        catch (MySqlException ex) {
+            logger.LogError(ex, "Database error retrieving budgets for user ID {UserId}", userId);
+            throw new DatabaseException($"Database error retrieving budgets for user ID {userId}", ex);
+        }
+        catch (Exception ex) {
+            logger.LogError(ex, "Error retrieving budgets for user ID {UserId}", userId);
+            throw new Exception($"Error retrieving budgets for user ID {userId}", ex);
         }
     }
 
