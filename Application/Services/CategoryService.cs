@@ -8,7 +8,8 @@ namespace Application.Services;
 public class CategoryService(
     ICategoryRepository categoryRepository,
     ILogger<CategoryService> logger)
-    : ICategoryService {
+    : ICategoryService
+{
     public Category GetById(int id) {
         try {
             Category category = categoryRepository.FindById(id);
@@ -110,6 +111,7 @@ public class CategoryService(
     public bool Delete(int id) {
         try {
             var category = categoryRepository.FindById(id);
+
             return categoryRepository.Delete(category);
         }
         catch (CategoryNotFoundException ex) {

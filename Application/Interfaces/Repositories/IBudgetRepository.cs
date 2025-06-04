@@ -14,4 +14,5 @@ public interface IBudgetRepository
     public bool Edit(Budget budget);
 
     public bool Delete(Budget budget);
+    public double CalculateBudgetSpending(int budgetId);
 }

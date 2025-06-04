@@ -9,7 +9,10 @@ namespace RestAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TransactionController(ITransactionService transactionService, ITagService tagService) : ControllerBase
+public class TransactionController(
+    ITransactionService transactionService,
+    ITagService tagService,
+    ICategoryService categoryService) : ControllerBase
 {
     [HttpGet("balance/{userId}")]
     public IActionResult GetBalance([FromRoute] int userId) {
@@ -76,9 +79,37 @@ public class TransactionController(ITransactionService transactionService, ITagS
         }
     }
 
-    [HttpPut("/edit/{userId:int}")]
-    public IActionResult Edit([FromRoute] int userId, [FromBody] TransactionRequest req) {
-        throw new NotImplementedException();
+    [HttpPut("edit/{id:int}")]
+    public IActionResult Edit([FromRoute] int id, [FromBody] TransactionRequest req) {
+        try {
+            var category = categoryService.GetById(req.CategoryId);
+            var tags = new List<Tag>();
+            foreach (var tagId in req.TagIds) {
+                tags.Add(tagService.GetById(tagId));
+            }
+
+            var isEdited =
+                transactionService.Edit(id, req.Amount, req.Description, req.Date, req.UserId, req.CategoryId, tags);
+
+            if (!isEdited) {
+                throw new Exception();
+            }
+
+            var res = new TransactionResponse(id, req.Description, req.Amount, req.Date, category,
+                tags);
+
+            return Ok(res);
+        }
+        catch (ArgumentException) {
+            return BadRequest("Invalid transaction data.");
+        }
+        catch (DatabaseException) {
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                new { message = "Een databasefout is opgetreden. Probeer het later opnieuw." });
+        }
+        catch (Exception) {
+            return BadRequest("An unexpected error occured.");
+        }
     }
 
     [HttpDelete("{id:int}")]

@@ -87,11 +87,12 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
 
             int offset = (page - 1) * pageSize;
             string sql =
-                "SELECT id, description, amount, date, user_id, category_id FROM transactions ORDER BY date DESC LIMIT @limit OFFSET @offset";
+                "SELECT id, description, amount, date, user_id, category_id FROM transactions WHERE user_id = @user_id ORDER BY date DESC LIMIT @limit OFFSET @offset";
 
             using MySqlCommand command = new MySqlCommand(sql, connection);
             command.Parameters.AddWithValue("@limit", pageSize);
             command.Parameters.AddWithValue("@offset", offset);
+            command.Parameters.AddWithValue("@user_id", userId);
 
             using MySqlDataReader reader = command.ExecuteReader();
             while (reader.Read()) {
@@ -318,27 +319,18 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            // Eerst alle tags verwijderen uit de koppeltabel
-            string deleteTagsSql = "DELETE FROM transaction_tag WHERE transaction_id = @transaction_id";
-            using (MySqlCommand deleteTagsCommand = new MySqlCommand(deleteTagsSql, connection)) {
-                deleteTagsCommand.Parameters.AddWithValue("@transaction_id", transaction.Id);
-                deleteTagsCommand.ExecuteNonQuery();
-            }
-
-            // Daarna de transactie zelf verwijderen
             string deleteTransactionSql = "DELETE FROM transactions WHERE id = @id";
-            using (MySqlCommand deleteTransactionCommand = new MySqlCommand(deleteTransactionSql, connection)) {
-                deleteTransactionCommand.Parameters.AddWithValue("@id", transaction.Id);
+            using MySqlCommand deleteTransactionCommand = new MySqlCommand(deleteTransactionSql, connection);
+            deleteTransactionCommand.Parameters.AddWithValue("@id", transaction.Id);
 
-                int rowsAffected = deleteTransactionCommand.ExecuteNonQuery();
+            int rowsAffected = deleteTransactionCommand.ExecuteNonQuery();
 
-                if (rowsAffected > 0) {
-                    return true;
-                }
-
-                throw new TransactionNotFoundException(
-                    $"Transaction with ID {transaction.Id} was not found for deletion.");
+            if (rowsAffected > 0) {
+                return true;
             }
+
+            throw new TransactionNotFoundException(
+                $"Transaction with ID {transaction.Id} was not found for deletion.");
         }
         catch (TransactionNotFoundException ex) {
             logger.LogError(ex, $"Transaction with ID {transaction.Id} was not found for deletion.");
@@ -351,20 +343,26 @@ public class TransactionRepository(string connectionString, ILogger<TransactionR
     }
 
     public void AddTagsToTransaction(int transactionId, List<Tag> tags) {
-        if (tags == null! || tags.Count == 0) {
-            return;
-        }
-
         try {
             using MySqlConnection connection = new MySqlConnection(connectionString);
             connection.Open();
 
-            foreach (var tag in tags) {
-                string sql = "INSERT INTO transaction_tag (transaction_id, tag_id) VALUES (@transaction_id, @tag_id)";
-                using MySqlCommand command = new MySqlCommand(sql, connection);
-                command.Parameters.AddWithValue("@transaction_id", transactionId);
-                command.Parameters.AddWithValue("@tag_id", tag.Id);
-                command.ExecuteNonQuery();
+            string deleteSql = "DELETE FROM transaction_tag WHERE transaction_id = @transaction_id";
+            using (MySqlCommand deleteCommand = new MySqlCommand(deleteSql, connection)) {
+                deleteCommand.Parameters.AddWithValue("@transaction_id", transactionId);
+                deleteCommand.ExecuteNonQuery();
+            }
+
+            if (tags != null && tags.Count > 0) {
+                foreach (var tag in tags) {
+                    string insertSql =
+                        "INSERT INTO transaction_tag (transaction_id, tag_id) VALUES (@transaction_id, @tag_id)";
+                    using (MySqlCommand insertCommand = new MySqlCommand(insertSql, connection)) {
+                        insertCommand.Parameters.AddWithValue("@transaction_id", transactionId);
+                        insertCommand.Parameters.AddWithValue("@tag_id", tag.Id);
+                        insertCommand.ExecuteNonQuery();
+                    }
+                }
             }
         }
         catch (MySqlException ex) {

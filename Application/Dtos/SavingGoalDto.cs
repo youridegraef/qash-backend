@@ -5,10 +5,11 @@ public class SavingGoalDto(
     string name,
     double amountSaved,
     double target,
-    DateOnly deadline) {
+    DateOnly deadline)
+{
     public int Id { get; set; } = id;
     public string Name { get; set; } = name;
-    public double AmountSaved { get; set; } = amountSaved;
+    public double AmountSaved { get; set; } = amountSaved * -1;
     public double Target { get; set; } = target;
     public DateOnly Deadline { get; set; } = deadline;
 }

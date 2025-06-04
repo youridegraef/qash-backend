@@ -13,6 +13,10 @@ public class SavingGoalController(ISavingGoalService savingGoalService) : Contro
     [HttpPost("add")]
     public IActionResult Add([FromBody] SavingGoalRequest req) {
         try {
+            if (req.Target < 0) {
+                return BadRequest("Target can't be less than 0.");
+            }
+
             var goal = savingGoalService.Add(req.Name, req.Target, req.Deadline, req.UserId);
             var res = new SavingGoalResponse(goal.Id, goal.Name, goal.AmountSaved, goal.Target, goal.Deadline);
             return Ok(res);

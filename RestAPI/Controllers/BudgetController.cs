@@ -23,6 +23,10 @@ public class BudgetController(IBudgetService budgetService) : ControllerBase
     [HttpPost("add")]
     public IActionResult AddBudget([FromBody] BudgetRequest req) {
         try {
+            if (req.Target < 0) {
+                return BadRequest("Target can't be less than 0.");
+            }
+
             var budget = budgetService.Add(req.StartDate, req.EndDate, req.Target, req.CategoryId);
 
             var res = new BudgetResponse(budget.Id, budget.Name, budget.StartDate, budget.EndDate, budget.Spent,

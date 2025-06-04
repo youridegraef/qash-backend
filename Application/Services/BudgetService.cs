@@ -9,7 +9,6 @@ namespace Application.Services;
 public class BudgetService(
     IBudgetRepository budgetRepository,
     ICategoryService categoryService,
-    ITransactionService transactionService,
     ILogger<BudgetService> logger)
     : IBudgetService
 {
@@ -20,12 +19,7 @@ public class BudgetService(
                 throw new BudgetNotFoundException($"No budget with id: {id} found.");
 
             var category = categoryService.GetById(budget.CategoryId);
-            var spent = transactionService
-                .GetByUserId(category.UserId)
-                .Where(t => t.CategoryId == category.Id
-                            && t.Date >= budget.StartDate
-                            && t.Date <= budget.EndDate)
-                .Sum(t => t.Amount);
+            var spent = budgetRepository.CalculateBudgetSpending(id);
 
             return new BudgetDto(
                 budget.Id,
@@ -63,11 +57,8 @@ public class BudgetService(
 
             foreach (var budget in budgets) {
                 try {
-                    var transactions = transactionService.GetByCategoryId(budget.CategoryId);
                     var category = categoryService.GetById(budget.CategoryId);
-                    var spent = transactions
-                        .Where(t => t.Date >= budget.StartDate && t.Date <= budget.EndDate)
-                        .Sum(t => t.Amount);
+                    var spent = budgetRepository.CalculateBudgetSpending(budget.Id);
 
                     budgetDtos.Add(new BudgetDto(
                         budget.Id,
@@ -103,12 +94,7 @@ public class BudgetService(
                 throw new BudgetNotFoundException($"No budget with category id: {categoryId} found.");
 
             var category = categoryService.GetById(categoryId);
-            var spent = transactionService
-                .GetByUserId(category.UserId)
-                .Where(t => t.CategoryId == category.Id
-                            && t.Date >= budget.StartDate
-                            && t.Date <= budget.EndDate)
-                .Sum(t => t.Amount);
+            var spent = budgetRepository.CalculateBudgetSpending(budget.Id);
 
             return new BudgetDto(
                 budget.Id,
@@ -147,7 +133,7 @@ public class BudgetService(
                 addedBudget.EndDate,
                 0,
                 addedBudget.Target,
-                category.Id
+                categoryId
             );
         }
         catch (ArgumentException ex) {
