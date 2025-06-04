@@ -1,12 +1,14 @@
 using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using RestAPI.RequestModels;
+using RestAPI.ResponseModels;
 
 namespace RestAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class SavingGoalController(ISavingGoalService savingGoalService) : ControllerBase {
+public class SavingGoalController(ISavingGoalService savingGoalService) : ControllerBase
+{
     [HttpPost("/add/{userId:int}")]
     public IActionResult Add([FromRoute] int userId, [FromBody] SavingGoalRequest req) {
         throw new NotImplementedException();
@@ -14,7 +16,10 @@ public class SavingGoalController(ISavingGoalService savingGoalService) : Contro
 
     [HttpPost("/get/{userId:int}")]
     public IActionResult Get([FromRoute] int userId) {
-        throw new NotImplementedException();
+        var savingGoals = savingGoalService.GetByUserId(userId);
+        var res = savingGoals.Select(g =>
+            new SavingGoalResponse(g.Id, g.Name, g.AmountSaved, g.Target, g.Deadline));
+        return Ok(res);
     }
 
     [HttpPut("/edit/{userId:int}")]
