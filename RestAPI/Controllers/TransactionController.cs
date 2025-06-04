@@ -1,3 +1,4 @@
+using Application.Domain;
 using Application.Exceptions;
 using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +9,8 @@ namespace RestAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TransactionController(ITransactionService transactionService) : ControllerBase {
+public class TransactionController(ITransactionService transactionService, ITagService tagService) : ControllerBase
+{
     [HttpGet("balance/{userId}")]
     public IActionResult GetBalance([FromRoute] int userId) {
         return Ok(transactionService.GetBalance(userId));
@@ -24,11 +26,16 @@ public class TransactionController(ITransactionService transactionService) : Con
         return Ok(transactionService.GetExpenses(userId));
     }
 
-    [HttpPost("/add/{userId}")]
-    public IActionResult AddTransaction([FromBody] TransactionRequest req, [FromRoute] int userId) {
+    [HttpPost("add")]
+    public IActionResult AddTransaction([FromBody] TransactionRequest req) {
         try {
+            var tags = new List<Tag>();
+            foreach (var tagId in req.TagIds) {
+                tags.Add(tagService.GetById(tagId));
+            }
+
             var transaction =
-                transactionService.Add(req.Description, req.Amount, req.Date, userId, req.Category.Id, req.Tags);
+                transactionService.Add(req.Description, req.Amount, req.Date, req.UserId, req.CategoryId, tags);
 
             var res = new TransactionResponse(transaction.Id, transaction.Description, transaction.Amount,
                 transaction.Date, transaction.Category, transaction.Tags);

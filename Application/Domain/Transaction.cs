@@ -1,6 +1,7 @@
 namespace Application.Domain;
 
-public class Transaction {
+public class Transaction
+{
     public int Id { get; private set; }
     public string Description { get; private set; }
     public double Amount { get; private set; }
@@ -13,6 +14,7 @@ public class Transaction {
         Amount = amount;
         Date = date;
         UserId = userId;
+        CategoryId = categoryId;
     }
 
     public Transaction(int id, string description, double amount, DateOnly date, int userId, int categoryId) {
