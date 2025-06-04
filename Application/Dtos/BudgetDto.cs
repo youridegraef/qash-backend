@@ -13,7 +13,7 @@ public class BudgetDto(
     public string Name { get; set; } = name;
     public DateOnly StartDate { get; set; } = startDate;
     public DateOnly EndDate { get; set; } = endDate;
-    public double Spent { get; set; } = spent * -1;
+    public double Spent { get; set; } = spent;
     public double Target { get; set; } = target;
     public int CategoryId { get; set; } = categoryId;
 }

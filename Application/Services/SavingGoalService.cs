@@ -93,6 +93,10 @@ public class SavingGoalService(
 
             return dtos;
         }
+        catch (SavingGoalNotFoundException) {
+            logger.LogError("Saving goal with user id: {UserId} not found.", userId);
+            throw;
+        }
         catch (KeyNotFoundException ex) {
             logger.LogError(ex, "No saving goals found for user_id: {UserId}", userId);
             throw new Exception($"No saving goals found for user_id: {userId}", ex);
