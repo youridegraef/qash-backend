@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "DGvZCB7YoSI=",
+  "dgSpecHash": "WGEw35QZnPE=",
   "success": true,
-  "projectFilePath": "/Users/macbook/Tech/SchoolProjects/ExpenseTracker/TestLayer/TestLayer.csproj",
+  "projectFilePath": "/Users/macbook/Tech/SchoolProjects/Qash/ExpenseTracker/TestLayer/TestLayer.csproj",
   "expectedPackageFiles": [
     "/Users/macbook/.nuget/packages/bcrypt.net-next/4.0.3/bcrypt.net-next.4.0.3.nupkg.sha512",
     "/Users/macbook/.nuget/packages/castle.core/5.1.1/castle.core.5.1.1.nupkg.sha512",
@@ -32,7 +32,9 @@
     "/Users/macbook/.nuget/packages/system.diagnostics.eventlog/6.0.0/system.diagnostics.eventlog.6.0.0.nupkg.sha512",
     "/Users/macbook/.nuget/packages/system.identitymodel.tokens.jwt/8.9.0/system.identitymodel.tokens.jwt.8.9.0.nupkg.sha512",
     "/Users/macbook/.nuget/packages/system.memory/4.5.3/system.memory.4.5.3.nupkg.sha512",
-    "/Users/macbook/.nuget/packages/system.reflection.metadata/1.6.0/system.reflection.metadata.1.6.0.nupkg.sha512"
+    "/Users/macbook/.nuget/packages/system.reflection.metadata/1.6.0/system.reflection.metadata.1.6.0.nupkg.sha512",
+    "/Users/macbook/.nuget/packages/microsoft.netcore.app.ref/8.0.11/microsoft.netcore.app.ref.8.0.11.nupkg.sha512",
+    "/Users/macbook/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.11/microsoft.aspnetcore.app.ref.8.0.11.nupkg.sha512"
   ],
   "logs": []
 }

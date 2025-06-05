@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "zt9Bh7l2dnU=",
+  "dgSpecHash": "umls3p5v3u4=",
   "success": true,
-  "projectFilePath": "/Users/macbook/Tech/SchoolProjects/ExpenseTracker/DataAccess/DataAccess.csproj",
+  "projectFilePath": "/Users/macbook/Tech/SchoolProjects/Qash/ExpenseTracker/DataAccess/DataAccess.csproj",
   "expectedPackageFiles": [
     "/Users/macbook/.nuget/packages/bcrypt.net-next/4.0.3/bcrypt.net-next.4.0.3.nupkg.sha512",
     "/Users/macbook/.nuget/packages/bouncycastle.cryptography/2.3.1/bouncycastle.cryptography.2.3.1.nupkg.sha512",
@@ -48,7 +48,9 @@
     "/Users/macbook/.nuget/packages/system.threading.tasks/4.3.0/system.threading.tasks.4.3.0.nupkg.sha512",
     "/Users/macbook/.nuget/packages/system.threading.tasks.extensions/4.5.4/system.threading.tasks.extensions.4.5.4.nupkg.sha512",
     "/Users/macbook/.nuget/packages/system.windows.extensions/8.0.0/system.windows.extensions.8.0.0.nupkg.sha512",
-    "/Users/macbook/.nuget/packages/zstdsharp.port/0.8.0/zstdsharp.port.0.8.0.nupkg.sha512"
+    "/Users/macbook/.nuget/packages/zstdsharp.port/0.8.0/zstdsharp.port.0.8.0.nupkg.sha512",
+    "/Users/macbook/.nuget/packages/microsoft.netcore.app.ref/8.0.11/microsoft.netcore.app.ref.8.0.11.nupkg.sha512",
+    "/Users/macbook/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.11/microsoft.aspnetcore.app.ref.8.0.11.nupkg.sha512"
   ],
   "logs": []
 }

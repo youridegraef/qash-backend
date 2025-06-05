@@ -762,11 +762,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/macbook/Tech/SchoolProjects/ExpenseTracker/Application/Application.csproj",
+      "projectUniqueName": "/Users/macbook/Tech/SchoolProjects/Qash/ExpenseTracker/Application/Application.csproj",
       "projectName": "Application",
-      "projectPath": "/Users/macbook/Tech/SchoolProjects/ExpenseTracker/Application/Application.csproj",
+      "projectPath": "/Users/macbook/Tech/SchoolProjects/Qash/ExpenseTracker/Application/Application.csproj",
       "packagesPath": "/Users/macbook/.nuget/packages/",
-      "outputPath": "/Users/macbook/Tech/SchoolProjects/ExpenseTracker/Application/obj/",
+      "outputPath": "/Users/macbook/Tech/SchoolProjects/Qash/ExpenseTracker/Application/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/macbook/.nuget/NuGet/NuGet.Config"
@@ -792,8 +792,9 @@
       "restoreAuditProperties": {
         "enableAudit": "true",
         "auditLevel": "low",
-        "auditMode": "direct"
-      }
+        "auditMode": "all"
+      },
+      "SdkAnalysisLevel": "9.0.100"
     },
     "frameworks": {
       "net8.0": {
@@ -827,12 +828,22 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[8.0.11, 8.0.11]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[8.0.11, 8.0.11]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.407/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.100/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
